@@ -1,0 +1,8 @@
+# Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: echo
+usage: echo
+description: writes Hello to the console
+command: echo Hello

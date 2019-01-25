@@ -1,0 +1,8 @@
+# Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: home
+usage: home
+description: output the current fabric home directory
+command: ${FABRIC_HOME}/plugins/home/bin/home
