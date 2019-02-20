@@ -53,8 +53,8 @@ func TestGetPlugins(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			handler := &DefaultHandler{
-				Dir:              test.path,
-				MetadataFileName: "plugin.yaml",
+				Dir:      test.path,
+				Filename: DefaultFilename,
 			}
 
 			plugins, err := handler.GetPlugins()
@@ -101,7 +101,7 @@ func TestInstallErrors(t *testing.T) {
 			input: filepath.Join(testDir, "foo", "bar"),
 			setup: func() {
 				os.MkdirAll(filepath.Join(testDir, "foo", "bar"), 0777)
-				ioutil.WriteFile(filepath.Join(testDir, "foo", "bar", "plugin.yaml"),
+				ioutil.WriteFile(filepath.Join(testDir, "foo", "bar", DefaultFilename),
 					[]byte("command: !!float 'error'"), 0777,
 				)
 			},
@@ -122,8 +122,8 @@ func TestInstallErrors(t *testing.T) {
 			}
 
 			handler := &DefaultHandler{
-				Dir:              testDir,
-				MetadataFileName: "plugin.yaml",
+				Dir:      testDir,
+				Filename: DefaultFilename,
 			}
 
 			err := handler.InstallPlugin(test.input)
@@ -155,8 +155,8 @@ func TestUninstallErrors(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			handler := &DefaultHandler{
-				Dir:              test.path,
-				MetadataFileName: "plugin.yaml",
+				Dir:      test.path,
+				Filename: DefaultFilename,
 			}
 
 			err := handler.UninstallPlugin(test.plugin)
@@ -170,8 +170,8 @@ func TestSameFile(t *testing.T) {
 	defer cleanup()
 
 	handler := &DefaultHandler{
-		Dir:              testDir,
-		MetadataFileName: "plugin.yaml",
+		Dir:      testDir,
+		Filename: DefaultFilename,
 	}
 
 	err1 := handler.InstallPlugin("./testdata/plugins/echo")
@@ -185,8 +185,8 @@ func TestInstallFileExists(t *testing.T) {
 	defer cleanup()
 
 	handler := &DefaultHandler{
-		Dir:              testDir,
-		MetadataFileName: "plugin.yaml",
+		Dir:      testDir,
+		Filename: DefaultFilename,
 	}
 
 	err1 := handler.InstallPlugin("./testdata/plugins/echo")

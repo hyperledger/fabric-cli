@@ -21,8 +21,8 @@ func NewPluginListCommand(settings *environment.Settings) *cobra.Command {
 	pcmd := pluginListCommand{
 		out: settings.Streams.Out,
 		handler: &plugin.DefaultHandler{
-			Dir:              settings.Home.Plugins(),
-			MetadataFileName: plugin.DefaultMetadataFileName,
+			Dir:      settings.Home.Plugins(),
+			Filename: plugin.DefaultFilename,
 		},
 	}
 

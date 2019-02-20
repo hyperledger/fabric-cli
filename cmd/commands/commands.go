@@ -8,6 +8,7 @@ package commands
 
 import (
 	"github.com/hyperledger/fabric-cli/cmd/commands/plugin"
+	"github.com/hyperledger/fabric-cli/cmd/commands/profile"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/spf13/cobra"
 )
@@ -18,5 +19,8 @@ func All(settings *environment.Settings) []*cobra.Command {
 	return []*cobra.Command{
 		// fabric plugin < list | install | uninstall >
 		plugin.NewPluginCommand(settings),
+
+		// fabric profile < list | create | delete | show | use >
+		profile.NewProfileCommand(settings),
 	}
 }

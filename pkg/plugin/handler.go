@@ -25,8 +25,8 @@ type Handler interface {
 
 // DefaultHandler is the default plugin handler
 type DefaultHandler struct {
-	Dir              string
-	MetadataFileName string
+	Dir      string
+	Filename string
 }
 
 // GetPlugins returns all installed plugins found in the plugins directory
@@ -55,7 +55,7 @@ func (h *DefaultHandler) GetPlugins() ([]*Plugin, error) {
 // InstallPlugin creates a symlink from the specified directory to the plugins
 // directory
 func (h *DefaultHandler) InstallPlugin(path string) error {
-	if _, err := os.Stat(h.Dir); err != nil {
+	if _, err := os.Stat(h.Dir); os.IsNotExist(err) {
 		if err := os.MkdirAll(h.Dir, 0755); err != nil {
 			return err
 		}
@@ -94,8 +94,8 @@ func (h *DefaultHandler) validatePlugin(dir string) error {
 		return errors.New("plugin does not exist")
 	}
 
-	if _, err := os.Stat(filepath.Join(dir, h.MetadataFileName)); err != nil {
-		return fmt.Errorf("%s does not exist", h.MetadataFileName)
+	if _, err := os.Stat(filepath.Join(dir, h.Filename)); err != nil {
+		return fmt.Errorf("%s does not exist", h.Filename)
 	}
 
 	return nil
@@ -107,7 +107,7 @@ func (h *DefaultHandler) loadPlugin(dir string) (*Plugin, error) {
 		return nil, err
 	}
 
-	data, err := ioutil.ReadFile(filepath.Join(p, h.MetadataFileName))
+	data, err := ioutil.ReadFile(filepath.Join(p, h.Filename))
 	if err != nil {
 		return nil, err
 	}

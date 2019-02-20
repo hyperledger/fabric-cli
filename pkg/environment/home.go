@@ -32,3 +32,14 @@ func (h Home) Path(components ...string) string {
 func (h Home) Plugins() string {
 	return h.Path("plugins")
 }
+
+// Init creates a home directory if it does not already exist
+func (h Home) Init() error {
+	if _, err := os.Stat(h.String()); os.IsNotExist(err) {
+		if err = os.MkdirAll(h.String(), 0755); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

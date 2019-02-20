@@ -22,8 +22,8 @@ func NewPluginUninstallCommand(settings *environment.Settings) *cobra.Command {
 	pcmd := pluginUninstallCommand{
 		out: settings.Streams.Out,
 		handler: &plugin.DefaultHandler{
-			Dir:              settings.Home.Plugins(),
-			MetadataFileName: plugin.DefaultMetadataFileName,
+			Dir:      settings.Home.Plugins(),
+			Filename: plugin.DefaultFilename,
 		},
 	}
 

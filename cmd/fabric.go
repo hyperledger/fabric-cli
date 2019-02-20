@@ -30,8 +30,8 @@ func NewFabricCommand(settings *environment.Settings) *cobra.Command {
 
 	// load all plugins into the root command
 	loadPlugins(cmd, settings, &plugin.DefaultHandler{
-		Dir:              settings.Home.Plugins(),
-		MetadataFileName: plugin.DefaultMetadataFileName,
+		Dir:      settings.Home.Plugins(),
+		Filename: plugin.DefaultFilename,
 	})
 
 	return cmd
@@ -67,6 +67,8 @@ func loadPlugins(cmd *cobra.Command, settings *environment.Settings, handler plu
 		return
 	}
 
+	settings.SetupPluginEnv()
+
 	for _, plugin := range plugins {
 		p := plugin
 		c := &cobra.Command{
@@ -75,6 +77,7 @@ func loadPlugins(cmd *cobra.Command, settings *environment.Settings, handler plu
 			RunE: func(cmd *cobra.Command, args []string) error {
 				e := exec.Command(os.ExpandEnv(p.Command.Base),
 					append(p.Command.Args, args...)...)
+				e.Env = os.Environ()
 				e.Stdin = settings.Streams.In
 				e.Stdout = settings.Streams.Out
 				e.Stderr = settings.Streams.Err

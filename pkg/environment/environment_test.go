@@ -51,6 +51,22 @@ func TestGetSettings(t *testing.T) {
 			assert.Nil(t, err)
 			assert.Equal(t, settings.Home, test.home)
 			assert.Equal(t, settings.Home.Plugins(), test.plugins)
+
+			for k := range test.env {
+				os.Unsetenv(k)
+			}
 		})
 	}
+}
+
+func TestSettingsPluginEnv(t *testing.T) {
+	settings, err := GetSettings()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, settings)
+	assert.Zero(t, os.Getenv("FABRIC_HOME"))
+
+	settings.SetupPluginEnv()
+
+	assert.Equal(t, os.Getenv("FABRIC_HOME"), settings.Home.String())
 }

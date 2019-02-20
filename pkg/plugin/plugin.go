@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-// DefaultMetadataFileName is the filename for the plugin metadata
-const DefaultMetadataFileName = "plugin.yaml"
+// DefaultFilename is the filename for the plugin metadata
+const DefaultFilename = "plugin.yaml"
 
 // Plugin is an installed, third-party command
 // Consider using "github.com/mitchellh/mapstructure" when the yaml structure

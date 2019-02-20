@@ -7,51 +7,76 @@ SPDX-License-Identifier: Apache-2.0
 package environment
 
 import (
-	"fmt"
 	"os"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
-// Settings contains all of the environment settings
+// Settings contains the combination of all environment settings
 type Settings struct {
-	Home           Home
-	Streams        Streams
-	DisablePlugins bool
+	Config `yaml:"-"`
+
+	Home           Home       `yaml:"-"`
+	Streams        Streams    `yaml:"-"`
+	ActiveProfile  string     `mapstructure:"active_profile" yaml:"active_profile"`
+	Profiles       []*Profile `mapstructure:"profiles" yaml:"profiles"`
+	DisablePlugins bool       `mapstructure:"disable_plugins" yaml:"disable_plugins"`
 }
 
-// parseEnvironments overrides all default settings
-func (s *Settings) parseEnvironment() {
-	if v, ok := os.LookupEnv("FABRIC_HOME"); ok {
-		s.Home = Home(v)
-	}
-	if v, ok := os.LookupEnv("FABRIC_DISABLE_PLUGINS"); ok && v == "true" {
-		s.DisablePlugins = true
+// SetupPluginEnv sets the environment variables that are important to plugins
+// This is needed because environment variables are not populated with defaults
+func (s *Settings) SetupPluginEnv() {
+	for k, v := range map[string]string{
+		"FABRIC_HOME": s.Home.String(),
+	} {
+		os.Setenv(k, v) // nolint: errcheck
 	}
 }
 
-// setEnvironment sets all environment variables after settings is loaded
-// This is needed because default values won't be found in the environment
-func (s *Settings) setEnvironment() error {
-	if err := os.Setenv("FABRIC_HOME", s.Home.String()); err != nil {
-		return err
+// NewDefaultSettings returns an instance of settings with default config
+// implementation
+func NewDefaultSettings() *Settings {
+	s := &Settings{}
+	s.Config = &DefaultConfig{
+		Filename: DefaultConfigFilename,
+		Settings: s,
 	}
 
-	if err := os.Setenv("FABRIC_DISABLE_PLUGINS", fmt.Sprint(s.DisablePlugins)); err != nil {
-		return err
-	}
-
-	return nil
+	return s
 }
 
-// GetSettings returns the settings for the current environment
+// GetSettings populates a Settings struct based on viper precendence
+// Highest precedence to lowest:
+// 		Env > Config File > Defaults
+// This can support flags in the future
 func GetSettings() (*Settings, error) {
-	s := &Settings{
-		Home:    DefaultHome,
-		Streams: *DefaultStreams,
+	v := viper.New()
+
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	// Set default values(establish field type)
+	v.SetDefault("home", DefaultHome)
+	v.SetDefault("streams", DefaultStreams)
+	v.SetDefault("profiles", []*Profile{})
+	v.SetDefault("disable_plugins", false)
+
+	// Load environment variable overrides
+	v.SetEnvPrefix("fabric")
+	v.BindEnv("home")            // nolint: errcheck
+	v.BindEnv("disable_plugins") // nolint: errcheck
+
+	// Load config files if one exists
+	v.SetConfigFile(Home(v.GetString("home")).Path(DefaultConfigFilename))
+	if _, err := os.Stat(v.ConfigFileUsed()); err == nil {
+		if err := v.ReadInConfig(); err != nil {
+			return nil, err
+		}
 	}
 
-	s.parseEnvironment()
+	s := NewDefaultSettings()
 
-	if err := s.setEnvironment(); err != nil {
+	if err := v.Unmarshal(s); err != nil {
 		return nil, err
 	}
 
