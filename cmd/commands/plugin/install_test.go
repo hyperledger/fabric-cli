@@ -1,77 +1,131 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package plugin
+package plugin_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"testing"
+	"os"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
+
+	"github.com/hyperledger/fabric-cli/cmd/commands/plugin"
+	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/plugin/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestPluginInstallCommand(t *testing.T) {
-	cmd := NewPluginInstallCommand(testEnvironment())
+var _ = Describe("PluginInstallCommand", func() {
+	var (
+		cmd      *cobra.Command
+		settings *environment.Settings
+		out      *bytes.Buffer
 
-	assert.NotNil(t, cmd)
-	assert.False(t, cmd.HasSubCommands())
-}
+		args []string
+	)
 
-func TestInstallCommandComplete(t *testing.T) {
-	pcmd := pluginInstallCommand{
-		out:     new(bytes.Buffer),
-		handler: &mocks.MockHandler{},
-	}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
 
-	err := pcmd.complete([]string{"./foo/bar"})
+		settings = &environment.Settings{
+			Home: environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
+			},
+		}
 
-	assert.Nil(t, err)
-	assert.Equal(t, pcmd.path, "./foo/bar")
-}
+		args = os.Args
+	})
 
-func TestInstallCommandCompleteError(t *testing.T) {
-	pcmd := pluginInstallCommand{
-		out:     new(bytes.Buffer),
-		handler: &mocks.MockHandler{},
-	}
+	JustBeforeEach(func() {
+		cmd = plugin.NewPluginInstallCommand(settings)
+	})
 
-	err := pcmd.complete([]string{})
+	AfterEach(func() {
+		os.Args = args
+	})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "plugin path not specified")
-}
+	It("should create a plugin install commmand", func() {
+		Expect(cmd.Name()).To(Equal("install"))
+		Expect(cmd.HasSubCommands()).To(BeFalse())
+	})
 
-func TestInstallCommandRun(t *testing.T) {
-	pcmd := pluginInstallCommand{
-		out:     new(bytes.Buffer),
-		handler: &mocks.MockHandler{},
-		path:    "./foo/bar",
-	}
+	It("should provide a help prompt", func() {
+		os.Args = append(os.Args, "--help")
 
-	err := pcmd.run()
+		Expect(cmd.Execute()).Should(Succeed())
+		Expect(fmt.Sprint(out)).To(ContainSubstring("install <path>"))
+	})
+})
 
-	assert.Nil(t, err)
-	assert.Equal(t, fmt.Sprint(pcmd.out), "successfully installed the plugin\n")
-}
+var _ = Describe("PluginInstallImplementation", func() {
+	var (
+		impl    *plugin.InstallCommand
+		out     *bytes.Buffer
+		handler *mocks.PluginHandler
+	)
 
-func TestInstallCommandRunErr(t *testing.T) {
-	handler := &mocks.MockHandler{}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+		handler = &mocks.PluginHandler{}
+	})
 
-	handler.ExpectError("an error occurred installing the plugin")
+	JustBeforeEach(func() {
+		impl = &plugin.InstallCommand{
+			Out:     out,
+			Handler: handler,
+		}
+	})
 
-	pcmd := pluginInstallCommand{
-		out:     new(bytes.Buffer),
-		handler: handler,
-		path:    "./foo/bar",
-	}
+	It("should not be nil", func() {
+		Expect(impl).ShouldNot(BeNil())
+	})
 
-	err := pcmd.run()
+	Describe("Complete", func() {
+		It("should fail without args", func() {
+			err := impl.Complete([]string{})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "an error occurred installing the plugin")
-}
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("plugin path not specified"))
+		})
+
+		It("should fail with empty string", func() {
+			err := impl.Complete([]string{" "})
+
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("plugin path not specified"))
+		})
+
+		It("should succeed with input path", func() {
+			Expect(impl.Complete([]string{"./foo"})).Should(Succeed())
+		})
+	})
+
+	Describe("Run", func() {
+		JustBeforeEach(func() {
+			err := impl.Complete([]string{"./foo"})
+
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should fail if handler fails", func() {
+			handler.InstallPluginReturns(errors.New("handler error"))
+
+			err := impl.Run()
+
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("handler error"))
+		})
+
+		It("should successfully install a plugin", func() {
+			Expect(impl.Run()).Should(Succeed())
+			Expect(fmt.Sprint(out)).To(ContainSubstring("successfully installed the plugin\n"))
+		})
+	})
+})

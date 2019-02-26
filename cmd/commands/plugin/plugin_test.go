@@ -1,33 +1,61 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package plugin
+package plugin_test
 
 import (
 	"bytes"
+	"fmt"
+	"os"
 	"testing"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
+
+	"github.com/hyperledger/fabric-cli/cmd/commands/plugin"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestPluginCommand(t *testing.T) {
-	cmd := NewPluginCommand(testEnvironment())
-
-	assert.NotNil(t, cmd)
-	assert.True(t, cmd.HasSubCommands())
+func TestPlugin(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Plugin Suite")
 }
 
-func testEnvironment() *environment.Settings {
-	return &environment.Settings{
-		Home: environment.Home("./tmp"),
-		Streams: environment.Streams{
-			In:  new(bytes.Buffer),
-			Out: new(bytes.Buffer),
-			Err: new(bytes.Buffer),
-		},
-	}
-}
+var _ = Describe("PluginCommand", func() {
+	var (
+		cmd      *cobra.Command
+		settings *environment.Settings
+		out      *bytes.Buffer
+	)
+
+	Context("when creating a command from settings", func() {
+		BeforeEach(func() {
+			out = new(bytes.Buffer)
+
+			settings = &environment.Settings{
+				Home: environment.Home(os.TempDir()),
+				Streams: environment.Streams{
+					Out: out,
+				},
+			}
+		})
+
+		JustBeforeEach(func() {
+			cmd = plugin.NewPluginCommand(settings)
+		})
+
+		It("should create a plugin commmand", func() {
+			Expect(cmd.Name()).To(Equal("plugin"))
+			Expect(cmd.HasSubCommands()).To(BeTrue())
+			Expect(cmd.Execute()).Should(Succeed())
+			Expect(fmt.Sprint(out)).To(ContainSubstring("plugin [command]"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("list"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("install"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("uninstall"))
+		})
+	})
+})

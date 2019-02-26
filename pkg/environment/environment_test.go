@@ -1,72 +1,84 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package environment
+package environment_test
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
+	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
-func TestGetSettings(t *testing.T) {
-	tests := []struct {
-		// test name
-		name string
+func TestEnvironment(t *testing.T) {
+	RegisterFailHandler(Fail)
 
-		// environemnt variables
-		env map[string]string
+	RunSpecs(t, "Environment Suite")
+}
 
-		// expected output
-		home    Home
-		plugins string
-	}{
-		{
-			name:    "Environment Variables Not Set",
-			home:    DefaultHome,
-			plugins: DefaultHome.Plugins(),
-		},
-		{
-			name: "Environment Variables Set",
-			env: map[string]string{
-				"FABRIC_HOME": "/foo",
-			},
-			home:    Home("/foo"),
-			plugins: "/foo/plugins",
-		},
-	}
+var _ = Describe("Environment", func() {
+	var (
+		settings *environment.Settings
+		err      error
+	)
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			for k, v := range test.env {
-				os.Setenv(k, v)
-			}
+	JustBeforeEach(func() {
+		settings, err = environment.GetSettings()
 
-			settings, err := GetSettings()
+		Expect(err).NotTo(HaveOccurred())
+	})
 
-			assert.Nil(t, err)
-			assert.Equal(t, settings.Home, test.home)
-			assert.Equal(t, settings.Home.Plugins(), test.plugins)
+	It("should set default home", func() {
+		Expect(settings).NotTo(BeNil())
+		Expect(settings.Home.String()).To(Equal(environment.DefaultHome.String()))
+		Expect(settings.Home.Plugins()).To(Equal(environment.DefaultHome.Plugins()))
+	})
 
-			for k := range test.env {
-				os.Unsetenv(k)
-			}
+	Context("when environment overrides are set", func() {
+		BeforeEach(func() {
+			err := os.Setenv("FABRIC_HOME", os.TempDir())
+
+			Expect(err).NotTo(HaveOccurred())
 		})
-	}
-}
 
-func TestSettingsPluginEnv(t *testing.T) {
-	settings, err := GetSettings()
+		AfterEach(func() {
+			err := os.Unsetenv("FABRIC_HOME")
 
-	assert.Nil(t, err)
-	assert.NotNil(t, settings)
-	assert.Zero(t, os.Getenv("FABRIC_HOME"))
+			Expect(err).NotTo(HaveOccurred())
+		})
 
-	settings.SetupPluginEnv()
+		It("should override default home", func() {
+			Expect(settings).NotTo(BeNil())
+			Expect(settings.Home).NotTo(Equal(environment.DefaultHome))
+			Expect(settings.Home.String()).To(Equal(os.TempDir()))
+			Expect(settings.Home.Plugins()).To(Equal(filepath.Join(os.TempDir(), "plugins")))
+		})
+	})
+})
 
-	assert.Equal(t, os.Getenv("FABRIC_HOME"), settings.Home.String())
-}
+var _ = Describe("PluginEnvironment", func() {
+	var (
+		settings *environment.Settings
+		err      error
+	)
+
+	JustBeforeEach(func() {
+		settings, err = environment.GetSettings()
+
+		Expect(err).NotTo(HaveOccurred())
+
+		settings.SetupPluginEnv()
+	})
+
+	It("should set environment variables", func() {
+		Expect(os.Getenv("FABRIC_HOME")).To(Equal(environment.DefaultHome.String()))
+	})
+
+})

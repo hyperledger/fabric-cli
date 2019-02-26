@@ -1,124 +1,181 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package profile
+package profile_test
 
 import (
 	"bytes"
 	"fmt"
-	"testing"
+	"os"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
+
+	"github.com/hyperledger/fabric-cli/cmd/commands/profile"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestProfileShowCommand(t *testing.T) {
-	cmd := NewProfileShowCommand(testEnvironment())
+var _ = Describe("ProfileShowCommand", func() {
+	var (
+		cmd      *cobra.Command
+		settings *environment.Settings
+		out      *bytes.Buffer
 
-	assert.NotNil(t, cmd)
-	assert.False(t, cmd.HasSubCommands())
-}
-func TestShowCommandCompleteDefault(t *testing.T) {
-	pcmd := profileShowCommand{
-		out: new(bytes.Buffer),
-		profiles: []*environment.Profile{
-			&environment.Profile{
-				Name: "foobar",
+		args []string
+	)
+
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+
+		settings = &environment.Settings{
+			Home: environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
 			},
-		},
-		active: "foobar",
-	}
+		}
 
-	err := pcmd.complete([]string{})
+		args = os.Args
+	})
 
-	assert.Nil(t, err)
-	assert.Equal(t, pcmd.name, "foobar")
-}
+	JustBeforeEach(func() {
+		cmd = profile.NewProfileShowCommand(settings)
+	})
 
-func TestShowCommandCompleteDifferent(t *testing.T) {
-	pcmd := profileShowCommand{
-		out: new(bytes.Buffer),
-		profiles: []*environment.Profile{
-			&environment.Profile{
-				Name: "foobar",
-			},
-			&environment.Profile{
-				Name: "baz",
-			},
-		},
-		active: "foobar",
-	}
+	AfterEach(func() {
+		os.Args = args
+	})
 
-	err := pcmd.complete([]string{"baz"})
+	It("should create a profile show commmand", func() {
+		Expect(cmd.Name()).To(Equal("show"))
+		Expect(cmd.HasSubCommands()).To(BeFalse())
+	})
 
-	assert.Nil(t, err)
-	assert.Equal(t, pcmd.name, "baz")
-}
+	It("should provide a help prompt", func() {
+		os.Args = append(os.Args, "--help")
 
-func TestShowCommandCompleteError(t *testing.T) {
-	pcmd := profileShowCommand{
-		out: new(bytes.Buffer),
-		profiles: []*environment.Profile{
-			&environment.Profile{
-				Name: "foobar",
-			},
-		},
-	}
+		Expect(cmd.Execute()).Should(Succeed())
+		Expect(fmt.Sprint(out)).To(ContainSubstring("show [profilename]"))
+	})
+})
 
-	err := pcmd.complete([]string{})
+var _ = Describe("ProfileShowImplementation", func() {
+	var (
+		impl *profile.ShowCommand
+		out  *bytes.Buffer
+	)
 
-	assert.NotNil(t, err)
-}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+	})
 
-func TestShowCommandRunDefault(t *testing.T) {
-	pcmd := profileShowCommand{
-		out: new(bytes.Buffer),
-		profiles: []*environment.Profile{
-			&environment.Profile{
-				Name: "foobar",
-			},
-		},
-		active: "foobar",
-		name:   "foobar",
-	}
+	JustBeforeEach(func() {
+		impl = &profile.ShowCommand{
+			Out: out,
+		}
+	})
 
-	err := pcmd.run()
+	It("should not be nil", func() {
+		Expect(impl).ShouldNot(BeNil())
+	})
 
-	assert.Nil(t, err)
-	assert.Equal(t, fmt.Sprint(pcmd.out), "Name: foobar\n")
-}
+	Describe("Complete", func() {
+		It("should fail without args", func() {
+			err := impl.Complete([]string{})
 
-func TestShowCommandRunDifferent(t *testing.T) {
-	pcmd := profileShowCommand{
-		out: new(bytes.Buffer),
-		profiles: []*environment.Profile{
-			&environment.Profile{
-				Name: "foobar",
-			},
-			&environment.Profile{
-				Name: "baz",
-			},
-		},
-		active: "foobar",
-		name:   "baz",
-	}
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("no profile currently active"))
+		})
 
-	err := pcmd.run()
+		It("should fail with empty string", func() {
+			err := impl.Complete([]string{" "})
 
-	assert.Nil(t, err)
-	assert.Equal(t, fmt.Sprint(pcmd.out), "Name: baz\n")
-}
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("profile name not specified"))
+		})
 
-func TestShowCommandRunError(t *testing.T) {
-	pcmd := profileShowCommand{
-		out: new(bytes.Buffer),
-	}
+		It("should succeed with profile name", func() {
+			Expect(impl.Complete([]string{"foo"})).Should(Succeed())
+		})
 
-	err := pcmd.run()
+	})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "no profiles currently exist")
-}
+	Describe("Run", func() {
+		JustBeforeEach(func() {
+			err := impl.Complete([]string{"foo"})
+
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should fail to show profile", func() {
+			err := impl.Run()
+
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("no profiles currently exist"))
+		})
+
+		Context("when active profile is set", func() {
+			JustBeforeEach(func() {
+				impl.Profiles = []*environment.Profile{
+					&environment.Profile{
+						Name: "foo",
+					},
+				}
+				impl.Active = "foo"
+			})
+
+			It("should print the active profile", func() {
+				Expect(impl.Run()).Should(Succeed())
+				Expect(fmt.Sprint(out)).To(ContainSubstring("Name: foo\n"))
+			})
+		})
+
+		Context("when specified profile does not exist", func() {
+			JustBeforeEach(func() {
+				impl.Profiles = []*environment.Profile{
+					&environment.Profile{
+						Name: "foo",
+					},
+				}
+				impl.Active = "foo"
+
+				err := impl.Complete([]string{"bar"})
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should fail to show profile", func() {
+				err := impl.Run()
+
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(ContainSubstring("profile 'bar' was not found"))
+			})
+		})
+
+		Context("when non-active profile is specified", func() {
+			JustBeforeEach(func() {
+				impl.Profiles = []*environment.Profile{
+					&environment.Profile{
+						Name: "foo",
+					},
+					&environment.Profile{
+						Name: "bar",
+					},
+				}
+				impl.Active = "foo"
+
+				err := impl.Complete([]string{"bar"})
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should print the active profile", func() {
+				Expect(impl.Run()).Should(Succeed())
+				Expect(fmt.Sprint(out)).To(ContainSubstring("Name: bar\n"))
+			})
+		})
+	})
+})

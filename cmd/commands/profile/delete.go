@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
@@ -18,39 +18,45 @@ import (
 
 // NewProfileDeleteCommand creates a new "fabric profile delete" command
 func NewProfileDeleteCommand(settings *environment.Settings) *cobra.Command {
-	pcmd := profileDeleteCommand{
-		out: settings.Streams.Out,
+	c := DeleteCommand{
+		Out:      settings.Streams.Out,
+		Settings: settings,
 	}
 
 	cmd := &cobra.Command{
 		Use:   "delete <profilename>",
-		Short: "delete a configuration profile",
+		Short: "delete a Configuration profile",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			config, err := settings.FromFile()
-			if err != nil {
-				return err
-			}
-
-			pcmd.config = config
-
-			return pcmd.complete(args)
+			return c.Complete(args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pcmd.run()
+			return c.Run()
 		},
 	}
+
+	cmd.SetOutput(c.Out)
 
 	return cmd
 }
 
-type profileDeleteCommand struct {
-	out    io.Writer
-	config *environment.Settings
+// DeleteCommand implements the profile delete command
+type DeleteCommand struct {
+	Out      io.Writer
+	Settings *environment.Settings
 
-	name string
+	name   string
+	config *environment.Settings
 }
 
-func (cmd *profileDeleteCommand) complete(args []string) error {
+// Complete populates required fields for Run
+func (cmd *DeleteCommand) Complete(args []string) error {
+	config, err := cmd.Settings.FromFile()
+	if err != nil {
+		return err
+	}
+
+	cmd.config = config
+
 	if len(args) == 0 {
 		return errors.New("profile name not specified")
 	}
@@ -64,7 +70,8 @@ func (cmd *profileDeleteCommand) complete(args []string) error {
 	return nil
 }
 
-func (cmd *profileDeleteCommand) run() error {
+// Run executes the command
+func (cmd *DeleteCommand) Run() error {
 	var found bool
 	for i, p := range cmd.config.Profiles {
 		if p.Name == cmd.name {
@@ -86,7 +93,7 @@ func (cmd *profileDeleteCommand) run() error {
 		return err
 	}
 
-	fmt.Fprintf(cmd.out, "successfully deleted profile '%s'\n", cmd.name)
+	fmt.Fprintf(cmd.Out, "successfully deleted profile '%s'\n", cmd.name)
 
 	return nil
 }

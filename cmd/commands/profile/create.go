@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
@@ -19,39 +19,45 @@ import (
 
 // NewProfileCreateCommand creates a new "fabric profile create" command
 func NewProfileCreateCommand(settings *environment.Settings) *cobra.Command {
-	pcmd := profileCreateCommand{
-		out: settings.Streams.Out,
+	c := CreateCommand{
+		Out:      settings.Streams.Out,
+		Settings: settings,
 	}
 
 	cmd := &cobra.Command{
 		Use:   "create <profilename>",
 		Short: "create a new configuration profile",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			config, err := settings.FromFile()
-			if err != nil {
-				return err
-			}
-
-			pcmd.config = config
-
-			return pcmd.complete(args)
+			return c.Complete(args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pcmd.run()
+			return c.Run()
 		},
 	}
+
+	cmd.SetOutput(c.Out)
 
 	return cmd
 }
 
-type profileCreateCommand struct {
-	out    io.Writer
-	config *environment.Settings
+// CreateCommand implements the profile create command
+type CreateCommand struct {
+	Out      io.Writer
+	Settings *environment.Settings
 
-	name string
+	name   string
+	config *environment.Settings
 }
 
-func (cmd *profileCreateCommand) complete(args []string) error {
+// Complete populates required fields for Run
+func (cmd *CreateCommand) Complete(args []string) error {
+	config, err := cmd.Settings.FromFile()
+	if err != nil {
+		return err
+	}
+
+	cmd.config = config
+
 	if len(args) == 0 {
 		return errors.New("profile name not specified")
 	}
@@ -71,7 +77,8 @@ func (cmd *profileCreateCommand) complete(args []string) error {
 	return nil
 }
 
-func (cmd *profileCreateCommand) run() error {
+// Run executes the command
+func (cmd *CreateCommand) Run() error {
 	profile := &environment.Profile{
 		Name: cmd.name,
 	}
@@ -87,7 +94,7 @@ func (cmd *profileCreateCommand) run() error {
 		return err
 	}
 
-	fmt.Fprintf(cmd.out, "successfully created profile '%s'\n", cmd.name)
+	fmt.Fprintf(cmd.Out, "successfully created profile '%s'\n", cmd.name)
 
 	return nil
 }

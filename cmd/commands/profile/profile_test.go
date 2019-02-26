@@ -1,33 +1,63 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package profile
+package profile_test
 
 import (
 	"bytes"
+	"fmt"
+	"os"
 	"testing"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
+
+	"github.com/hyperledger/fabric-cli/cmd/commands/profile"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestProfileCommand(t *testing.T) {
-	cmd := NewProfileCommand(testEnvironment())
-
-	assert.NotNil(t, cmd)
-	assert.True(t, cmd.HasSubCommands())
+func TestProfile(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Profile Suite")
 }
 
-func testEnvironment() *environment.Settings {
-	return &environment.Settings{
-		Home: environment.Home("./tmp"),
-		Streams: environment.Streams{
-			In:  new(bytes.Buffer),
-			Out: new(bytes.Buffer),
-			Err: new(bytes.Buffer),
-		},
-	}
-}
+var _ = Describe("ProfileCommand", func() {
+	var (
+		cmd      *cobra.Command
+		settings *environment.Settings
+		out      *bytes.Buffer
+	)
+
+	Context("when creating a command from settings", func() {
+		BeforeEach(func() {
+			out = new(bytes.Buffer)
+
+			settings = &environment.Settings{
+				Home: environment.Home(os.TempDir()),
+				Streams: environment.Streams{
+					Out: out,
+				},
+			}
+		})
+
+		JustBeforeEach(func() {
+			cmd = profile.NewProfileCommand(settings)
+		})
+
+		It("should create a profile commmand", func() {
+			Expect(cmd.Name()).To(Equal("profile"))
+			Expect(cmd.HasSubCommands()).To(BeTrue())
+			Expect(cmd.Execute()).Should(Succeed())
+			Expect(fmt.Sprint(out)).To(ContainSubstring("profile [command]"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("list"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("create"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("delete"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("show"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("use"))
+		})
+	})
+})

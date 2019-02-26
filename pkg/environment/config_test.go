@@ -1,40 +1,60 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package environment
+package environment_test
 
 import (
 	"os"
-	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/hyperledger/fabric-cli/pkg/environment"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestFromConfigFile(t *testing.T) {
-	os.Setenv("FABRIC_HOME", os.TempDir())
+//go:generate counterfeiter -o mocks/config.go --fake-name DefaultConfig . Config
 
-	before, err := GetSettings()
+var _ = Describe("Config", func() {
+	var (
+		settings, file, result *environment.Settings
+		err                    error
+	)
 
-	assert.Nil(t, err)
-	assert.NotNil(t, before)
+	BeforeEach(func() {
+		settings, err = environment.GetSettings()
 
-	config, err := before.FromFile()
-	assert.Nil(t, err)
-	assert.NotNil(t, config)
+		Expect(err).NotTo(HaveOccurred())
 
-	config.ActiveProfile = "foo"
+		settings.Home = environment.Home(os.TempDir())
+	})
 
-	saveErr := config.Save()
-	assert.Nil(t, saveErr)
+	JustBeforeEach(func() {
+		err = settings.Home.Init()
 
-	after, err := GetSettings()
+		Expect(err).NotTo(HaveOccurred())
+	})
 
-	assert.Nil(t, err)
-	assert.NotNil(t, after)
-	assert.Equal(t, after.ActiveProfile, "foo")
+	Context("when loading from file", func() {
+		JustBeforeEach(func() {
+			file, err = settings.FromFile()
 
-	os.Unsetenv("FABRIC_HOME")
-}
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should not be nil", func() {
+			Expect(file).NotTo(BeNil())
+		})
+
+		It("should be able to save", func() {
+			file.ActiveProfile = "foo"
+
+			Expect(file.Save()).Should(Succeed())
+
+			result, err = settings.FromFile()
+
+			Expect(result.ActiveProfile).To(Equal("foo"))
+		})
+	})
+})

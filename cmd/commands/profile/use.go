@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
@@ -18,39 +18,45 @@ import (
 
 // NewProfileUseCommand creates a new "fabric profile use" command
 func NewProfileUseCommand(settings *environment.Settings) *cobra.Command {
-	pcmd := profileUseCommand{
-		out: settings.Streams.Out,
+	c := UseCommand{
+		Out:      settings.Streams.Out,
+		Settings: settings,
 	}
 
 	cmd := &cobra.Command{
 		Use:   "use <profilename>",
 		Short: "change active profile",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			config, err := settings.FromFile()
-			if err != nil {
-				return err
-			}
-
-			pcmd.config = config
-
-			return pcmd.complete(args)
+			return c.Complete(args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pcmd.run()
+			return c.Run()
 		},
 	}
+
+	cmd.SetOutput(c.Out)
 
 	return cmd
 }
 
-type profileUseCommand struct {
-	out    io.Writer
-	config *environment.Settings
+// UseCommand implements the profile show command
+type UseCommand struct {
+	Out      io.Writer
+	Settings *environment.Settings
 
-	name string
+	config *environment.Settings
+	name   string
 }
 
-func (cmd *profileUseCommand) complete(args []string) error {
+// Complete populates required fields for Run
+func (cmd *UseCommand) Complete(args []string) error {
+	config, err := cmd.Settings.FromFile()
+	if err != nil {
+		return err
+	}
+
+	cmd.config = config
+
 	if len(args) == 0 {
 		return errors.New("profile name not specified")
 	}
@@ -64,7 +70,8 @@ func (cmd *profileUseCommand) complete(args []string) error {
 	return nil
 }
 
-func (cmd *profileUseCommand) run() error {
+// Run executes the command
+func (cmd *UseCommand) Run() error {
 	var found bool
 	for _, p := range cmd.config.Profiles {
 		if p.Name == cmd.name {
@@ -82,7 +89,7 @@ func (cmd *profileUseCommand) run() error {
 		return err
 	}
 
-	fmt.Fprintf(cmd.out, "successfully set active profile to '%s'\n", cmd.name)
+	fmt.Fprintf(cmd.Out, "successfully set active profile to '%s'\n", cmd.name)
 
 	return nil
 }

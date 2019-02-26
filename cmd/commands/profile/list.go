@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
@@ -17,40 +17,44 @@ import (
 
 // NewProfileListCommand creates a new "fabric profile list" command
 func NewProfileListCommand(settings *environment.Settings) *cobra.Command {
-	pcmd := profileListCommand{
-		out:      settings.Streams.Out,
-		profiles: settings.Profiles,
-		active:   settings.ActiveProfile,
+	c := ListCommand{
+		Out:      settings.Streams.Out,
+		Profiles: settings.Profiles,
+		Active:   settings.ActiveProfile,
 	}
 
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "list all configuration profiles",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pcmd.run()
+			return c.Run()
 		},
 	}
+
+	cmd.SetOutput(c.Out)
 
 	return cmd
 }
 
-type profileListCommand struct {
-	out      io.Writer
-	profiles []*environment.Profile
-	active   string
+// ListCommand implements the profile list command
+type ListCommand struct {
+	Out      io.Writer
+	Profiles []*environment.Profile
+	Active   string
 }
 
-func (cmd *profileListCommand) run() error {
-	if len(cmd.profiles) == 0 {
+// Run executes the command
+func (cmd *ListCommand) Run() error {
+	if len(cmd.Profiles) == 0 {
 		return errors.New("no profiles currently exist")
 	}
 
-	for _, p := range cmd.profiles {
-		fmt.Fprint(cmd.out, p.Name)
-		if p.Name == cmd.active {
-			fmt.Fprint(cmd.out, " (active)")
+	for _, p := range cmd.Profiles {
+		fmt.Fprint(cmd.Out, p.Name)
+		if p.Name == cmd.Active {
+			fmt.Fprint(cmd.Out, " (active)")
 		}
-		fmt.Fprintln(cmd.out)
+		fmt.Fprintln(cmd.Out)
 
 	}
 

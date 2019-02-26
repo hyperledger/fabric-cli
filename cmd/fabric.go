@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
@@ -28,6 +28,8 @@ func NewFabricCommand(settings *environment.Settings) *cobra.Command {
 	// load all built in commands into the root command
 	cmd.AddCommand(commands.All(settings)...)
 
+	cmd.SetOutput(settings.Streams.Out)
+
 	// load all plugins into the root command
 	loadPlugins(cmd, settings, &plugin.DefaultHandler{
 		Dir:      settings.Home.Plugins(),
@@ -40,14 +42,14 @@ func NewFabricCommand(settings *environment.Settings) *cobra.Command {
 func main() {
 	settings, err := environment.GetSettings()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
+		fmt.Fprintf(settings.Streams.Err, "%v\n", err)
 		os.Exit(1)
 	}
 
 	cmd := NewFabricCommand(settings)
 
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
+		fmt.Fprintf(settings.Streams.Err, "%v\n", err)
 		os.Exit(1)
 	}
 

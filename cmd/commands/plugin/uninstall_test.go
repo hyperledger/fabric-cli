@@ -1,76 +1,139 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package plugin
+package plugin_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"testing"
+	"os"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
+
+	"github.com/hyperledger/fabric-cli/cmd/commands/plugin"
+	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/plugin/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestPluginUinstallCommand(t *testing.T) {
-	cmd := NewPluginUninstallCommand(testEnvironment())
+var _ = Describe("PluginUninstallCommand", func() {
+	var (
+		cmd      *cobra.Command
+		settings *environment.Settings
+		out      *bytes.Buffer
 
-	assert.NotNil(t, cmd)
-}
+		args []string
+	)
 
-func TestUninstallCommandComplete(t *testing.T) {
-	pcmd := pluginUninstallCommand{
-		out:     new(bytes.Buffer),
-		handler: &mocks.MockHandler{},
-	}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
 
-	err := pcmd.complete([]string{"foo"})
+		settings = &environment.Settings{
+			Home: environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
+			},
+		}
 
-	assert.Nil(t, err)
-	assert.Equal(t, pcmd.name, "foo")
-}
+		args = os.Args
+	})
 
-func TestUninstallCommandCompleteError(t *testing.T) {
-	pcmd := pluginUninstallCommand{
-		out:     new(bytes.Buffer),
-		handler: &mocks.MockHandler{},
-	}
+	JustBeforeEach(func() {
+		cmd = plugin.NewPluginUninstallCommand(settings)
+	})
 
-	err := pcmd.complete([]string{})
+	AfterEach(func() {
+		os.Args = args
+	})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "plugin name not specified")
-}
+	It("should create a plugin uninstall commmand", func() {
+		Expect(cmd.Name()).To(Equal("uninstall"))
+		Expect(cmd.HasSubCommands()).To(BeFalse())
+	})
 
-func TestUninstallCommandRun(t *testing.T) {
-	pcmd := pluginUninstallCommand{
-		out:     new(bytes.Buffer),
-		handler: &mocks.MockHandler{},
-		name:    "foo",
-	}
+	It("should provide a help prompt", func() {
+		os.Args = append(os.Args, "--help")
 
-	err := pcmd.run()
+		Expect(cmd.Execute()).Should(Succeed())
+		Expect(fmt.Sprint(out)).To(ContainSubstring("uninstall <name>"))
+	})
+})
 
-	assert.Nil(t, err)
-	assert.Equal(t, fmt.Sprint(pcmd.out), "successfully uninstalled the plugin\n")
-}
+var _ = Describe("PluginUninstallImplementation", func() {
+	var (
+		impl    *plugin.UninstallCommand
+		out     *bytes.Buffer
+		handler *mocks.PluginHandler
+	)
 
-func TestUninstallCommandRunErr(t *testing.T) {
-	handler := &mocks.MockHandler{}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+		handler = &mocks.PluginHandler{}
+	})
 
-	handler.ExpectError("an error occurred uninstalling the plugin")
+	JustBeforeEach(func() {
+		impl = &plugin.UninstallCommand{
+			Out:     out,
+			Handler: handler,
+		}
+	})
 
-	pcmd := pluginUninstallCommand{
-		out:     new(bytes.Buffer),
-		handler: handler,
-		name:    "foo",
-	}
+	It("should not be nil", func() {
+		Expect(impl).ShouldNot(BeNil())
+	})
 
-	err := pcmd.run()
+	Describe("Complete", func() {
+		It("should fail without args", func() {
+			err := impl.Complete([]string{})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "an error occurred uninstalling the plugin")
-}
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("plugin name not specified"))
+		})
+
+		It("should fail with empty string", func() {
+			err := impl.Complete([]string{" "})
+
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("plugin name not specified"))
+		})
+
+		It("should succeed with a name", func() {
+			Expect(impl.Complete([]string{"foo"})).Should(Succeed())
+		})
+	})
+
+	Describe("Run", func() {
+		BeforeEach(func() {
+			err := impl.Complete([]string{"foo"})
+
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should fail if handler fails", func() {
+			handler.UninstallPluginReturns(errors.New("handler error"))
+
+			err := impl.Run()
+
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("handler error"))
+		})
+
+		Context("when plugins have been installed", func() {
+			JustBeforeEach(func() {
+				err := handler.InstallPlugin("foo")
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should successfully uninstall a plugin", func() {
+				Expect(impl.Run()).Should(Succeed())
+				Expect(fmt.Sprint(out)).To(ContainSubstring("successfully uninstalled the plugin\n"))
+			})
+		})
+	})
+})

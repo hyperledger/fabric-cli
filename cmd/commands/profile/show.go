@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
@@ -18,58 +18,68 @@ import (
 
 // NewProfileShowCommand creates a new "fabric profile show" command
 func NewProfileShowCommand(settings *environment.Settings) *cobra.Command {
-	pcmd := profileShowCommand{
-		out:      settings.Streams.Out,
-		profiles: settings.Profiles,
-		active:   settings.ActiveProfile,
+	c := ShowCommand{
+		Out:      settings.Streams.Out,
+		Profiles: settings.Profiles,
+		Active:   settings.ActiveProfile,
 	}
 
 	cmd := &cobra.Command{
 		Use:   "show [profilename]",
 		Short: "show the metadata of the active profile",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return pcmd.complete(args)
+			return c.Complete(args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pcmd.run()
+			return c.Run()
 		},
 	}
+
+	cmd.SetOutput(c.Out)
 
 	return cmd
 }
 
-type profileShowCommand struct {
-	out      io.Writer
-	profiles []*environment.Profile
-	active   string
+// ShowCommand implements the profile show command
+type ShowCommand struct {
+	Out      io.Writer
+	Profiles []*environment.Profile
+	Active   string
 
 	name string
 }
 
-func (cmd *profileShowCommand) complete(args []string) error {
+// Complete populates required fields for Run
+func (cmd *ShowCommand) Complete(args []string) error {
 	if len(args) == 0 {
-		cmd.name = cmd.active
+		cmd.name = cmd.Active
+
+		if len(cmd.name) == 0 {
+			return errors.New("no profile currently active")
+		}
 	} else {
 		cmd.name = strings.TrimSpace(args[0])
-	}
 
-	if len(cmd.name) == 0 {
-		return errors.New("no profile currently active")
+		if len(cmd.name) == 0 {
+			return errors.New("profile name not specified")
+		}
 	}
 
 	return nil
 }
 
-func (cmd *profileShowCommand) run() error {
-	if len(cmd.profiles) == 0 {
+// Run executes the command
+func (cmd *ShowCommand) Run() error {
+	if len(cmd.Profiles) == 0 {
 		return errors.New("no profiles currently exist")
 	}
 
-	for _, p := range cmd.profiles {
+	for _, p := range cmd.Profiles {
 		if p.Name == cmd.name {
-			fmt.Fprintf(cmd.out, "Name: %s\n", p.Name)
+			fmt.Fprintf(cmd.Out, "Name: %s\n", p.Name)
+			return nil
 		}
 	}
 
-	return nil
+	return fmt.Errorf("profile '%s' was not found", cmd.name)
 }

@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
@@ -25,6 +25,8 @@ func NewProfileCommand(settings *environment.Settings) *cobra.Command {
 		NewProfileCreateCommand(settings),
 		NewProfileDeleteCommand(settings),
 	)
+
+	cmd.SetOutput(settings.Streams.Out)
 
 	return cmd
 }

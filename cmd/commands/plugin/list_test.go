@@ -1,54 +1,127 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package plugin
+package plugin_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"testing"
+	"os"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
+
+	"github.com/hyperledger/fabric-cli/cmd/commands/plugin"
+	"github.com/hyperledger/fabric-cli/pkg/environment"
+	plug "github.com/hyperledger/fabric-cli/pkg/plugin"
 	"github.com/hyperledger/fabric-cli/pkg/plugin/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestPluginListCommand(t *testing.T) {
-	cmd := NewPluginListCommand(testEnvironment())
+var _ = Describe("PluginListCommand", func() {
+	var (
+		cmd      *cobra.Command
+		settings *environment.Settings
+		out      *bytes.Buffer
 
-	assert.NotNil(t, cmd)
-}
+		args []string
+	)
 
-func TestListCommandRun(t *testing.T) {
-	handler := &mocks.MockHandler{}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
 
-	handler.InstallPlugin("./foo/bar")
+		settings = &environment.Settings{
+			Home: environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
+			},
+		}
 
-	pcmd := &pluginListCommand{
-		out:     new(bytes.Buffer),
-		handler: handler,
-	}
+		args = os.Args
+	})
 
-	err := pcmd.run()
+	JustBeforeEach(func() {
+		cmd = plugin.NewPluginListCommand(settings)
+	})
 
-	assert.Nil(t, err)
-	assert.Contains(t, fmt.Sprint(pcmd.out), "bar")
-}
+	AfterEach(func() {
+		os.Args = args
+	})
 
-func TestListCommandRunError(t *testing.T) {
-	handler := &mocks.MockHandler{}
+	It("should create a plugin list commmand", func() {
+		Expect(cmd.Name()).To(Equal("list"))
+		Expect(cmd.HasSubCommands()).To(BeFalse())
+	})
 
-	handler.ExpectError("unable to find plugins")
+	It("should provide a help prompt", func() {
+		os.Args = append(os.Args, "--help")
 
-	pcmd := &pluginListCommand{
-		out:     new(bytes.Buffer),
-		handler: handler,
-	}
+		Expect(cmd.Execute()).Should(Succeed())
+		Expect(fmt.Sprint(out)).To(ContainSubstring("list"))
+	})
+})
 
-	err := pcmd.run()
+var _ = Describe("PluginListImplementation", func() {
+	var (
+		impl    *plugin.ListCommand
+		out     *bytes.Buffer
+		handler *mocks.PluginHandler
+	)
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "unable to find plugins")
-}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+		handler = &mocks.PluginHandler{}
+	})
+
+	JustBeforeEach(func() {
+		impl = &plugin.ListCommand{
+			Out:     out,
+			Handler: handler,
+		}
+	})
+
+	It("should not be nil", func() {
+		Expect(impl).ShouldNot(BeNil())
+	})
+
+	Describe("Run", func() {
+		It("should fail if handler fails", func() {
+			handler.GetPluginsReturns(nil, errors.New("handler error"))
+
+			err := impl.Run()
+
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("handler error"))
+		})
+
+		It("should succeed when plugins have not been installed", func() {
+			Expect(impl.Run()).Should(Succeed())
+			Expect(fmt.Sprint(out)).To(ContainSubstring("no plugins currently exist"))
+		})
+
+		Context("when plugins have been installed", func() {
+			BeforeEach(func() {
+				handler.GetPluginsReturns([]*plug.Plugin{
+					&plug.Plugin{
+						Name: "foo",
+					},
+				}, nil)
+			})
+
+			JustBeforeEach(func() {
+				err := handler.InstallPlugin("foo")
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should successfully list a plugin", func() {
+				Expect(impl.Run()).Should(Succeed())
+				Expect(fmt.Sprint(out)).To(ContainSubstring("foo\n"))
+			})
+		})
+	})
+})

@@ -1,51 +1,110 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package profile
+package profile_test
 
 import (
 	"bytes"
 	"fmt"
-	"testing"
+	"os"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
+
+	"github.com/hyperledger/fabric-cli/cmd/commands/profile"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestProfileListCommand(t *testing.T) {
-	cmd := NewProfileListCommand(testEnvironment())
+var _ = Describe("ProfileListCommand", func() {
+	var (
+		cmd      *cobra.Command
+		settings *environment.Settings
+		out      *bytes.Buffer
 
-	assert.NotNil(t, cmd)
-	assert.False(t, cmd.HasSubCommands())
-}
+		args []string
+	)
 
-func TestListCommandRun(t *testing.T) {
-	pcmd := &profileListCommand{
-		out: new(bytes.Buffer),
-		profiles: []*environment.Profile{
-			&environment.Profile{
-				Name: "foo",
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+
+		settings = &environment.Settings{
+			Home: environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
 			},
-		},
-		active: "foo",
-	}
+		}
 
-	err := pcmd.run()
+		args = os.Args
+	})
 
-	assert.Nil(t, err)
-	assert.Contains(t, fmt.Sprint(pcmd.out), "foo (active)")
-}
+	JustBeforeEach(func() {
+		cmd = profile.NewProfileListCommand(settings)
+	})
 
-func TestListCommandRunError(t *testing.T) {
-	pcmd := &profileListCommand{
-		out: new(bytes.Buffer),
-	}
+	AfterEach(func() {
+		os.Args = args
+	})
 
-	err := pcmd.run()
+	It("should create a profile list commmand", func() {
+		Expect(cmd.Name()).To(Equal("list"))
+		Expect(cmd.HasSubCommands()).To(BeFalse())
+	})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "no profiles currently exist")
-}
+	It("should provide a help prompt", func() {
+		os.Args = append(os.Args, "--help")
+
+		Expect(cmd.Execute()).Should(Succeed())
+		Expect(fmt.Sprint(out)).To(ContainSubstring("list"))
+	})
+})
+
+var _ = Describe("ProfileListImplementation", func() {
+	var (
+		impl *profile.ListCommand
+		out  *bytes.Buffer
+	)
+
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+	})
+
+	JustBeforeEach(func() {
+		impl = &profile.ListCommand{
+			Out: out,
+		}
+	})
+
+	It("should not be nil", func() {
+		Expect(impl).ShouldNot(BeNil())
+	})
+
+	It("should fail to list profiles", func() {
+		err := impl.Run()
+
+		Expect(err).NotTo(BeNil())
+		Expect(err.Error()).To(ContainSubstring("no profiles currently exist"))
+	})
+
+	Context("when profiles exists", func() {
+		JustBeforeEach(func() {
+			impl.Profiles = []*environment.Profile{
+				&environment.Profile{
+					Name: "foo",
+				},
+				&environment.Profile{
+					Name: "bar",
+				},
+			}
+			impl.Active = "foo"
+		})
+
+		It("should list profiles", func() {
+			Expect(impl.Run()).Should(Succeed())
+			Expect(fmt.Sprint(out)).To(ContainSubstring("foo (active)\nbar\n"))
+		})
+	})
+})

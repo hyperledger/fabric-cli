@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -19,9 +20,9 @@ import (
 
 // NewPluginInstallCommand creates a new "fabric plugin install" command
 func NewPluginInstallCommand(settings *environment.Settings) *cobra.Command {
-	pcmd := pluginInstallCommand{
-		out: settings.Streams.Out,
-		handler: &plugin.DefaultHandler{
+	c := InstallCommand{
+		Out: settings.Streams.Out,
+		Handler: &plugin.DefaultHandler{
 			Dir:      settings.Home.Plugins(),
 			Filename: plugin.DefaultFilename,
 		},
@@ -31,40 +32,49 @@ func NewPluginInstallCommand(settings *environment.Settings) *cobra.Command {
 		Use:   "install <path>",
 		Short: "Install a plugin from the local filesystem",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return pcmd.complete(args)
+			return c.Complete(args)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return pcmd.run()
+			return c.Run()
 		},
 	}
+
+	cmd.SetOutput(c.Out)
 
 	return cmd
 }
 
-type pluginInstallCommand struct {
-	out     io.Writer
-	handler plugin.Handler
+// InstallCommand implements the plugin install command
+type InstallCommand struct {
+	Out     io.Writer
+	Handler plugin.Handler
 
 	path string
 }
 
-func (cmd *pluginInstallCommand) complete(args []string) error {
+// Complete populates required fields for Run
+func (cmd *InstallCommand) Complete(args []string) error {
 	if len(args) == 0 {
 		return errors.New("plugin path not specified")
 	}
 
-	cmd.path = args[0]
+	cmd.path = strings.TrimSpace(args[0])
+
+	if len(cmd.path) == 0 {
+		return errors.New("plugin path not specified")
+	}
 
 	return nil
 }
 
-func (cmd *pluginInstallCommand) run() error {
-	err := cmd.handler.InstallPlugin(cmd.path)
+// Run executes the command
+func (cmd *InstallCommand) Run() error {
+	err := cmd.Handler.InstallPlugin(cmd.path)
 	if err != nil {
 		return err
 	}
 
-	fmt.Fprintln(cmd.out, "successfully installed the plugin")
+	fmt.Fprintln(cmd.Out, "successfully installed the plugin")
 
 	return nil
 }

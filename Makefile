@@ -1,4 +1,4 @@
-# Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+# Copyright State Street Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -14,6 +14,7 @@ all: clean dep build
 .PHONY: clean
 clean:
 	rm -rf $(BIN_DIR)
+	find . -name "mocks" -type d -print0 | xargs -0 /bin/rm -rf
 
 .PHONY: dep
 dep:
@@ -23,8 +24,12 @@ dep:
 lint:
 	$(LINT_CMD) --disable=gocyclo --disable=gas --deadline=120s --exclude=vendor ./...
 
+.PHONY: generate
+generate: 
+	$(GO_CMD) generate ./...
+
 .PHONY: test
-test:
+test: generate
 	$(GO_CMD) test -cover ./...
 
 .PHONY: build

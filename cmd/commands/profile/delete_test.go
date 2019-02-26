@@ -1,128 +1,191 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package profile
+package profile_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"testing"
+	"os"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
+
+	"github.com/hyperledger/fabric-cli/cmd/commands/profile"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/environment/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestProfileDeleteCommand(t *testing.T) {
-	cmd := NewProfileDeleteCommand(testEnvironment())
+var _ = Describe("ProfileDeleteCommand", func() {
+	var (
+		cmd      *cobra.Command
+		settings *environment.Settings
+		config   *mocks.DefaultConfig
+		out      *bytes.Buffer
 
-	assert.NotNil(t, cmd)
-	assert.False(t, cmd.HasSubCommands())
-}
+		args []string
+	)
 
-func TestDeleteCommandComplete(t *testing.T) {
-	pcmd := profileDeleteCommand{
-		out:    new(bytes.Buffer),
-		config: &environment.Settings{},
-	}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+		config = &mocks.DefaultConfig{}
 
-	err := pcmd.complete([]string{"foobar"})
-
-	assert.Nil(t, err)
-	assert.Equal(t, pcmd.name, "foobar")
-}
-
-func TestDeleteCommandCompleteError(t *testing.T) {
-	pcmd := profileDeleteCommand{
-		out:    new(bytes.Buffer),
-		config: &environment.Settings{},
-	}
-
-	err := pcmd.complete([]string{})
-
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "profile name not specified")
-}
-
-func TestDeleteCommandCompleteErrorTrim(t *testing.T) {
-	pcmd := profileDeleteCommand{
-		out:    new(bytes.Buffer),
-		config: &environment.Settings{},
-	}
-
-	err := pcmd.complete([]string{" "})
-
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "profile name not specified")
-}
-
-func TestDeleteCommandRun(t *testing.T) {
-	mock := &mocks.MockConfig{}
-	settings := &environment.Settings{
-		Config: mock,
-		Profiles: []*environment.Profile{
-			&environment.Profile{
-				Name: "foobar",
+		settings = &environment.Settings{
+			Config: config,
+			Home:   environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
 			},
-		},
-		ActiveProfile: "foobar",
-	}
+		}
 
-	pcmd := profileDeleteCommand{
-		out:    new(bytes.Buffer),
-		config: settings,
-		name:   "foobar",
-	}
+		config.FromFileReturns(settings, nil)
+		config.SaveReturns(nil)
 
-	err := pcmd.run()
+		args = os.Args
+	})
 
-	assert.Nil(t, err)
-	assert.Equal(t, fmt.Sprint(pcmd.out), "successfully deleted profile 'foobar'\n")
-	assert.Len(t, settings.ActiveProfile, 0)
-}
+	JustBeforeEach(func() {
+		cmd = profile.NewProfileDeleteCommand(settings)
+	})
 
-func TestDeleteCommandRunError(t *testing.T) {
-	mock := &mocks.MockConfig{}
-	settings := &environment.Settings{
-		Config: mock,
-		Profiles: []*environment.Profile{
-			&environment.Profile{
-				Name: "foobar",
+	AfterEach(func() {
+		os.Args = args
+	})
+
+	It("should create a profile delete commmand", func() {
+		Expect(cmd.Name()).To(Equal("delete"))
+		Expect(cmd.HasSubCommands()).To(BeFalse())
+	})
+
+	It("should provide a help prompt", func() {
+		os.Args = append(os.Args, "--help")
+
+		Expect(cmd.Execute()).Should(Succeed())
+		Expect(fmt.Sprint(out)).To(ContainSubstring("delete <profilename>"))
+	})
+})
+
+var _ = Describe("ProfileDeleteImplementation", func() {
+	var (
+		impl     *profile.DeleteCommand
+		out      *bytes.Buffer
+		settings *environment.Settings
+		config   *mocks.DefaultConfig
+	)
+
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+		config = &mocks.DefaultConfig{}
+
+		settings = &environment.Settings{
+			Config: config,
+			Home:   environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
 			},
-		},
-	}
+		}
 
-	mock.ExpectError("save error")
+		config.FromFileReturns(settings, nil)
+		config.SaveReturns(nil)
+	})
 
-	pcmd := profileDeleteCommand{
-		out:    new(bytes.Buffer),
-		config: settings,
-		name:   "foobar",
-	}
+	JustBeforeEach(func() {
+		impl = &profile.DeleteCommand{
+			Out:      out,
+			Settings: settings,
+		}
+	})
 
-	err := pcmd.run()
+	It("should not be nil", func() {
+		Expect(impl).ShouldNot(BeNil())
+	})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "save error")
-}
+	Describe("Complete", func() {
+		It("should fail without args", func() {
+			err := impl.Complete([]string{})
 
-func TestDeleteCommandErrorDNE(t *testing.T) {
-	mock := &mocks.MockConfig{}
-	settings := &environment.Settings{
-		Config: mock,
-	}
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("profile name not specified"))
+		})
 
-	pcmd := profileDeleteCommand{
-		out:    new(bytes.Buffer),
-		config: settings,
-		name:   "foobar",
-	}
+		It("should fail with empty string", func() {
+			err := impl.Complete([]string{" "})
 
-	err := pcmd.run()
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("profile name not specified"))
+		})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "profile 'foobar' was not found")
-}
+		It("should succeed with profile name", func() {
+			Expect(impl.Complete([]string{"foo"})).Should(Succeed())
+		})
+
+		Context("when config cannot be loaded", func() {
+			BeforeEach(func() {
+				config.FromFileReturns(nil, errors.New("cannot load config"))
+			})
+
+			It("should fail loading config", func() {
+				err := impl.Complete([]string{"foo"})
+
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(ContainSubstring("cannot load config"))
+			})
+		})
+	})
+
+	Describe("Run", func() {
+		JustBeforeEach(func() {
+			err := impl.Complete([]string{"foo"})
+
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should fail with non-existent profile", func() {
+			err := impl.Run()
+
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("profile 'foo' was not found"))
+		})
+
+		Context("when a profile exists", func() {
+			BeforeEach(func() {
+				settings.Profiles = []*environment.Profile{
+					&environment.Profile{
+						Name: "foo",
+					},
+				}
+				settings.ActiveProfile = "foo"
+			})
+
+			It("should successfully delete the profile", func() {
+				Expect(impl.Run()).Should(Succeed())
+				Expect(fmt.Sprint(out)).To(ContainSubstring("successfully deleted profile 'foo'\n"))
+				Expect(settings.ActiveProfile).To(Equal(""))
+			})
+		})
+
+		Context("when config cannot be saved", func() {
+			BeforeEach(func() {
+				config.SaveReturns(errors.New("save error"))
+
+				settings.Profiles = []*environment.Profile{
+					&environment.Profile{
+						Name: "foo",
+					},
+				}
+			})
+
+			It("should fail loading config", func() {
+				err := impl.Run()
+
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(ContainSubstring("save error"))
+			})
+		})
+	})
+})

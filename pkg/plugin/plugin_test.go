@@ -1,10 +1,10 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package plugin
+package plugin_test
 
 import (
 	"io/ioutil"
@@ -12,190 +12,171 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/hyperledger/fabric-cli/pkg/plugin"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-var testDir = "./testdata/tmp"
+func TestPlugin(t *testing.T) {
+	RegisterFailHandler(Fail)
 
-func TestGetPlugins(t *testing.T) {
-	tests := []struct {
-		// test case name
-		name string
+	RunSpecs(t, "Plugin Suite")
+}
 
-		// input path
-		path string
+//go:generate counterfeiter -o mocks/handler.go --fake-name PluginHandler . Handler
 
-		// expected output
-		expectErr    bool
-		outputLength int
-	}{
-		{
-			name:         "Existing Path",
-			path:         "./testdata/plugins",
-			outputLength: 3,
-		},
-		{
-			name:         "Nonexistent Path",
-			path:         "./foo/bar",
-			outputLength: 0,
-		},
-		{
-			name:      "Malformed Input",
-			path:      "[]",
-			expectErr: true,
-		},
-		{
-			name:      "Empty Path",
-			path:      "",
-			expectErr: true,
-		},
-	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			handler := &DefaultHandler{
-				Dir:      test.path,
-				Filename: DefaultFilename,
-			}
+var _ = Describe("Plugin", func() {
+	var (
+		dir     string
+		handler *plugin.DefaultHandler
+	)
+
+	BeforeEach(func() {
+		dir = filepath.Join(os.TempDir(), "plugins")
+
+		handler = &plugin.DefaultHandler{
+			Dir:      dir,
+			Filename: plugin.DefaultFilename,
+		}
+	})
+
+	JustBeforeEach(func() {
+		err := os.RemoveAll(handler.Dir)
+
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	AfterEach(func() {
+		err := os.RemoveAll(handler.Dir)
+
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	Describe("Get", func() {
+		It("should get plugins", func() {
+			plugins, err := handler.GetPlugins()
+
+			Expect(err).To(BeNil())
+			Expect(len(plugins)).To(Equal(0))
+		})
+
+		Context("when the plugin directory is malformed", func() {
+			BeforeEach(func() {
+				handler.Dir = "[]"
+			})
+
+			It("should fail to get plugins", func() {
+				_, err := handler.GetPlugins()
+
+				Expect(err).NotTo(BeNil())
+			})
+		})
+
+		Context("when the plugin directory is empty", func() {
+			BeforeEach(func() {
+				handler.Dir = ""
+			})
+
+			It("should fail to get plugins", func() {
+				_, err := handler.GetPlugins()
+
+				Expect(err).NotTo(BeNil())
+			})
+		})
+	})
+
+	Describe("Install", func() {
+		It("should fail to uninstall non-existent plugin", func() {
+			err := handler.UninstallPlugin("foo")
+
+			Expect(err).NotTo(BeNil())
+		})
+
+		Context("when plugin yaml does not exist", func() {
+			BeforeEach(func() {
+				err := os.MkdirAll(filepath.Join(os.TempDir(), "foo", "bar"), 0777)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should fail to install plugin", func() {
+				err := handler.InstallPlugin(filepath.Join(os.TempDir(), "foo", "bar"))
+
+				Expect(err).NotTo(BeNil())
+			})
+		})
+
+		Context("when plugin yaml is malformed", func() {
+			BeforeEach(func() {
+				err := os.MkdirAll(filepath.Join(os.TempDir(), "foo", "bar"), 0777)
+
+				Expect(err).NotTo(HaveOccurred())
+
+				err = ioutil.WriteFile(filepath.Join(os.TempDir(), "foo", "bar", handler.Filename),
+					[]byte("command: !!float 'error'"), 0777)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should fail to install plugin", func() {
+				err := handler.InstallPlugin(filepath.Join(os.TempDir(), "foo", "bar"))
+
+				Expect(err).NotTo(BeNil())
+			})
+		})
+
+		Context("when a plugin is installed", func() {
+			JustBeforeEach(func() {
+				err := handler.InstallPlugin("./testdata/plugins/home")
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should fail to install existing plugin", func() {
+				err := handler.InstallPlugin("./testdata/plugins/home")
+
+				Expect(err).NotTo(BeNil())
+
+				plugins, err := handler.GetPlugins()
+
+				Expect(err).To(BeNil())
+				Expect(len(plugins)).To(Equal(1))
+			})
+		})
+	})
+
+	Describe("Uninstall", func() {
+		It("should install plugin", func() {
+			Expect(handler.InstallPlugin("./testdata/plugins/home")).Should(Succeed())
 
 			plugins, err := handler.GetPlugins()
 
-			if test.expectErr {
-				assert.NotNil(t, err)
-				return
-			}
-
-			assert.Nil(t, err)
-			assert.NotNil(t, plugins)
-			assert.Len(t, plugins, test.outputLength)
+			Expect(err).To(BeNil())
+			Expect(len(plugins)).To(Equal(1))
 		})
-	}
-}
 
-func TestInstallErrors(t *testing.T) {
-	defer cleanup()
+		It("should fail to install non-existent plugin", func() {
+			err := handler.InstallPlugin(".foo/bar")
 
-	tests := []struct {
-		name string
-
-		input string
-
-		setup   func()
-		cleanup func()
-	}{
-		{
-			name:  "Plugin Does Not Exist",
-			input: "./foo/bar",
-		},
-		{
-			name:  "YAML Does Not Exist",
-			input: filepath.Join(testDir, "foo", "bar"),
-			setup: func() {
-				os.MkdirAll(filepath.Join(testDir, "foo", "bar"), 0777)
-			},
-			cleanup: func() {
-				os.RemoveAll(filepath.Join(testDir, "foo"))
-			},
-		},
-		{
-			name:  "Malformed YAML",
-			input: filepath.Join(testDir, "foo", "bar"),
-			setup: func() {
-				os.MkdirAll(filepath.Join(testDir, "foo", "bar"), 0777)
-				ioutil.WriteFile(filepath.Join(testDir, "foo", "bar", DefaultFilename),
-					[]byte("command: !!float 'error'"), 0777,
-				)
-			},
-			cleanup: func() {
-				os.RemoveAll(filepath.Join(testDir, "foo"))
-			},
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			if test.setup != nil {
-				test.setup()
-			}
-
-			if test.cleanup != nil {
-				defer test.cleanup()
-			}
-
-			handler := &DefaultHandler{
-				Dir:      testDir,
-				Filename: DefaultFilename,
-			}
-
-			err := handler.InstallPlugin(test.input)
-
-			assert.NotNil(t, err)
+			Expect(err).NotTo(BeNil())
 		})
-	}
-}
 
-func TestUninstallErrors(t *testing.T) {
-	tests := []struct {
-		name string
+		Context("when a plugin is installed", func() {
+			JustBeforeEach(func() {
+				err := handler.InstallPlugin("./testdata/plugins/home")
 
-		path   string
-		plugin string
-	}{
-		{
-			name:   "Plugin Not Found",
-			path:   testDir,
-			plugin: "foo",
-		},
-		{
-			name:   "Invalid Path",
-			path:   "[]",
-			plugin: "foo",
-		},
-	}
+				Expect(err).NotTo(HaveOccurred())
+			})
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			handler := &DefaultHandler{
-				Dir:      test.path,
-				Filename: DefaultFilename,
-			}
+			It("should uninstall plugin", func() {
+				Expect(handler.UninstallPlugin("home")).Should(Succeed())
 
-			err := handler.UninstallPlugin(test.plugin)
+				plugins, err := handler.GetPlugins()
 
-			assert.NotNil(t, err)
+				Expect(err).To(BeNil())
+				Expect(len(plugins)).To(Equal(0))
+			})
 		})
-	}
-}
+	})
 
-func TestSameFile(t *testing.T) {
-	defer cleanup()
-
-	handler := &DefaultHandler{
-		Dir:      testDir,
-		Filename: DefaultFilename,
-	}
-
-	err1 := handler.InstallPlugin("./testdata/plugins/echo")
-	assert.Nil(t, err1)
-
-	err2 := handler.UninstallPlugin("echo")
-	assert.Nil(t, err2)
-}
-
-func TestInstallFileExists(t *testing.T) {
-	defer cleanup()
-
-	handler := &DefaultHandler{
-		Dir:      testDir,
-		Filename: DefaultFilename,
-	}
-
-	err1 := handler.InstallPlugin("./testdata/plugins/echo")
-	assert.Nil(t, err1)
-
-	err2 := handler.InstallPlugin("./testdata/plugins/echo")
-	assert.NotNil(t, err2)
-}
-
-func cleanup() {
-	os.RemoveAll(testDir)
-}
+})

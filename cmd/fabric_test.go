@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
@@ -8,131 +8,124 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
+	"github.com/hyperledger/fabric-cli/pkg/plugin"
 	"github.com/hyperledger/fabric-cli/pkg/plugin/mocks"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestRootCommand(t *testing.T) {
-	settings := &environment.Settings{
-		Home: environment.DefaultHome,
-		Streams: environment.Streams{
-			In:  new(bytes.Buffer),
-			Out: new(bytes.Buffer),
-			Err: new(bytes.Buffer),
-		},
-	}
-	cmd := NewFabricCommand(settings)
+func TestFabricCommand(t *testing.T) {
+	RegisterFailHandler(Fail)
 
-	assert.NotNil(t, cmd)
-	assert.True(t, cmd.HasSubCommands())
-
-	err := cmd.Execute()
-
-	assert.Nil(t, err)
+	RunSpecs(t, "Fabric Suite")
 }
 
-func TestLoadPlugins(t *testing.T) {
-	tests := []struct {
-		// test name
-		name string
-
-		// input arguments
+var _ = Describe("FabricCommand", func() {
+	var (
+		cmd      *cobra.Command
 		settings *environment.Settings
-		handler  *mocks.MockHandler
+		out      *bytes.Buffer
+	)
 
-		// helper functions
-		addPlugin func(handler *mocks.MockHandler, path string) error
-		setError  func(handler *mocks.MockHandler, msg string)
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
 
-		// output
-		expectErr bool
-		count     int
-	}{
-		{
-			name: "No Plugins",
-			settings: &environment.Settings{
-				Streams: testStreams(),
+		settings = &environment.Settings{
+			Home: environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
 			},
-			handler: &mocks.MockHandler{},
-			count:   0,
-		},
-		{
-			name: "Bad Path",
-			settings: &environment.Settings{
-				Streams: testStreams(),
+		}
+	})
+
+	JustBeforeEach(func() {
+		cmd = NewFabricCommand(settings)
+	})
+
+	It("should create a fabric commmand", func() {
+		Expect(cmd.Name()).To(Equal("fabric"))
+		Expect(cmd.HasSubCommands()).To(BeTrue())
+		Expect(cmd.Execute()).Should(Succeed())
+		Expect(fmt.Sprint(out)).To(ContainSubstring("fabric [command]"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("profile"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("plugin"))
+	})
+
+})
+
+var _ = Describe("LoadPlugins", func() {
+	var (
+		out, err *bytes.Buffer
+		cmd      *cobra.Command
+		settings *environment.Settings
+		handler  *mocks.PluginHandler
+	)
+
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+		err = new(bytes.Buffer)
+		cmd = &cobra.Command{}
+
+		cmd.SetOutput(out)
+
+		settings = &environment.Settings{
+			Home: environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Err: err,
 			},
-			handler: &mocks.MockHandler{},
-			setError: func(handler *mocks.MockHandler, msg string) {
-				handler.ExpectError(msg)
-			},
-			expectErr: true,
-		},
-		{
-			name: "One Plugin",
-			settings: &environment.Settings{
-				Streams: testStreams(),
-			},
-			handler: &mocks.MockHandler{},
-			addPlugin: func(handler *mocks.MockHandler, path string) error {
-				return handler.InstallPlugin(path)
-			},
-			count: 1,
-		},
-	}
+		}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			if test.addPlugin != nil {
-				err := test.addPlugin(test.handler, "./foo/bar")
-				assert.Nil(t, err)
-			}
+		handler = &mocks.PluginHandler{}
+	})
 
-			if test.setError != nil {
-				test.setError(test.handler, "test error message")
-			}
+	JustBeforeEach(func() {
+		loadPlugins(cmd, settings, handler)
+	})
 
-			cmd := &cobra.Command{}
+	Context("when plugins are disabled", func() {
+		BeforeEach(func() {
+			settings.DisablePlugins = true
 
-			loadPlugins(cmd, test.settings, test.handler)
+			err := handler.InstallPlugin("foo")
 
-			err := fmt.Sprint(test.settings.Streams.Err)
-
-			if test.expectErr {
-				assert.NotEqual(t, len(err), 0)
-				return
-			}
-
-			assert.Len(t, err, 0)
-			assert.Len(t, cmd.Commands(), test.count)
+			Expect(err).NotTo(HaveOccurred())
 		})
-	}
-}
 
-func TestDisablePlugins(t *testing.T) {
-	cmd := &cobra.Command{}
+		It("should not have foo command", func() {
+			Expect(cmd.Execute()).Should(Succeed())
+			Expect(cmd.HasSubCommands()).Should(BeFalse())
+		})
+	})
 
-	settings := &environment.Settings{
-		DisablePlugins: true,
-	}
+	Context("when plugin handler fails", func() {
+		BeforeEach(func() {
+			handler.GetPluginsReturns(nil, errors.New("handler error"))
+		})
 
-	handler := &mocks.MockHandler{}
+		It("should fail to load plugins", func() {
+			Expect(fmt.Sprint(err)).To(ContainSubstring("An error occurred while loading plugins: handler error"))
+		})
+	})
 
-	handler.InstallPlugin("./foo/bar")
+	Context("when plugins have been installed", func() {
+		BeforeEach(func() {
+			handler.GetPluginsReturns([]*plugin.Plugin{
+				&plugin.Plugin{
+					Name: "foo",
+				},
+			}, nil)
+		})
 
-	loadPlugins(cmd, settings, handler)
-
-	assert.False(t, cmd.HasSubCommands())
-}
-
-func testStreams() environment.Streams {
-	return environment.Streams{
-		In:  new(bytes.Buffer),
-		Out: new(bytes.Buffer),
-		Err: new(bytes.Buffer),
-	}
-}
+		It("should load plugins", func() {
+			Expect(cmd.Execute()).Should(Succeed())
+			Expect(cmd.HasSubCommands()).Should(BeTrue())
+		})
+	})
+})

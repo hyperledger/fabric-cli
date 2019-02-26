@@ -1,115 +1,182 @@
 /*
-Copyright © 2019 State Street Bank and Trust Company.  All rights reserved
+Copyright State Street Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
 */
 
-package profile
+package profile_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"testing"
+	"os"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/spf13/cobra"
+
+	"github.com/hyperledger/fabric-cli/cmd/commands/profile"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/environment/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestProfileCreateCommand(t *testing.T) {
-	cmd := NewProfileCreateCommand(testEnvironment())
+var _ = Describe("ProfileCreateCommand", func() {
+	var (
+		cmd      *cobra.Command
+		settings *environment.Settings
+		config   *mocks.DefaultConfig
+		out      *bytes.Buffer
 
-	assert.NotNil(t, cmd)
-	assert.False(t, cmd.HasSubCommands())
-}
+		args []string
+	)
 
-func TestCreateCommandComplete(t *testing.T) {
-	pcmd := profileCreateCommand{
-		out:    new(bytes.Buffer),
-		config: &environment.Settings{},
-	}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+		config = &mocks.DefaultConfig{}
 
-	err := pcmd.complete([]string{"foo"})
-
-	assert.Nil(t, err)
-	assert.Equal(t, pcmd.name, "foo")
-}
-
-func TestCreateCommandCompleteError(t *testing.T) {
-	pcmd := profileCreateCommand{
-		out:    new(bytes.Buffer),
-		config: &environment.Settings{},
-	}
-
-	err := pcmd.complete([]string{})
-
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "profile name not specified")
-}
-
-func TestCreateCommandCompleteErrorTrim(t *testing.T) {
-	pcmd := profileCreateCommand{
-		out:    new(bytes.Buffer),
-		config: &environment.Settings{},
-	}
-
-	err := pcmd.complete([]string{" "})
-
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "profile name not specified")
-}
-
-func TestCreateCommandCompleteExists(t *testing.T) {
-	pcmd := profileCreateCommand{
-		out: new(bytes.Buffer),
-		config: &environment.Settings{
-			Profiles: []*environment.Profile{
-				&environment.Profile{
-					Name: "foo",
-				},
+		settings = &environment.Settings{
+			Config: config,
+			Home:   environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
 			},
-		},
-	}
+		}
 
-	err := pcmd.complete([]string{"foo"})
+		args = os.Args
+	})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "profile 'foo' already exists")
-}
+	JustBeforeEach(func() {
+		cmd = profile.NewProfileCreateCommand(settings)
+	})
 
-func TestCreateCommandRun(t *testing.T) {
-	mock := &mocks.MockConfig{}
-	settings := &environment.Settings{Config: mock}
+	AfterEach(func() {
+		os.Args = args
+	})
 
-	pcmd := profileCreateCommand{
-		out:    new(bytes.Buffer),
-		config: settings,
-		name:   "foobar",
-	}
+	It("should create a profile create commmand", func() {
+		Expect(cmd.Name()).To(Equal("create"))
+		Expect(cmd.HasSubCommands()).To(BeFalse())
+	})
 
-	assert.Empty(t, pcmd.config.ActiveProfile)
+	It("should provide a help prompt", func() {
+		os.Args = append(os.Args, "--help")
 
-	err := pcmd.run()
+		Expect(cmd.Execute()).Should(Succeed())
+		Expect(fmt.Sprint(out)).To(ContainSubstring("create <profilename>"))
+	})
+})
 
-	assert.Nil(t, err)
-	assert.Equal(t, fmt.Sprint(pcmd.out), "successfully created profile 'foobar'\n")
+var _ = Describe("ProfileCreateImplementation", func() {
+	var (
+		impl     *profile.CreateCommand
+		out      *bytes.Buffer
+		settings *environment.Settings
+		config   *mocks.DefaultConfig
+	)
 
-	assert.Equal(t, pcmd.config.ActiveProfile, "foobar")
-}
+	BeforeEach(func() {
+		out = new(bytes.Buffer)
+		config = &mocks.DefaultConfig{}
 
-func TestCreateCommandRunErr(t *testing.T) {
-	mock := &mocks.MockConfig{}
-	settings := &environment.Settings{Config: mock}
+		settings = &environment.Settings{
+			Config: config,
+			Home:   environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
+			},
+		}
 
-	mock.ExpectError("profile exists")
+		config.FromFileReturns(settings, nil)
+		config.SaveReturns(nil)
+	})
 
-	pcmd := profileCreateCommand{
-		out:    new(bytes.Buffer),
-		config: settings,
-	}
+	JustBeforeEach(func() {
+		impl = &profile.CreateCommand{
+			Out:      out,
+			Settings: settings,
+		}
+	})
 
-	err := pcmd.run()
+	It("should not be nil", func() {
+		Expect(impl).ShouldNot(BeNil())
+	})
 
-	assert.NotNil(t, err)
-	assert.Equal(t, err.Error(), "profile exists")
-}
+	Describe("Complete", func() {
+		It("should fail without args", func() {
+			err := impl.Complete([]string{})
+
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("profile name not specified"))
+		})
+
+		It("should fail with empty string", func() {
+			err := impl.Complete([]string{" "})
+
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("profile name not specified"))
+		})
+
+		It("should succeed with profile name", func() {
+			Expect(impl.Complete([]string{"foo"})).Should(Succeed())
+		})
+
+		Context("when config cannot be loaded", func() {
+			BeforeEach(func() {
+				config.FromFileReturns(nil, errors.New("cannot load config"))
+			})
+
+			It("should fail loading config", func() {
+				err := impl.Complete([]string{"foo"})
+
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(ContainSubstring("cannot load config"))
+			})
+		})
+
+		Context("when a profile already exists", func() {
+			BeforeEach(func() {
+				settings.Profiles = []*environment.Profile{
+					&environment.Profile{
+						Name: "foo",
+					},
+				}
+			})
+
+			It("should fail with existing profile", func() {
+				err := impl.Complete([]string{"foo"})
+
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(ContainSubstring("profile 'foo' already exists"))
+			})
+		})
+
+	})
+
+	Describe("Run", func() {
+		JustBeforeEach(func() {
+			err := impl.Complete([]string{"foo"})
+
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should succeed with profile name", func() {
+			Expect(impl.Run()).Should(Succeed())
+			Expect(fmt.Sprint(out)).To(ContainSubstring("successfully created profile 'foo'\n"))
+			Expect(settings.ActiveProfile).To(Equal("foo"))
+		})
+
+		Context("when config cannot be saved", func() {
+			BeforeEach(func() {
+				config.SaveReturns(errors.New("save error"))
+			})
+
+			It("should fail saving config", func() {
+				err := impl.Run()
+
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(ContainSubstring("save error"))
+			})
+		})
+	})
+})
