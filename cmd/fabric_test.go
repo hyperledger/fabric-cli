@@ -117,7 +117,7 @@ var _ = Describe("LoadPlugins", func() {
 	Context("when plugins have been installed", func() {
 		BeforeEach(func() {
 			handler.GetPluginsReturns([]*plugin.Plugin{
-				&plugin.Plugin{
+				{
 					Name: "foo",
 				},
 			}, nil)

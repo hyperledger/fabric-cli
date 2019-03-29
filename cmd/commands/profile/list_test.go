@@ -92,10 +92,10 @@ var _ = Describe("ProfileListImplementation", func() {
 	Context("when profiles exists", func() {
 		JustBeforeEach(func() {
 			impl.Profiles = []*environment.Profile{
-				&environment.Profile{
+				{
 					Name: "foo",
 				},
-				&environment.Profile{
+				{
 					Name: "bar",
 				},
 			}

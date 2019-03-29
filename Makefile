@@ -4,7 +4,7 @@
 
 GO_CMD		?= go
 DEP_CMD		?= dep
-LINT_CMD	?= gometalinter
+LINT_CMD	?= golangci-lint
 
 BIN_DIR := $(CURDIR)/bin
 CMD_DIR := $(CURDIR)/cmd
@@ -20,13 +20,13 @@ clean:
 dep:
 	$(DEP_CMD) ensure
 
-.PHONY: lint
-lint:
-	$(LINT_CMD) --disable=gocyclo --disable=gas --deadline=120s --exclude=vendor ./...
-
 .PHONY: generate
-generate: 
+generate:
 	$(GO_CMD) generate ./...
+
+.PHONY: lint
+lint: generate
+	$(LINT_CMD) run
 
 .PHONY: test
 test: generate

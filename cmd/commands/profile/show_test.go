@@ -120,7 +120,7 @@ var _ = Describe("ProfileShowImplementation", func() {
 		Context("when active profile is set", func() {
 			JustBeforeEach(func() {
 				impl.Profiles = []*environment.Profile{
-					&environment.Profile{
+					{
 						Name: "foo",
 					},
 				}
@@ -136,7 +136,7 @@ var _ = Describe("ProfileShowImplementation", func() {
 		Context("when specified profile does not exist", func() {
 			JustBeforeEach(func() {
 				impl.Profiles = []*environment.Profile{
-					&environment.Profile{
+					{
 						Name: "foo",
 					},
 				}
@@ -158,10 +158,10 @@ var _ = Describe("ProfileShowImplementation", func() {
 		Context("when non-active profile is specified", func() {
 			JustBeforeEach(func() {
 				impl.Profiles = []*environment.Profile{
-					&environment.Profile{
+					{
 						Name: "foo",
 					},
-					&environment.Profile{
+					{
 						Name: "bar",
 					},
 				}

@@ -137,7 +137,7 @@ var _ = Describe("ProfileCreateImplementation", func() {
 		Context("when a profile already exists", func() {
 			BeforeEach(func() {
 				settings.Profiles = []*environment.Profile{
-					&environment.Profile{
+					{
 						Name: "foo",
 					},
 				}

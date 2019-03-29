@@ -155,7 +155,7 @@ var _ = Describe("ProfileDeleteImplementation", func() {
 		Context("when a profile exists", func() {
 			BeforeEach(func() {
 				settings.Profiles = []*environment.Profile{
-					&environment.Profile{
+					{
 						Name: "foo",
 					},
 				}
@@ -174,7 +174,7 @@ var _ = Describe("ProfileDeleteImplementation", func() {
 				config.SaveReturns(errors.New("save error"))
 
 				settings.Profiles = []*environment.Profile{
-					&environment.Profile{
+					{
 						Name: "foo",
 					},
 				}

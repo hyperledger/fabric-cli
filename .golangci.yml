@@ -1,0 +1,22 @@
+# Copyright State Street Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+run:
+  deadline: 2m
+
+linters:
+  disable-all: true
+  enable:
+    - gocyclo
+    - gofmt
+    - golint
+    - govet
+    - ineffassign
+    - interfacer
+    - lll
+    - misspell
+    - nakedret
+    - structcheck
+    - unparam
+    - varcheck

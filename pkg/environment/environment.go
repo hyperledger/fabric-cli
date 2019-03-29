@@ -46,7 +46,7 @@ func NewDefaultSettings() *Settings {
 	return s
 }
 
-// GetSettings populates a Settings struct based on viper precendence
+// GetSettings populates a Settings struct based on viper precedence
 // Highest precedence to lowest:
 // 		Env > Config File > Defaults
 // This can support flags in the future
