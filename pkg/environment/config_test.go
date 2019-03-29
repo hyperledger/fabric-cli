@@ -14,7 +14,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-//nolint:lll
 //go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/config.go --fake-name DefaultConfig . Config
 
 var _ = Describe("Config", func() {

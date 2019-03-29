@@ -20,3 +20,7 @@ linters:
     - structcheck
     - unparam
     - varcheck
+
+linters-settings:
+  lll:
+    line-length: 150

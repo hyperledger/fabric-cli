@@ -8,6 +8,8 @@ LINT_CMD	?= golangci-lint
 BIN_DIR := $(CURDIR)/bin
 CMD_DIR := $(CURDIR)/cmd
 
+export GO111MODULE := on
+
 all: clean build
 
 .PHONY: clean
