@@ -11,11 +11,12 @@ The Hyperledger Fabric CLI is a tool used to interact with [Fabric networks](htt
 
 ## Installation
 
-1. Clone this repo into `$GOPATH/src/github.com/hyperledger`
-2. Run `make`
-3. Locate the binary in the `bin` directory
-4. Add the binary to your PATH
-5. Execute `fabric` for more information
+1. Clone this repo
+2. Install `gobin` using `GO111MODULE=off go get -u github.com/myitcv/gobin`
+3. Run `make`
+4. Locate the binary in the `bin` directory
+5. Add the binary to your PATH
+6. Execute `fabric` for more information
 
 ## Built-in Commands
 

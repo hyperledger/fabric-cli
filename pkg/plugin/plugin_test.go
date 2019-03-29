@@ -23,7 +23,8 @@ func TestPlugin(t *testing.T) {
 	RunSpecs(t, "Plugin Suite")
 }
 
-//go:generate counterfeiter -o mocks/handler.go --fake-name PluginHandler . Handler
+//nolint:lll
+//go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/handler.go --fake-name PluginHandler . Handler
 
 var _ = Describe("Plugin", func() {
 	var (

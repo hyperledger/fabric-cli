@@ -2,3 +2,4 @@
 bin/
 vendor/
 _vendor*
+.gobincache
