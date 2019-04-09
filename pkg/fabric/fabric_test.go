@@ -24,6 +24,7 @@ import (
 //go:generate counterfeiter -o mocks/ledger.go --fake-name Ledger . Ledger
 //go:generate counterfeiter -o mocks/resmgmt.go --fake-name ResourceManangement . ResourceManagement
 //go:generate counterfeiter -o mocks/msp.go --fake-name MSP . MSP
+//go:generate counterfeiter -o mocks/channelcfg.go --fake-name ChannelCfg github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab.ChannelCfg
 
 func TestFabric(t *testing.T) {
 	RegisterFailHandler(Fail)

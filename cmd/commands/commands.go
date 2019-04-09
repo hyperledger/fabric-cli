@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package commands
 
 import (
+	"github.com/hyperledger/fabric-cli/cmd/commands/channel"
 	"github.com/hyperledger/fabric-cli/cmd/commands/plugin"
 	"github.com/hyperledger/fabric-cli/cmd/commands/profile"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -22,5 +23,8 @@ func All(settings *environment.Settings) []*cobra.Command {
 
 		// fabric profile < list | create | delete | show | use >
 		profile.NewProfileCommand(settings),
+
+		// fabric channel < create | join | update | list | config >
+		channel.NewChannelCommand(settings),
 	}
 }
