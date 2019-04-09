@@ -20,8 +20,7 @@ import (
 func NewProfileShowCommand(settings *environment.Settings) *cobra.Command {
 	c := ShowCommand{
 		Out:      settings.Streams.Out,
-		Profiles: settings.Profiles,
-		Active:   settings.ActiveProfile,
+		Settings: settings,
 	}
 
 	cmd := &cobra.Command{
@@ -43,8 +42,7 @@ func NewProfileShowCommand(settings *environment.Settings) *cobra.Command {
 // ShowCommand implements the profile show command
 type ShowCommand struct {
 	Out      io.Writer
-	Profiles []*environment.Profile
-	Active   string
+	Settings *environment.Settings
 
 	name string
 }
@@ -52,7 +50,7 @@ type ShowCommand struct {
 // Complete populates required fields for Run
 func (cmd *ShowCommand) Complete(args []string) error {
 	if len(args) == 0 {
-		cmd.name = cmd.Active
+		cmd.name = cmd.Settings.ActiveProfile
 
 		if len(cmd.name) == 0 {
 			return errors.New("no profile currently active")
@@ -70,16 +68,16 @@ func (cmd *ShowCommand) Complete(args []string) error {
 
 // Run executes the command
 func (cmd *ShowCommand) Run() error {
-	if len(cmd.Profiles) == 0 {
+	if len(cmd.Settings.Profiles) == 0 {
 		return errors.New("no profiles currently exist")
 	}
 
-	for _, p := range cmd.Profiles {
-		if p.Name == cmd.name {
-			fmt.Fprintf(cmd.Out, "Name: %s\n", p.Name)
-			return nil
-		}
+	profile, ok := cmd.Settings.Profiles[cmd.name]
+	if !ok {
+		return fmt.Errorf("profile '%s' was not found", cmd.name)
 	}
 
-	return fmt.Errorf("profile '%s' was not found", cmd.name)
+	fmt.Fprintf(cmd.Out, "Name: %s\n", profile.Name)
+
+	return nil
 }

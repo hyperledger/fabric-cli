@@ -88,6 +88,7 @@ var _ = Describe("ProfileDeleteImplementation", func() {
 			Streams: environment.Streams{
 				Out: out,
 			},
+			Profiles: make(map[string]*environment.Profile),
 		}
 
 		config.FromFileReturns(settings, nil)
@@ -154,8 +155,8 @@ var _ = Describe("ProfileDeleteImplementation", func() {
 
 		Context("when a profile exists", func() {
 			BeforeEach(func() {
-				settings.Profiles = []*environment.Profile{
-					{
+				settings.Profiles = map[string]*environment.Profile{
+					"foo": {
 						Name: "foo",
 					},
 				}
@@ -173,8 +174,8 @@ var _ = Describe("ProfileDeleteImplementation", func() {
 			BeforeEach(func() {
 				config.SaveReturns(errors.New("save error"))
 
-				settings.Profiles = []*environment.Profile{
-					{
+				settings.Profiles = map[string]*environment.Profile{
+					"foo": {
 						Name: "foo",
 					},
 				}

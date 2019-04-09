@@ -82,3 +82,76 @@ var _ = Describe("PluginEnvironment", func() {
 	})
 
 })
+
+var _ = Describe("Profile", func() {
+	var (
+		settings *environment.Settings
+		profile  *environment.Profile
+		err      error
+	)
+
+	BeforeEach(func() {
+		settings = &environment.Settings{}
+	})
+
+	Describe("ActiveProfile", func() {
+		JustBeforeEach(func() {
+			profile, err = settings.GetActiveProfile()
+		})
+
+		It("should fail without profiles", func() {
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(ContainSubstring("no profiles currently exist"))
+			Expect(profile).To(BeNil())
+		})
+
+		Context("when profiles exist", func() {
+			BeforeEach(func() {
+				settings.Profiles = map[string]*environment.Profile{
+					"foo": {
+						Name: "foo",
+					},
+				}
+			})
+
+			It("should fail without active profile set", func() {
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(ContainSubstring("no profile currently active"))
+				Expect(profile).To(BeNil())
+			})
+		})
+
+		Context("when profiles exist but are missing the active profile", func() {
+			BeforeEach(func() {
+				settings.Profiles = map[string]*environment.Profile{
+					"foo": {
+						Name: "foo",
+					},
+				}
+				settings.ActiveProfile = "bar"
+			})
+
+			It("should fail to find active profile", func() {
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(ContainSubstring("profile 'bar' was not found"))
+				Expect(profile).To(BeNil())
+			})
+		})
+
+		Context("when active profile exists and is set", func() {
+			BeforeEach(func() {
+				settings.Profiles = map[string]*environment.Profile{
+					"foo": {
+						Name: "foo",
+					},
+				}
+				settings.ActiveProfile = "foo"
+			})
+
+			It("should return the active profile", func() {
+				Expect(err).To(BeNil())
+				Expect(profile).NotTo(BeNil())
+			})
+		})
+	})
+})

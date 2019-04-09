@@ -72,17 +72,11 @@ func (cmd *DeleteCommand) Complete(args []string) error {
 
 // Run executes the command
 func (cmd *DeleteCommand) Run() error {
-	var found bool
-	for i, p := range cmd.config.Profiles {
-		if p.Name == cmd.name {
-			found = true
-			cmd.config.Profiles = append(cmd.config.Profiles[:i], cmd.config.Profiles[i+1:]...)
-		}
-	}
-
-	if !found {
+	if _, ok := cmd.config.Profiles[cmd.name]; !ok {
 		return fmt.Errorf("profile '%s' was not found", cmd.name)
 	}
+
+	delete(cmd.config.Profiles, cmd.name)
 
 	if cmd.name == cmd.config.ActiveProfile {
 		cmd.config.ActiveProfile = ""

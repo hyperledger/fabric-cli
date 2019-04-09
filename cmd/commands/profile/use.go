@@ -72,17 +72,11 @@ func (cmd *UseCommand) Complete(args []string) error {
 
 // Run executes the command
 func (cmd *UseCommand) Run() error {
-	var found bool
-	for _, p := range cmd.config.Profiles {
-		if p.Name == cmd.name {
-			found = true
-			cmd.config.ActiveProfile = cmd.name
-		}
-	}
-
-	if !found {
+	if _, ok := cmd.config.Profiles[cmd.name]; !ok {
 		return fmt.Errorf("profile '%s' was not found", cmd.name)
 	}
+
+	cmd.config.ActiveProfile = cmd.name
 
 	err := cmd.config.Save()
 	if err != nil {

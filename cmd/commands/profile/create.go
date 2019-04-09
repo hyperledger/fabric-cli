@@ -68,25 +68,21 @@ func (cmd *CreateCommand) Complete(args []string) error {
 		return errors.New("profile name not specified")
 	}
 
-	for _, p := range cmd.config.Profiles {
-		if cmd.name == p.Name {
-			return fmt.Errorf("profile '%s' already exists", cmd.name)
-		}
-	}
-
 	return nil
 }
 
 // Run executes the command
 func (cmd *CreateCommand) Run() error {
-	profile := &environment.Profile{
+	if _, ok := cmd.config.Profiles[cmd.name]; ok {
+		return fmt.Errorf("profile '%s' already exists", cmd.name)
+	}
+
+	cmd.config.Profiles[cmd.name] = &environment.Profile{
 		Name: cmd.name,
 	}
 
-	cmd.config.Profiles = append(cmd.config.Profiles, profile)
-
 	if len(cmd.config.ActiveProfile) == 0 {
-		cmd.config.ActiveProfile = profile.Name
+		cmd.config.ActiveProfile = cmd.name
 	}
 
 	err := cmd.config.Save()

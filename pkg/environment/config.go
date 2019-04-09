@@ -25,8 +25,9 @@ type Config interface {
 
 // DefaultConfig contains the default operations for managing the config file
 type DefaultConfig struct {
+	*Settings
+
 	Filename string
-	Settings *Settings
 }
 
 // FromFile retruns an instance of settings only based on config file
@@ -44,12 +45,7 @@ func (c *DefaultConfig) FromFile() (*Settings, error) {
 		}
 	}
 
-	s := &Settings{}
-
-	s.Config = &DefaultConfig{
-		Filename: DefaultConfigFilename,
-		Settings: s,
-	}
+	s := NewDefaultSettings()
 
 	if err := v.Unmarshal(s); err != nil {
 		return nil, err

@@ -64,17 +64,27 @@ var _ = Describe("ProfileShowCommand", func() {
 
 var _ = Describe("ProfileShowImplementation", func() {
 	var (
-		impl *profile.ShowCommand
-		out  *bytes.Buffer
+		impl     *profile.ShowCommand
+		out      *bytes.Buffer
+		settings *environment.Settings
 	)
 
 	BeforeEach(func() {
 		out = new(bytes.Buffer)
+
+		settings = &environment.Settings{
+			Home: environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
+			},
+			Profiles: make(map[string]*environment.Profile),
+		}
 	})
 
 	JustBeforeEach(func() {
 		impl = &profile.ShowCommand{
-			Out: out,
+			Out:      out,
+			Settings: settings,
 		}
 	})
 
@@ -119,12 +129,16 @@ var _ = Describe("ProfileShowImplementation", func() {
 
 		Context("when active profile is set", func() {
 			JustBeforeEach(func() {
-				impl.Profiles = []*environment.Profile{
-					{
+				settings.Profiles = map[string]*environment.Profile{
+					"foo": {
 						Name: "foo",
 					},
+					"bar": {
+						Name: "bar",
+					},
 				}
-				impl.Active = "foo"
+
+				settings.ActiveProfile = "foo"
 			})
 
 			It("should print the active profile", func() {
@@ -135,12 +149,13 @@ var _ = Describe("ProfileShowImplementation", func() {
 
 		Context("when specified profile does not exist", func() {
 			JustBeforeEach(func() {
-				impl.Profiles = []*environment.Profile{
-					{
+				settings.Profiles = map[string]*environment.Profile{
+					"foo": {
 						Name: "foo",
 					},
 				}
-				impl.Active = "foo"
+
+				settings.ActiveProfile = "foo"
 
 				err := impl.Complete([]string{"bar"})
 
@@ -157,15 +172,16 @@ var _ = Describe("ProfileShowImplementation", func() {
 
 		Context("when non-active profile is specified", func() {
 			JustBeforeEach(func() {
-				impl.Profiles = []*environment.Profile{
-					{
+				settings.Profiles = map[string]*environment.Profile{
+					"foo": {
 						Name: "foo",
 					},
-					{
+					"bar": {
 						Name: "bar",
 					},
 				}
-				impl.Active = "foo"
+
+				settings.ActiveProfile = "foo"
 
 				err := impl.Complete([]string{"bar"})
 

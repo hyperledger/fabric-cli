@@ -64,17 +64,27 @@ var _ = Describe("ProfileListCommand", func() {
 
 var _ = Describe("ProfileListImplementation", func() {
 	var (
-		impl *profile.ListCommand
-		out  *bytes.Buffer
+		impl     *profile.ListCommand
+		out      *bytes.Buffer
+		settings *environment.Settings
 	)
 
 	BeforeEach(func() {
 		out = new(bytes.Buffer)
+
+		settings = &environment.Settings{
+			Home: environment.Home(os.TempDir()),
+			Streams: environment.Streams{
+				Out: out,
+			},
+			Profiles: make(map[string]*environment.Profile),
+		}
 	})
 
 	JustBeforeEach(func() {
 		impl = &profile.ListCommand{
-			Out: out,
+			Out:      out,
+			Settings: settings,
 		}
 	})
 
@@ -91,15 +101,16 @@ var _ = Describe("ProfileListImplementation", func() {
 
 	Context("when profiles exists", func() {
 		JustBeforeEach(func() {
-			impl.Profiles = []*environment.Profile{
-				{
+			settings.Profiles = map[string]*environment.Profile{
+				"foo": {
 					Name: "foo",
 				},
-				{
+				"bar": {
 					Name: "bar",
 				},
 			}
-			impl.Active = "foo"
+
+			settings.ActiveProfile = "foo"
 		})
 
 		It("should list profiles", func() {

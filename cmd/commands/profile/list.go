@@ -19,8 +19,7 @@ import (
 func NewProfileListCommand(settings *environment.Settings) *cobra.Command {
 	c := ListCommand{
 		Out:      settings.Streams.Out,
-		Profiles: settings.Profiles,
-		Active:   settings.ActiveProfile,
+		Settings: settings,
 	}
 
 	cmd := &cobra.Command{
@@ -39,23 +38,22 @@ func NewProfileListCommand(settings *environment.Settings) *cobra.Command {
 // ListCommand implements the profile list command
 type ListCommand struct {
 	Out      io.Writer
-	Profiles []*environment.Profile
-	Active   string
+	Settings *environment.Settings
 }
 
 // Run executes the command
 func (cmd *ListCommand) Run() error {
-	if len(cmd.Profiles) == 0 {
+	if len(cmd.Settings.Profiles) == 0 {
 		return errors.New("no profiles currently exist")
 	}
 
-	for _, p := range cmd.Profiles {
+	for _, p := range cmd.Settings.Profiles {
 		fmt.Fprint(cmd.Out, p.Name)
-		if p.Name == cmd.Active {
+		if p.Name == cmd.Settings.ActiveProfile {
 			fmt.Fprint(cmd.Out, " (active)")
 		}
-		fmt.Fprintln(cmd.Out)
 
+		fmt.Fprintln(cmd.Out)
 	}
 
 	return nil

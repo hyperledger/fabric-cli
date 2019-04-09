@@ -85,6 +85,7 @@ var _ = Describe("ProfileCreateImplementation", func() {
 			Streams: environment.Streams{
 				Out: out,
 			},
+			Profiles: make(map[string]*environment.Profile),
 		}
 
 		config.FromFileReturns(settings, nil)
@@ -134,23 +135,6 @@ var _ = Describe("ProfileCreateImplementation", func() {
 			})
 		})
 
-		Context("when a profile already exists", func() {
-			BeforeEach(func() {
-				settings.Profiles = []*environment.Profile{
-					{
-						Name: "foo",
-					},
-				}
-			})
-
-			It("should fail with existing profile", func() {
-				err := impl.Complete([]string{"foo"})
-
-				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).To(ContainSubstring("profile 'foo' already exists"))
-			})
-		})
-
 	})
 
 	Describe("Run", func() {
@@ -164,6 +148,23 @@ var _ = Describe("ProfileCreateImplementation", func() {
 			Expect(impl.Run()).Should(Succeed())
 			Expect(fmt.Sprint(out)).To(ContainSubstring("successfully created profile 'foo'\n"))
 			Expect(settings.ActiveProfile).To(Equal("foo"))
+		})
+
+		Context("when a profile already exists", func() {
+			BeforeEach(func() {
+				settings.Profiles = map[string]*environment.Profile{
+					"foo": {
+						Name: "foo",
+					},
+				}
+			})
+
+			It("should fail with existing profile", func() {
+				err := impl.Run()
+
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(ContainSubstring("profile 'foo' already exists"))
+			})
 		})
 
 		Context("when config cannot be saved", func() {

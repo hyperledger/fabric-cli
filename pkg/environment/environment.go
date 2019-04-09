@@ -7,6 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 package environment
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"strings"
 
@@ -17,11 +19,11 @@ import (
 type Settings struct {
 	Config `yaml:"-"`
 
-	Home           Home       `yaml:"-"`
-	Streams        Streams    `yaml:"-"`
-	ActiveProfile  string     `mapstructure:"active_profile" yaml:"active_profile"`
-	Profiles       []*Profile `mapstructure:"profiles" yaml:"profiles"`
-	DisablePlugins bool       `mapstructure:"disable_plugins" yaml:"disable_plugins"`
+	Home           Home                `yaml:"-"`
+	Streams        Streams             `yaml:"-"`
+	ActiveProfile  string              `mapstructure:"active_profile" yaml:"active_profile"`
+	Profiles       map[string]*Profile `mapstructure:"profiles" yaml:"profiles"`
+	DisablePlugins bool                `mapstructure:"disable_plugins" yaml:"disable_plugins,omitempty"`
 }
 
 // SetupPluginEnv sets the environment variables that are important to plugins
@@ -34,10 +36,36 @@ func (s *Settings) SetupPluginEnv() {
 	}
 }
 
+// GetActiveProfile provides a centralized resolution for the active profile.
+// There are 4 states the config could be in:
+//		- No profiles
+//		- Profiles exist but active profile is unset
+//		- Active profile exists and is set
+//		- Active profile does not exist but is set
+func (s *Settings) GetActiveProfile() (*Profile, error) {
+	if len(s.Profiles) == 0 {
+		return nil, errors.New("no profiles currently exist")
+	}
+
+	if len(s.ActiveProfile) == 0 {
+		return nil, errors.New("no profile currently active")
+	}
+
+	profile, ok := s.Profiles[s.ActiveProfile]
+	if !ok {
+		return nil, fmt.Errorf("profile '%s' was not found", s.ActiveProfile)
+	}
+
+	return profile, nil
+}
+
 // NewDefaultSettings returns an instance of settings with default config
 // implementation
 func NewDefaultSettings() *Settings {
-	s := &Settings{}
+	s := &Settings{
+		Profiles: make(map[string]*Profile),
+	}
+
 	s.Config = &DefaultConfig{
 		Filename: DefaultConfigFilename,
 		Settings: s,
@@ -58,7 +86,7 @@ func GetSettings() (*Settings, error) {
 	// Set default values(establish field type)
 	v.SetDefault("home", DefaultHome)
 	v.SetDefault("streams", DefaultStreams)
-	v.SetDefault("profiles", []*Profile{})
+	v.SetDefault("profiles", map[string]*Profile{})
 	v.SetDefault("disable_plugins", false)
 
 	// Load environment variable overrides
