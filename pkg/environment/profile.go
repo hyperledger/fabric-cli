@@ -6,11 +6,6 @@ SPDX-License-Identifier: Apache-2.0
 
 package environment
 
-import (
-	"bytes"
-	"text/template"
-)
-
 // Profile contains metadata for a fabric network
 type Profile struct {
 	Name string
@@ -69,19 +64,4 @@ type Peer struct {
 
 	ChannelOptions map[string]interface{} `yaml:",omitempty"`
 	GRPCOptions    map[string]interface{} `yaml:",omitempty"`
-}
-
-// ToTemplate transforms the profile into the provided template
-func (p *Profile) ToTemplate(path string) ([]byte, error) {
-	tmpl, err := template.ParseFiles(path)
-	if err != nil {
-		return nil, err
-	}
-
-	buffer := &bytes.Buffer{}
-	if err := tmpl.Execute(buffer, p); err != nil {
-		return nil, err
-	}
-
-	return buffer.Bytes(), nil
 }

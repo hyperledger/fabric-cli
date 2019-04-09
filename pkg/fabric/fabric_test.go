@@ -8,8 +8,6 @@ package fabric_test
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -40,63 +38,8 @@ var _ = Describe("Fabric", func() {
 	)
 
 	BeforeEach(func() {
-		profile = &environment.Profile{
-			Context: &environment.Context{
-				Organization: "Org1",
-				Identity:     "Admin",
-				Orderers:     []string{"orderer.example.com"},
-				Peers:        []string{"peer0.org1.example.com"},
-			},
-			CryptoConfig:    "${FABRIC_CFG_PATH}",
-			CredentialStore: filepath.Clean(os.TempDir()),
-			Channels: map[string]*environment.Channel{
-				"mychannel": {
-					ID:    "mychannel",
-					Peers: []string{"peer0.org1.example.com"},
-				},
-			},
-			Organizations: map[string]*environment.Organization{
-				"Org1": {
-					ID: "Org1",
-					MSP: &environment.MSP{
-						ID:    "Org1MSP",
-						Store: "peerOrganizations/org1.example.com/users/{username}@org1.example.com/msp",
-					},
-					Peers: []string{
-						"peer0.example.com",
-					},
-				},
-			},
-			Orderers: map[string]*environment.Orderer{
-				"orderer.example.com": {
-					ID:  "orderer.example.com",
-					URL: "grpc://localhost:7050",
-					TLS: "${FABRIC_CFG_PATH}/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem",
-				},
-			},
-			Peers: map[string]*environment.Peer{
-				"peer0.org1.example.com": {
-					ID:  "orderer.example.com",
-					URL: "grpc://localhost:7050",
-					TLS: "${FABRIC_CFG_PATH}/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem",
-					ChannelOptions: map[string]interface{}{
-						"endorsingPeer": true,
-					},
-					GRPCOptions: map[string]interface{}{
-						"keep-alive-timeout": "20s",
-					},
-				},
-			},
-		}
-
+		profile = &environment.Profile{}
 		factory = &mocks.Factory{}
-	})
-
-	It("should transform profile to config", func() {
-		config, err := profile.ToTemplate("./templates/config.tmpl")
-
-		Expect(err).To(BeNil())
-		Expect(config).NotTo(BeNil())
 	})
 
 	Describe("Channel", func() {

@@ -7,7 +7,11 @@ SPDX-License-Identifier: Apache-2.0
 package fabric
 
 import (
+	"bytes"
+	"text/template"
+
 	"github.com/hyperledger/fabric-cli/pkg/environment"
+	"github.com/hyperledger/fabric-cli/pkg/fabric/templates"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/event"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
@@ -32,12 +36,17 @@ func NewFactory(profile *environment.Profile) Factory {
 }
 
 func (f *factory) SDK() (SDK, error) {
-	bytes, err := f.profile.ToTemplate("./templates/config.tmpl")
+	tmpl, err := template.New("config").Parse(templates.Config)
 	if err != nil {
 		return nil, err
 	}
 
-	sdk, err := fabsdk.New(config.FromRaw(bytes, "yaml"))
+	buffer := &bytes.Buffer{}
+	if err := tmpl.Execute(buffer, f.profile); err != nil {
+		return nil, err
+	}
+
+	sdk, err := fabsdk.New(config.FromRaw(buffer.Bytes(), "yaml"))
 	if err != nil {
 		return nil, err
 	}

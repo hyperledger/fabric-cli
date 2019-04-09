@@ -1,4 +1,13 @@
-{{- $profile := .}}
+/*
+Copyright State Street Corp. All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+*/
+
+package templates
+
+// Config is a template string for SDK config yaml
+const Config = `{{- $profile := .}}
 client:
     organization: {{.Context.Organization}}
 
@@ -59,3 +68,4 @@ peers:
         tlsCACerts:
             path: {{.TLS}}
 {{- end}}
+`
