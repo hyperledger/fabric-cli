@@ -66,7 +66,7 @@ var _ = Describe("ProfileUseCommand", func() {
 		os.Args = append(os.Args, "--help")
 
 		Expect(cmd.Execute()).Should(Succeed())
-		Expect(fmt.Sprint(out)).To(ContainSubstring("use <profilename>"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("use <profile-name>"))
 	})
 })
 

@@ -29,7 +29,7 @@ func NewPluginInstallCommand(settings *environment.Settings) *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:   "install <path>",
+		Use:   "install <plugin-path>",
 		Short: "Install a plugin from the local filesystem",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return c.Complete(args)

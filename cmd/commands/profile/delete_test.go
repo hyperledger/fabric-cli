@@ -66,7 +66,7 @@ var _ = Describe("ProfileDeleteCommand", func() {
 		os.Args = append(os.Args, "--help")
 
 		Expect(cmd.Execute()).Should(Succeed())
-		Expect(fmt.Sprint(out)).To(ContainSubstring("delete <profilename>"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("delete <profile-name>"))
 	})
 })
 

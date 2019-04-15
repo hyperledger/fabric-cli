@@ -25,7 +25,7 @@ func NewProfileCreateCommand(settings *environment.Settings) *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:   "create <profilename>",
+		Use:   "create <profile-name>",
 		Short: "create a new configuration profile",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return c.Complete(args)

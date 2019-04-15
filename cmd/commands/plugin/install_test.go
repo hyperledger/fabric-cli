@@ -60,7 +60,7 @@ var _ = Describe("PluginInstallCommand", func() {
 		os.Args = append(os.Args, "--help")
 
 		Expect(cmd.Execute()).Should(Succeed())
-		Expect(fmt.Sprint(out)).To(ContainSubstring("install <path>"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("install <plugin-path>"))
 	})
 })
 

@@ -24,7 +24,7 @@ func NewProfileShowCommand(settings *environment.Settings) *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:   "show [profilename]",
+		Use:   "show [profile-name]",
 		Short: "show the metadata of the active profile",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return c.Complete(args)

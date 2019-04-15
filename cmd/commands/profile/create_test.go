@@ -63,7 +63,7 @@ var _ = Describe("ProfileCreateCommand", func() {
 		os.Args = append(os.Args, "--help")
 
 		Expect(cmd.Execute()).Should(Succeed())
-		Expect(fmt.Sprint(out)).To(ContainSubstring("create <profilename>"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("create <profile-name>"))
 	})
 })
 

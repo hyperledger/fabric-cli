@@ -60,7 +60,7 @@ var _ = Describe("PluginUninstallCommand", func() {
 		os.Args = append(os.Args, "--help")
 
 		Expect(cmd.Execute()).Should(Succeed())
-		Expect(fmt.Sprint(out)).To(ContainSubstring("uninstall <name>"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("uninstall <plugin-name>"))
 	})
 })
 

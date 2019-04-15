@@ -58,7 +58,7 @@ var _ = Describe("ProfileShowCommand", func() {
 		os.Args = append(os.Args, "--help")
 
 		Expect(cmd.Execute()).Should(Succeed())
-		Expect(fmt.Sprint(out)).To(ContainSubstring("show [profilename]"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("show [profile-name]"))
 	})
 })
 

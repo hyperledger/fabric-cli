@@ -24,7 +24,7 @@ func NewProfileUseCommand(settings *environment.Settings) *cobra.Command {
 	}
 
 	cmd := &cobra.Command{
-		Use:   "use <profilename>",
+		Use:   "use <profile-name>",
 		Short: "change active profile",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return c.Complete(args)
