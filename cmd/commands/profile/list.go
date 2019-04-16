@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/spf13/cobra"
@@ -47,7 +48,14 @@ func (cmd *ListCommand) Run() error {
 		return errors.New("no profiles currently exist")
 	}
 
-	for _, p := range cmd.Settings.Profiles {
+	var keys []string
+	for k := range cmd.Settings.Profiles {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		p := cmd.Settings.Profiles[k]
 		fmt.Fprint(cmd.Out, p.Name)
 		if p.Name == cmd.Settings.ActiveProfile {
 			fmt.Fprint(cmd.Out, " (active)")

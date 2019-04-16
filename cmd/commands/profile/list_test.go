@@ -113,9 +113,9 @@ var _ = Describe("ProfileListImplementation", func() {
 			settings.ActiveProfile = "foo"
 		})
 
-		It("should list profiles", func() {
+		It("should list profiles alphabetically sorted", func() {
 			Expect(impl.Run()).Should(Succeed())
-			Expect(fmt.Sprint(out)).To(ContainSubstring("foo (active)\nbar\n"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("bar\nfoo (active)\n"))
 		})
 	})
 })
