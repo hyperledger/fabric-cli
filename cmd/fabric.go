@@ -42,7 +42,7 @@ func NewFabricCommand(settings *environment.Settings) *cobra.Command {
 func main() {
 	settings, err := environment.GetSettings()
 	if err != nil {
-		fmt.Fprintf(settings.Streams.Err, "%v\n", err)
+		fmt.Fprintf(environment.DefaultStreams.Err, "%v\n", err)
 		os.Exit(1)
 	}
 
