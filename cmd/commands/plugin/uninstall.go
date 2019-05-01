@@ -9,58 +9,54 @@ package plugin
 import (
 	"errors"
 	"fmt"
-	"io"
-	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/hyperledger/fabric-cli/cmd/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/plugin"
 )
 
 // NewPluginUninstallCommand creates a new "fabric plugin uninstall" command
 func NewPluginUninstallCommand(settings *environment.Settings) *cobra.Command {
-	c := UninstallCommand{
-		Out: settings.Streams.Out,
-		Handler: &plugin.DefaultHandler{
-			Dir:      settings.Home.Plugins(),
-			Filename: plugin.DefaultFilename,
-		},
+	c := UninstallCommand{}
+
+	c.Settings = settings
+	c.Handler = &plugin.DefaultHandler{
+		Dir:      settings.Home.Plugins(),
+		Filename: plugin.DefaultFilename,
 	}
 
 	cmd := &cobra.Command{
 		Use:   "uninstall <plugin-name>",
 		Short: "Uninstall a plugin",
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return c.Complete(args)
+		Args:  c.ParseArgs(),
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			return c.Validate()
 		},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return c.Run()
 		},
 	}
 
-	cmd.SetOutput(c.Out)
+	c.AddArg(&c.Name)
+
+	cmd.SetOutput(c.Settings.Streams.Out)
 
 	return cmd
 }
 
 // UninstallCommand implements the plugin uninstall command
 type UninstallCommand struct {
-	Out     io.Writer
+	common.Command
 	Handler plugin.Handler
 
-	name string
+	Name string
 }
 
-// Complete populates required fields for Run
-func (cmd *UninstallCommand) Complete(args []string) error {
-	if len(args) == 0 {
-		return errors.New("plugin name not specified")
-	}
-
-	cmd.name = strings.TrimSpace(args[0])
-
-	if len(cmd.name) == 0 {
+// Validate checks the required parameters for run
+func (c *UninstallCommand) Validate() error {
+	if len(c.Name) == 0 {
 		return errors.New("plugin name not specified")
 	}
 
@@ -68,13 +64,13 @@ func (cmd *UninstallCommand) Complete(args []string) error {
 }
 
 // Run executes the command
-func (cmd *UninstallCommand) Run() error {
-	err := cmd.Handler.UninstallPlugin(cmd.name)
+func (c *UninstallCommand) Run() error {
+	err := c.Handler.UninstallPlugin(c.Name)
 	if err != nil {
 		return err
 	}
 
-	fmt.Fprintln(cmd.Out, "successfully uninstalled the plugin")
+	fmt.Fprintln(c.Settings.Streams.Out, "successfully uninstalled the plugin")
 
 	return nil
 }

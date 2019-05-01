@@ -8,57 +8,57 @@ package plugin
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/spf13/cobra"
 
+	"github.com/hyperledger/fabric-cli/cmd/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/plugin"
 )
 
 // NewPluginListCommand creates a new "fabric plugin list" command
 func NewPluginListCommand(settings *environment.Settings) *cobra.Command {
-	c := ListCommand{
-		Out: settings.Streams.Out,
-		Handler: &plugin.DefaultHandler{
-			Dir:      settings.Home.Plugins(),
-			Filename: plugin.DefaultFilename,
-		},
+	c := ListCommand{}
+
+	c.Settings = settings
+	c.Handler = &plugin.DefaultHandler{
+		Dir:      settings.Home.Plugins(),
+		Filename: plugin.DefaultFilename,
 	}
 
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "list all installed plugins",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return c.Run()
 		},
 	}
 
-	cmd.SetOutput(c.Out)
+	cmd.SetOutput(c.Settings.Streams.Out)
 
 	return cmd
 }
 
 // ListCommand implements the plugin list command
 type ListCommand struct {
-	Out     io.Writer
+	common.Command
 	Handler plugin.Handler
 }
 
 // Run executes the command
-func (cmd *ListCommand) Run() error {
-	plugins, err := cmd.Handler.GetPlugins()
+func (c *ListCommand) Run() error {
+	plugins, err := c.Handler.GetPlugins()
 	if err != nil {
 		return err
 	}
 
 	if len(plugins) == 0 {
-		fmt.Fprintln(cmd.Out, "no plugins currently exist")
+		fmt.Fprintln(c.Settings.Streams.Out, "no plugins currently exist")
 		return nil
 	}
 
 	for _, plugin := range plugins {
-		fmt.Fprint(cmd.Out, plugin.Name, "\n")
+		fmt.Fprint(c.Settings.Streams.Out, plugin.Name, "\n")
 	}
 
 	return nil

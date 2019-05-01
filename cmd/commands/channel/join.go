@@ -9,28 +9,25 @@ package channel
 import (
 	"errors"
 	"fmt"
-	"io"
-	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/hyperledger/fabric-cli/pkg/fabric"
 )
 
 // NewChannelJoinCommand creates a new "fabric channel join" command
 func NewChannelJoinCommand(settings *environment.Settings) *cobra.Command {
-	c := JoinCommand{
-		Out:      settings.Streams.Out,
-		Settings: settings,
-	}
+	c := JoinCommand{}
+
+	c.Settings = settings
 
 	cmd := &cobra.Command{
 		Use:   "join <channel-id>",
 		Short: "join a channel",
-		PreRunE: func(cmd *cobra.Command, _ []string) error {
-			if err := c.Complete(cmd); err != nil {
+		Args:  c.ParseArgs(),
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			if err := c.Complete(); err != nil {
 				return err
 			}
 
@@ -45,58 +42,18 @@ func NewChannelJoinCommand(settings *environment.Settings) *cobra.Command {
 		},
 	}
 
-	cmd.SetOutput(c.Out)
+	c.AddArg(&c.ChannelID)
+
+	cmd.SetOutput(c.Settings.Streams.Out)
 
 	return cmd
 }
 
 // JoinCommand implements the channel join command
 type JoinCommand struct {
-	Out      io.Writer
-	Settings *environment.Settings
-	Profile  *environment.Profile
-
-	ResourceManangement fabric.ResourceManagement
-	Options             []resmgmt.RequestOption
+	BaseCommand
 
 	ChannelID string
-}
-
-// Complete populates required fields for Run
-func (c *JoinCommand) Complete(cmd *cobra.Command) error {
-	var err error
-
-	c.Profile, err = c.Settings.GetActiveProfile()
-	if err != nil {
-		return err
-	}
-
-	if c.ResourceManangement == nil {
-		c.ResourceManangement, err = fabric.NewResourceManagementClient(c.Profile)
-		if err != nil {
-			return err
-		}
-	}
-
-	if c.Options == nil && c.Profile.Context != nil {
-		peers := []string{}
-		for _, p := range c.Profile.Context.Peers {
-			peers = append(peers, c.Profile.Peers[p].URL)
-		}
-
-		c.Options = []resmgmt.RequestOption{
-			resmgmt.WithTargetEndpoints(peers...),
-		}
-	}
-
-	args := cmd.Flags().Args()
-	if len(args) != 1 {
-		return fmt.Errorf("unexpected args: %v", args)
-	}
-
-	c.ChannelID = strings.TrimSpace(args[0])
-
-	return nil
 }
 
 // Validate checks the required parameters for run
@@ -104,16 +61,26 @@ func (c *JoinCommand) Validate() error {
 	if len(c.ChannelID) == 0 {
 		return errors.New("channel id not specified")
 	}
+
 	return nil
 }
 
 // Run executes the command
 func (c *JoinCommand) Run() error {
-	if err := c.ResourceManangement.JoinChannel(c.ChannelID, c.Options...); err != nil {
+	context, err := c.Settings.Config.GetCurrentContext()
+	if err != nil {
 		return err
 	}
 
-	fmt.Fprintf(c.Out, "successfully joined channel '%s'\n", c.ChannelID)
+	options := []resmgmt.RequestOption{
+		resmgmt.WithTargetEndpoints(context.Peers...),
+	}
+
+	if err := c.ResourceManagement.JoinChannel(c.ChannelID, options...); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(c.Settings.Streams.Out, "successfully joined channel '%s'\n", c.ChannelID)
 
 	return nil
 }

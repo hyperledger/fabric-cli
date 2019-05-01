@@ -8,6 +8,7 @@ go 1.12
 
 require (
 	github.com/cloudflare/cfssl v0.0.0-20190328212615-ea569c5aa1be // indirect
+	github.com/davecgh/go-spew v1.1.1
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/golangci/golangci-lint v1.16.0 // indirect
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
@@ -22,6 +23,7 @@ require (
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.3.0 // indirect
 	golang.org/x/net v0.0.0-20190328230028-74de082e2cca // indirect

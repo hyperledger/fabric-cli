@@ -9,29 +9,26 @@ package channel
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
-	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/hyperledger/fabric-cli/pkg/fabric"
 )
 
 // NewChannelCreateCommand creates a new "fabric channel create" command
 func NewChannelCreateCommand(settings *environment.Settings) *cobra.Command {
-	c := CreateCommand{
-		Out:      settings.Streams.Out,
-		Settings: settings,
-	}
+	c := &CreateCommand{}
+
+	c.Settings = settings
 
 	cmd := &cobra.Command{
 		Use:   "create <channel-id> <tx-path>",
 		Short: "create a new channel",
-		PreRunE: func(cmd *cobra.Command, _ []string) error {
-			if err := c.Complete(cmd); err != nil {
+		Args:  c.ParseArgs(),
+		PreRunE: func(_ *cobra.Command, args []string) error {
+			if err := c.Complete(); err != nil {
 				return err
 			}
 
@@ -46,52 +43,20 @@ func NewChannelCreateCommand(settings *environment.Settings) *cobra.Command {
 		},
 	}
 
-	cmd.SetOutput(c.Out)
+	c.AddArg(&c.ChannelID)
+	c.AddArg(&c.ChannelTX)
+
+	cmd.SetOutput(c.Settings.Streams.Out)
 
 	return cmd
 }
 
 // CreateCommand implements the channel create command
 type CreateCommand struct {
-	Out      io.Writer
-	Settings *environment.Settings
-	Profile  *environment.Profile
-
-	ResourceManangement fabric.ResourceManagement
+	BaseCommand
 
 	ChannelID string
 	ChannelTX string
-}
-
-// Complete populates required fields for Run
-func (c *CreateCommand) Complete(cmd *cobra.Command) error {
-	var err error
-
-	c.Profile, err = c.Settings.GetActiveProfile()
-	if err != nil {
-		return err
-	}
-
-	if c.ResourceManangement == nil {
-		c.ResourceManangement, err = fabric.NewResourceManagementClient(c.Profile)
-		if err != nil {
-			return err
-		}
-	}
-
-	if c.Profile.Context != nil {
-		c.ChannelID = c.Profile.Context.Channel
-	}
-
-	args := cmd.Flags().Args()
-	if len(args) != 2 {
-		return fmt.Errorf("unexpected args: %v", args)
-	}
-
-	c.ChannelID = strings.TrimSpace(args[0])
-	c.ChannelTX = strings.TrimSpace(args[1])
-
-	return nil
 }
 
 // Validate checks the required parameters for run
@@ -116,14 +81,14 @@ func (c *CreateCommand) Run() error {
 
 	defer r.Close()
 
-	if _, err := c.ResourceManangement.SaveChannel(resmgmt.SaveChannelRequest{
+	if _, err := c.ResourceManagement.SaveChannel(resmgmt.SaveChannelRequest{
 		ChannelID:     c.ChannelID,
 		ChannelConfig: r,
 	}); err != nil {
 		return err
 	}
 
-	fmt.Fprintf(c.Out, "successfully created channel '%s'\n", c.ChannelID)
+	fmt.Fprintf(c.Settings.Streams.Out, "successfully created channel '%s'\n", c.ChannelID)
 
 	return nil
 }

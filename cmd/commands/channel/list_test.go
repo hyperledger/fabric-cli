@@ -12,8 +12,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/peer"
 	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -73,8 +71,8 @@ var _ = Describe("ChannelListImplementation", func() {
 		err      error
 		out      *bytes.Buffer
 		settings *environment.Settings
-		cmd      *cobra.Command
-		client   *mocks.ResourceManangement
+		factory  *mocks.Factory
+		client   *mocks.ResourceManagement
 	)
 
 	BeforeEach(func() {
@@ -87,76 +85,41 @@ var _ = Describe("ChannelListImplementation", func() {
 			},
 		}
 
-		cmd = channel.NewChannelListCommand(settings)
-		client = &mocks.ResourceManangement{}
+		factory = &mocks.Factory{}
+		client = &mocks.ResourceManagement{}
 
-		impl = &channel.ListCommand{
-			Out:                 out,
-			Settings:            settings,
-			ResourceManangement: client,
-		}
+		impl = &channel.ListCommand{}
+		impl.Settings = settings
+		impl.Factory = factory
 	})
 
 	It("should not be nil", func() {
 		Expect(impl).ShouldNot(BeNil())
 	})
 
-	Describe("Complete", func() {
-		JustBeforeEach(func() {
-			err = impl.Complete(cmd)
-		})
-
-		It("should fail without profiles", func() {
-			Expect(err).NotTo(BeNil())
-			Expect(err.Error()).To(ContainSubstring("no profiles currently exist"))
-		})
-
-		Context("when active profile is set", func() {
-			BeforeEach(func() {
-				settings.ActiveProfile = "foo"
-				settings.Profiles = map[string]*environment.Profile{
-					"foo": {
-						Name: "foo",
-					},
-				}
-			})
-
-			It("should complete the command", func() {
-				Expect(err).To(BeNil())
-			})
-		})
-	})
-
-	Describe("Validate", func() {
-		JustBeforeEach(func() {
-			err = impl.Validate()
-		})
-
-		It("should fail without channel id", func() {
-			Expect(err).NotTo(BeNil())
-			Expect(err.Error()).To(Equal("peer not specified"))
-		})
-
-		Context("when options are set", func() {
-			BeforeEach(func() {
-				impl.Options = []resmgmt.RequestOption{
-					resmgmt.WithTargets(&peer.Peer{}),
-				}
-			})
-
-			It("should succeed with channel id set", func() {
-				Expect(err).To(BeNil())
-			})
-		})
-	})
-
 	Describe("Run", func() {
+		BeforeEach(func() {
+			impl.ResourceManagement = client
+		})
+
 		JustBeforeEach(func() {
 			err = impl.Run()
 		})
 
+		It("should fail without context", func() {
+			Expect(err).NotTo(BeNil())
+		})
+
 		Context("when resmgmt client succeeds", func() {
 			BeforeEach(func() {
+				settings.Config = &environment.Config{
+					CurrentContext: "foo",
+					Contexts: map[string]*environment.Context{
+						"foo": {
+							Peers: []string{"peer0", "peer1"},
+						},
+					},
+				}
 				client.QueryChannelsReturns(&pb.ChannelQueryResponse{
 					Channels: []*pb.ChannelInfo{
 						{
@@ -174,6 +137,14 @@ var _ = Describe("ChannelListImplementation", func() {
 
 		Context("when resmgmt client fails", func() {
 			BeforeEach(func() {
+				settings.Config = &environment.Config{
+					CurrentContext: "foo",
+					Contexts: map[string]*environment.Context{
+						"foo": {
+							Peers: []string{"peer0", "peer1"},
+						},
+					},
+				}
 				client.QueryChannelsReturns(nil, errors.New("query error"))
 			})
 

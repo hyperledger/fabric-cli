@@ -27,26 +27,28 @@ func TestFabricCommand(t *testing.T) {
 	RunSpecs(t, "Fabric Suite")
 }
 
-var _ = Describe("FabricCommand", func() {
+var _ = Describe("DefaultFabricCommand", func() {
 	var (
 		cmd      *cobra.Command
 		settings *environment.Settings
 		out      *bytes.Buffer
+		err      *bytes.Buffer
 	)
 
 	BeforeEach(func() {
 		out = new(bytes.Buffer)
+		err = new(bytes.Buffer)
 
-		settings = &environment.Settings{
-			Home: environment.Home(os.TempDir()),
-			Streams: environment.Streams{
-				Out: out,
-			},
+		settings = environment.NewDefaultSettings()
+		settings.Home = environment.Home(os.TempDir())
+		settings.Streams = environment.Streams{
+			Out: out,
+			Err: err,
 		}
 	})
 
 	JustBeforeEach(func() {
-		cmd = NewFabricCommand(settings)
+		cmd = NewDefaultFabricCommand(settings, []string{})
 	})
 
 	It("should create a fabric commmand", func() {
@@ -54,31 +56,32 @@ var _ = Describe("FabricCommand", func() {
 		Expect(cmd.HasSubCommands()).To(BeTrue())
 		Expect(cmd.Execute()).Should(Succeed())
 		Expect(fmt.Sprint(out)).To(ContainSubstring("fabric [command]"))
-		Expect(fmt.Sprint(out)).To(ContainSubstring("profile"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("network"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("context"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("channel"))
 		Expect(fmt.Sprint(out)).To(ContainSubstring("plugin"))
 	})
-
 })
 
 var _ = Describe("LoadPlugins", func() {
 	var (
-		out, err *bytes.Buffer
+		err      error
 		cmd      *cobra.Command
+		out      *bytes.Buffer
 		settings *environment.Settings
 		handler  *mocks.PluginHandler
 	)
 
 	BeforeEach(func() {
-		out = new(bytes.Buffer)
-		err = new(bytes.Buffer)
 		cmd = &cobra.Command{}
+		out = new(bytes.Buffer)
 
 		cmd.SetOutput(out)
 
 		settings = &environment.Settings{
 			Home: environment.Home(os.TempDir()),
 			Streams: environment.Streams{
-				Err: err,
+				Out: out,
 			},
 		}
 
@@ -86,7 +89,7 @@ var _ = Describe("LoadPlugins", func() {
 	})
 
 	JustBeforeEach(func() {
-		loadPlugins(cmd, settings, handler)
+		err = loadPlugins(cmd, settings, handler)
 	})
 
 	Context("when plugins are disabled", func() {
@@ -110,7 +113,7 @@ var _ = Describe("LoadPlugins", func() {
 		})
 
 		It("should fail to load plugins", func() {
-			Expect(fmt.Sprint(err)).To(ContainSubstring("An error occurred while loading plugins: handler error"))
+			Expect(err.Error()).To(ContainSubstring("handler error"))
 		})
 	})
 

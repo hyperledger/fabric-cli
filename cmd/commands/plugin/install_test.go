@@ -77,41 +77,35 @@ var _ = Describe("PluginInstallImplementation", func() {
 	})
 
 	JustBeforeEach(func() {
-		impl = &plugin.InstallCommand{
-			Out:     out,
-			Handler: handler,
+		impl = &plugin.InstallCommand{}
+		impl.Settings = &environment.Settings{
+			Streams: environment.Streams{
+				Out: out,
+			},
 		}
+		impl.Handler = handler
 	})
 
 	It("should not be nil", func() {
 		Expect(impl).ShouldNot(BeNil())
 	})
 
-	Describe("Complete", func() {
+	Describe("Validate", func() {
 		It("should fail without args", func() {
-			err := impl.Complete([]string{})
-
-			Expect(err).NotTo(BeNil())
-			Expect(err.Error()).To(ContainSubstring("plugin path not specified"))
-		})
-
-		It("should fail with empty string", func() {
-			err := impl.Complete([]string{" "})
-
+			err := impl.Validate()
 			Expect(err).NotTo(BeNil())
 			Expect(err.Error()).To(ContainSubstring("plugin path not specified"))
 		})
 
 		It("should succeed with input path", func() {
-			Expect(impl.Complete([]string{"./foo"})).Should(Succeed())
+			impl.Path = "foo"
+			Expect(impl.Validate()).Should(Succeed())
 		})
 	})
 
 	Describe("Run", func() {
-		JustBeforeEach(func() {
-			err := impl.Complete([]string{"./foo"})
-
-			Expect(err).NotTo(HaveOccurred())
+		BeforeEach(func() {
+			impl.Path = "foo"
 		})
 
 		It("should fail if handler fails", func() {

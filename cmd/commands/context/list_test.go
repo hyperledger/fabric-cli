@@ -4,7 +4,7 @@ Copyright State Street Corp. All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0
 */
 
-package profile_test
+package context_test
 
 import (
 	"bytes"
@@ -15,11 +15,11 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
 
-	"github.com/hyperledger/fabric-cli/cmd/commands/profile"
+	"github.com/hyperledger/fabric-cli/cmd/commands/context"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
-var _ = Describe("ProfileListCommand", func() {
+var _ = Describe("ListContextCommand", func() {
 	var (
 		cmd      *cobra.Command
 		settings *environment.Settings
@@ -42,14 +42,14 @@ var _ = Describe("ProfileListCommand", func() {
 	})
 
 	JustBeforeEach(func() {
-		cmd = profile.NewProfileListCommand(settings)
+		cmd = context.NewContextListCommand(settings)
 	})
 
 	AfterEach(func() {
 		os.Args = args
 	})
 
-	It("should create a profile list commmand", func() {
+	It("should create a list context commmand", func() {
 		Expect(cmd.Name()).To(Equal("list"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})
@@ -62,9 +62,10 @@ var _ = Describe("ProfileListCommand", func() {
 	})
 })
 
-var _ = Describe("ProfileListImplementation", func() {
+var _ = Describe("ListContextImplementation", func() {
 	var (
-		impl     *profile.ListCommand
+		impl     *context.ListCommand
+		err      error
 		out      *bytes.Buffer
 		settings *environment.Settings
 	)
@@ -72,50 +73,43 @@ var _ = Describe("ProfileListImplementation", func() {
 	BeforeEach(func() {
 		out = new(bytes.Buffer)
 
-		settings = &environment.Settings{
-			Home: environment.Home(os.TempDir()),
-			Streams: environment.Streams{
-				Out: out,
-			},
-			Profiles: make(map[string]*environment.Profile),
-		}
-	})
+		settings = environment.NewDefaultSettings()
+		settings.Home = environment.Home(os.TempDir())
+		settings.Streams = environment.Streams{Out: out}
 
-	JustBeforeEach(func() {
-		impl = &profile.ListCommand{
-			Out:      out,
-			Settings: settings,
-		}
+		impl = &context.ListCommand{}
+		impl.Settings = settings
 	})
 
 	It("should not be nil", func() {
 		Expect(impl).ShouldNot(BeNil())
 	})
 
-	It("should fail to list profiles", func() {
-		err := impl.Run()
-
-		Expect(err).NotTo(BeNil())
-		Expect(err.Error()).To(ContainSubstring("no profiles currently exist"))
-	})
-
-	Context("when profiles exists", func() {
+	Describe("Run", func() {
 		JustBeforeEach(func() {
-			settings.Profiles = map[string]*environment.Profile{
-				"foo": {
-					Name: "foo",
-				},
-				"bar": {
-					Name: "bar",
-				},
-			}
-
-			settings.ActiveProfile = "foo"
+			err = impl.Run()
 		})
 
-		It("should list profiles alphabetically sorted", func() {
-			Expect(impl.Run()).Should(Succeed())
-			Expect(fmt.Sprint(out)).To(ContainSubstring("bar\nfoo (active)\n"))
+		It("should fail without a context", func() {
+			Expect(err).NotTo(BeNil())
+		})
+
+		Context("when a context exists", func() {
+			BeforeEach(func() {
+				settings.Config = &environment.Config{
+					CurrentContext: "foo",
+					Contexts: map[string]*environment.Context{
+						"foo": {},
+						"bar": {},
+					},
+				}
+			})
+
+			It("should print list context", func() {
+				Expect(err).To(BeNil())
+				Expect(fmt.Sprint(out)).To(ContainSubstring("foo (current)"))
+				Expect(fmt.Sprint(out)).To(ContainSubstring("bar"))
+			})
 		})
 	})
 })

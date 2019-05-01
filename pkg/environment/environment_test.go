@@ -7,15 +7,19 @@ SPDX-License-Identifier: Apache-2.0
 package environment_test
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/hyperledger/fabric-cli/pkg/environment"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"github.com/hyperledger/fabric-cli/pkg/environment"
+	"github.com/spf13/pflag"
+	"gopkg.in/yaml.v2"
 )
+
+var TestPath = filepath.Join(os.TempDir(), "fabric")
 
 func TestEnvironment(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -23,135 +27,210 @@ func TestEnvironment(t *testing.T) {
 	RunSpecs(t, "Environment Suite")
 }
 
-var _ = Describe("Environment", func() {
+var _ = Describe("Settings", func() {
 	var (
 		settings *environment.Settings
-		err      error
-	)
-
-	JustBeforeEach(func() {
-		settings, err = environment.GetSettings()
-
-		Expect(err).NotTo(HaveOccurred())
-	})
-
-	It("should set default home", func() {
-		Expect(settings).NotTo(BeNil())
-		Expect(settings.Home.String()).To(Equal(environment.DefaultHome.String()))
-		Expect(settings.Home.Plugins()).To(Equal(environment.DefaultHome.Plugins()))
-	})
-
-	Context("when environment overrides are set", func() {
-		BeforeEach(func() {
-			err := os.Setenv("FABRIC_HOME", os.TempDir())
-
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			err := os.Unsetenv("FABRIC_HOME")
-
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		It("should override default home", func() {
-			Expect(settings).NotTo(BeNil())
-			Expect(settings.Home).NotTo(Equal(environment.DefaultHome))
-			Expect(settings.Home.String()).To(Equal(os.TempDir()))
-			Expect(settings.Home.Plugins()).To(Equal(filepath.Join(os.TempDir(), "plugins")))
-		})
-	})
-})
-
-var _ = Describe("PluginEnvironment", func() {
-	var (
-		settings *environment.Settings
-		err      error
-	)
-
-	JustBeforeEach(func() {
-		settings, err = environment.GetSettings()
-
-		Expect(err).NotTo(HaveOccurred())
-
-		settings.SetupPluginEnv()
-	})
-
-	It("should set environment variables", func() {
-		Expect(os.Getenv("FABRIC_HOME")).To(Equal(environment.DefaultHome.String()))
-	})
-
-})
-
-var _ = Describe("Profile", func() {
-	var (
-		settings *environment.Settings
-		profile  *environment.Profile
-		err      error
 	)
 
 	BeforeEach(func() {
-		settings = &environment.Settings{}
+		settings = environment.NewDefaultSettings()
 	})
 
-	Describe("ActiveProfile", func() {
+	It("should contain default streams", func() {
+		Expect(settings.Streams).To(Equal(environment.DefaultStreams))
+	})
+
+	Describe("AddFlags", func() {
+		var (
+			flags *pflag.FlagSet
+		)
+
+		BeforeEach(func() {
+			flags = pflag.NewFlagSet("test", pflag.ExitOnError)
+		})
+
 		JustBeforeEach(func() {
-			profile, err = settings.GetActiveProfile()
+			settings.AddFlags(flags)
 		})
 
-		It("should fail without profiles", func() {
-			Expect(err).NotTo(BeNil())
-			Expect(err.Error()).To(ContainSubstring("no profiles currently exist"))
-			Expect(profile).To(BeNil())
+		It("should override disable plugins", func() {
+			Expect(settings.DisablePlugins).To(BeFalse())
+
+			flags.Set("disable-plugins", "true")
+
+			Expect(settings.DisablePlugins).To(BeTrue())
 		})
 
-		Context("when profiles exist", func() {
+		It("should override home", func() {
+			Expect(settings.Home.String()).To(Equal(environment.DefaultHome.String()))
+
+			flags.Set("home", "path/to/new/home")
+
+			Expect(settings.Home.String()).To(Equal("path/to/new/home"))
+		})
+	})
+
+	Describe("Init", func() {
+		var (
+			flags *pflag.FlagSet
+			err   error
+		)
+
+		BeforeEach(func() {
+			flags = pflag.NewFlagSet("test", pflag.ExitOnError)
+
+			settings.AddFlags(flags)
+		})
+
+		JustBeforeEach(func() {
+			err = settings.Init(flags)
+		})
+
+		Context("when environment variables are set", func() {
 			BeforeEach(func() {
-				settings.Profiles = map[string]*environment.Profile{
-					"foo": {
-						Name: "foo",
-					},
-				}
+				os.Setenv("FABRIC_DISABLE_PLUGINS", "true")
 			})
 
-			It("should fail without active profile set", func() {
-				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).To(ContainSubstring("no profile currently active"))
-				Expect(profile).To(BeNil())
-			})
-		})
-
-		Context("when profiles exist but are missing the active profile", func() {
-			BeforeEach(func() {
-				settings.Profiles = map[string]*environment.Profile{
-					"foo": {
-						Name: "foo",
-					},
-				}
-				settings.ActiveProfile = "bar"
+			AfterEach(func() {
+				os.Unsetenv("FABRIC_DISABLE_PLUGINS")
 			})
 
-			It("should fail to find active profile", func() {
-				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).To(ContainSubstring("profile 'bar' was not found"))
-				Expect(profile).To(BeNil())
-			})
-		})
-
-		Context("when active profile exists and is set", func() {
-			BeforeEach(func() {
-				settings.Profiles = map[string]*environment.Profile{
-					"foo": {
-						Name: "foo",
-					},
-				}
-				settings.ActiveProfile = "foo"
-			})
-
-			It("should return the active profile", func() {
+			It("should disable plugins", func() {
 				Expect(err).To(BeNil())
-				Expect(profile).NotTo(BeNil())
+				Expect(settings.DisablePlugins).To(BeTrue())
 			})
+		})
+
+		Context("when flags are set", func() {
+			BeforeEach(func() {
+				flags.Set("disable-plugins", "true")
+			})
+
+			It("should override disable plugins", func() {
+				Expect(err).To(BeNil())
+				Expect(settings.DisablePlugins).To(BeTrue())
+			})
+		})
+
+		Context("when config file exists", func() {
+			BeforeEach(func() {
+				flags.Set("home", TestPath)
+
+				data, _ := yaml.Marshal(&environment.Config{
+					CurrentContext: "baz",
+				})
+
+				os.MkdirAll(TestPath, 0777)
+
+				ioutil.WriteFile(filepath.Join(TestPath, environment.DefaultConfigFilename), data, 0777)
+			})
+
+			JustAfterEach(func() {
+				os.RemoveAll(TestPath)
+			})
+
+			It("should populate config", func() {
+				Expect(err).To(BeNil())
+				Expect(settings.Config.CurrentContext).To(Equal("baz"))
+			})
+		})
+
+		Context("when config file is invalid", func() {
+			BeforeEach(func() {
+				flags.Set("home", TestPath)
+
+				data, _ := yaml.Marshal(struct {
+					Networks string
+				}{
+					Networks: "foo",
+				})
+
+				os.MkdirAll(TestPath, 0777)
+
+				ioutil.WriteFile(filepath.Join(TestPath, environment.DefaultConfigFilename), data, 0777)
+			})
+
+			JustAfterEach(func() {
+				os.RemoveAll(TestPath)
+			})
+
+			It("should fail to unmarshal config file", func() {
+				Expect(err).NotTo(BeNil())
+			})
+		})
+	})
+
+	Describe("ModifyConfig", func() {
+		var (
+			actions []environment.Action
+			err     error
+		)
+
+		BeforeEach(func() {
+			settings.Home = environment.Home(TestPath)
+		})
+
+		JustBeforeEach(func() {
+			err = settings.ModifyConfig(actions...)
+		})
+
+		JustAfterEach(func() {
+			os.RemoveAll(TestPath)
+		})
+
+		It("should not fail without actions", func() {
+			Expect(err).To(BeNil())
+		})
+
+		Context("when changing current context", func() {
+			BeforeEach(func() {
+				actions = append(actions, environment.SetCurrentContext("foo"))
+			})
+
+			It("should set current context", func() {
+				Expect(err).To(BeNil())
+				Expect(settings.Config.CurrentContext).To(Equal("foo"))
+			})
+		})
+
+		Context("when config file is invalid", func() {
+			BeforeEach(func() {
+				data, _ := yaml.Marshal(struct {
+					Networks string
+				}{
+					Networks: "foo",
+				})
+
+				os.MkdirAll(TestPath, 0777)
+
+				ioutil.WriteFile(filepath.Join(TestPath, environment.DefaultConfigFilename), data, 0777)
+			})
+
+			JustAfterEach(func() {
+				os.RemoveAll(TestPath)
+			})
+
+			It("should fail to unmarshal config file", func() {
+				Expect(err).NotTo(BeNil())
+			})
+		})
+	})
+
+	Describe("SetupPluginEnvironment", func() {
+		JustBeforeEach(func() {
+			settings.SetupPluginEnvironment()
+		})
+
+		JustAfterEach(func() {
+			os.Unsetenv("FABRIC_HOME")
+			os.Unsetenv("FABRIC_DISABLE_PLUGINS")
+		})
+
+		It("should populate the environment with home", func() {
+			v, ok := os.LookupEnv("FABRIC_HOME")
+
+			Expect(ok).To(BeTrue())
+			Expect(v).To(Equal(settings.Home.String()))
 		})
 	})
 })

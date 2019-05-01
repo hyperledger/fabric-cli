@@ -72,8 +72,8 @@ var _ = Describe("ChannelUpdateImplementation", func() {
 		err      error
 		out      *bytes.Buffer
 		settings *environment.Settings
-		cmd      *cobra.Command
-		client   *mocks.ResourceManangement
+		factory  *mocks.Factory
+		client   *mocks.ResourceManagement
 	)
 
 	BeforeEach(func() {
@@ -86,66 +86,16 @@ var _ = Describe("ChannelUpdateImplementation", func() {
 			},
 		}
 
-		cmd = channel.NewChannelUpdateCommand(settings)
-		client = &mocks.ResourceManangement{}
+		factory = &mocks.Factory{}
+		client = &mocks.ResourceManagement{}
 
-		impl = &channel.UpdateCommand{
-			Out:                 out,
-			Settings:            settings,
-			ResourceManangement: client,
-		}
+		impl = &channel.UpdateCommand{}
+		impl.Settings = settings
+		impl.Factory = factory
 	})
 
 	It("should not be nil", func() {
 		Expect(impl).ShouldNot(BeNil())
-	})
-
-	Describe("Complete", func() {
-		JustBeforeEach(func() {
-			err = impl.Complete(cmd)
-		})
-
-		It("should fail without profiles", func() {
-			Expect(err).NotTo(BeNil())
-			Expect(err.Error()).To(ContainSubstring("no profiles currently exist"))
-		})
-
-		Context("when args are provided", func() {
-			BeforeEach(func() {
-				settings.ActiveProfile = "foo"
-				settings.Profiles = map[string]*environment.Profile{
-					"foo": {
-						Name: "foo",
-					},
-				}
-
-				cmd.Flags().Parse([]string{"mychannel", "./testdata/channel.tx"})
-			})
-
-			It("should populate channel id and tx path", func() {
-				Expect(err).To(BeNil())
-				Expect(impl.ChannelID).To(Equal("mychannel"))
-				Expect(impl.ChannelTX).To(Equal("./testdata/channel.tx"))
-			})
-		})
-
-		Context("when too many args are provided", func() {
-			BeforeEach(func() {
-				settings.ActiveProfile = "foo"
-				settings.Profiles = map[string]*environment.Profile{
-					"foo": {
-						Name: "foo",
-					},
-				}
-
-				cmd.Flags().Parse([]string{"foo", "bar", "baz"})
-			})
-
-			It("should fail to complete", func() {
-				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).To(ContainSubstring("unexpected args"))
-			})
-		})
 	})
 
 	Describe("Validate", func() {
@@ -185,6 +135,7 @@ var _ = Describe("ChannelUpdateImplementation", func() {
 		BeforeEach(func() {
 			impl.ChannelID = "mychannel"
 			impl.ChannelTX = "./testdata/channel.tx"
+			impl.ResourceManagement = client
 		})
 
 		JustBeforeEach(func() {

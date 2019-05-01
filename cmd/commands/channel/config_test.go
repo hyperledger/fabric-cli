@@ -71,8 +71,8 @@ var _ = Describe("ChannelConfigImplementation", func() {
 		err      error
 		out      *bytes.Buffer
 		settings *environment.Settings
-		cmd      *cobra.Command
-		client   *mocks.ResourceManangement
+		factory  *mocks.Factory
+		client   *mocks.ResourceManagement
 	)
 
 	BeforeEach(func() {
@@ -85,65 +85,16 @@ var _ = Describe("ChannelConfigImplementation", func() {
 			},
 		}
 
-		cmd = channel.NewChannelConfigCommand(settings)
-		client = &mocks.ResourceManangement{}
+		factory = &mocks.Factory{}
+		client = &mocks.ResourceManagement{}
 
-		impl = &channel.ConfigCommand{
-			Out:                 out,
-			Settings:            settings,
-			ResourceManangement: client,
-		}
+		impl = &channel.ConfigCommand{}
+		impl.Settings = settings
+		impl.Factory = factory
 	})
 
 	It("should not be nil", func() {
 		Expect(impl).ShouldNot(BeNil())
-	})
-
-	Describe("Complete", func() {
-		JustBeforeEach(func() {
-			err = impl.Complete(cmd)
-		})
-
-		It("should fail without profiles", func() {
-			Expect(err).NotTo(BeNil())
-			Expect(err.Error()).To(ContainSubstring("no profiles currently exist"))
-		})
-
-		Context("when args are provided", func() {
-			BeforeEach(func() {
-				settings.ActiveProfile = "foo"
-				settings.Profiles = map[string]*environment.Profile{
-					"foo": {
-						Name: "foo",
-					},
-				}
-
-				cmd.Flags().Parse([]string{"mychannel"})
-			})
-
-			It("should populate channel id", func() {
-				Expect(err).To(BeNil())
-				Expect(impl.ChannelID).To(Equal("mychannel"))
-			})
-		})
-
-		Context("when too many args are provided", func() {
-			BeforeEach(func() {
-				settings.ActiveProfile = "foo"
-				settings.Profiles = map[string]*environment.Profile{
-					"foo": {
-						Name: "foo",
-					},
-				}
-
-				cmd.Flags().Parse([]string{"foo", "bar", "baz"})
-			})
-
-			It("should fail to complete", func() {
-				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).To(ContainSubstring("unexpected args"))
-			})
-		})
 	})
 
 	Describe("Validate", func() {
@@ -171,6 +122,10 @@ var _ = Describe("ChannelConfigImplementation", func() {
 		var (
 			cfg *mocks.ChannelCfg
 		)
+
+		BeforeEach(func() {
+			impl.ResourceManagement = client
+		})
 
 		JustBeforeEach(func() {
 			err = impl.Run()

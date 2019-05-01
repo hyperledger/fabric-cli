@@ -12,7 +12,7 @@ import (
 )
 
 // DefaultStreams contains the default io streams
-var DefaultStreams = &Streams{
+var DefaultStreams = Streams{
 	In:  os.Stdin,
 	Out: os.Stdout,
 	Err: os.Stderr,

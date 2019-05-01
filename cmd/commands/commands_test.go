@@ -20,7 +20,7 @@ import (
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	RunSpecs(t, "Command Suite")
+	RunSpecs(t, "Commands Suite")
 }
 
 var _ = Describe("Commands", func() {

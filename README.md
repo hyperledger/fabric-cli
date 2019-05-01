@@ -18,6 +18,21 @@ The Hyperledger Fabric CLI is a tool used to interact with [Fabric networks](htt
 5. Add the binary to your PATH
 6. Execute `fabric` for more information
 
+## Getting Started
+
+1. Add a Network with `fabric network set`
+2. Add a Context with  `fabric context set`
+3. Use the new context with `fabric context use`
+4. You're all set... Have fun!
+
+## Network
+
+A network is a direct reference to a [Fabric-SDK-Go configuration](https://github.com/hyperledger/fabric-sdk-go/blob/master/pkg/core/config/testdata/config_test.yaml).  This configuration contains all of the necessary details for interacting with a Fabric network at a global scope.
+
+## Context
+
+A context defines the scope for interactions with the network.  An example of this would be: As `Admin`, I want peer `peer0.org1.example.com` in organization `Org1` to join channel `mychannel`.  In this example, the context would include the identity, peer, organization, and channel.
+
 ## Built-in Commands
 
 Built-in commands can be found in [/cmd/fabric/commands](/cmd/fabric/commands).  These commands can serve as examples for building future commands like `plugin chaincode install ...`.

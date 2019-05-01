@@ -8,6 +8,7 @@ package channel_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/hyperledger/fabric-cli/cmd/commands/channel"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
+	"github.com/hyperledger/fabric-cli/pkg/fabric/mocks"
 )
 
 func TestChannel(t *testing.T) {
@@ -58,7 +60,49 @@ var _ = Describe("ChannelCommand", func() {
 			Expect(fmt.Sprint(out)).To(ContainSubstring("update"))
 			Expect(fmt.Sprint(out)).To(ContainSubstring("list"))
 			Expect(fmt.Sprint(out)).To(ContainSubstring("config"))
+		})
+	})
+})
+var _ = Describe("BaseChannelCommand", func() {
+	var c *channel.BaseCommand
 
+	BeforeEach(func() {
+		c = &channel.BaseCommand{}
+	})
+
+	Describe("Complete", func() {
+		var (
+			err     error
+			factory *mocks.Factory
+			client  *mocks.ResourceManagement
+		)
+
+		BeforeEach(func() {
+			factory = &mocks.Factory{}
+			client = &mocks.ResourceManagement{}
+
+			factory.ResourceManagementReturns(client, nil)
+
+			c.Factory = factory
+		})
+
+		JustBeforeEach(func() {
+			err = c.Complete()
+		})
+
+		It("should complete", func() {
+			Expect(err).To(BeNil())
+			Expect(c.ResourceManagement).NotTo(BeNil())
+		})
+
+		Context("when resmgmt fails", func() {
+			BeforeEach(func() {
+				factory.ResourceManagementReturns(nil, errors.New("factory error"))
+			})
+
+			It("should fail with factory error", func() {
+				Expect(err).NotTo(BeNil())
+			})
 		})
 	})
 })

@@ -9,29 +9,25 @@ package channel
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
-	"strings"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/hyperledger/fabric-cli/pkg/fabric"
 )
 
 // NewChannelUpdateCommand creates a new "fabric channel update" command
 func NewChannelUpdateCommand(settings *environment.Settings) *cobra.Command {
-	c := UpdateCommand{
-		Out:      settings.Streams.Out,
-		Settings: settings,
-	}
+	c := UpdateCommand{}
+
+	c.Settings = settings
 
 	cmd := &cobra.Command{
 		Use:   "update <channel-id> <tx-path>",
 		Short: "update a channel",
-		PreRunE: func(cmd *cobra.Command, _ []string) error {
-			if err := c.Complete(cmd); err != nil {
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			if err := c.Complete(); err != nil {
 				return err
 			}
 
@@ -46,48 +42,17 @@ func NewChannelUpdateCommand(settings *environment.Settings) *cobra.Command {
 		},
 	}
 
-	cmd.SetOutput(c.Out)
+	cmd.SetOutput(c.Settings.Streams.Out)
 
 	return cmd
 }
 
 // UpdateCommand implements the channel update command
 type UpdateCommand struct {
-	Out      io.Writer
-	Settings *environment.Settings
-	Profile  *environment.Profile
-
-	ResourceManangement fabric.ResourceManagement
+	BaseCommand
 
 	ChannelID string
 	ChannelTX string
-}
-
-// Complete populates required fields for Run
-func (c *UpdateCommand) Complete(cmd *cobra.Command) error {
-	var err error
-
-	c.Profile, err = c.Settings.GetActiveProfile()
-	if err != nil {
-		return err
-	}
-
-	if c.ResourceManangement == nil {
-		c.ResourceManangement, err = fabric.NewResourceManagementClient(c.Profile)
-		if err != nil {
-			return err
-		}
-	}
-
-	args := cmd.Flags().Args()
-	if len(args) != 2 {
-		return fmt.Errorf("unexpected args: %v", args)
-	}
-
-	c.ChannelID = strings.TrimSpace(args[0])
-	c.ChannelTX = strings.TrimSpace(args[1])
-
-	return nil
 }
 
 // Validate checks the required parameters for run
@@ -112,14 +77,14 @@ func (c *UpdateCommand) Run() error {
 
 	defer r.Close()
 
-	if _, err := c.ResourceManangement.SaveChannel(resmgmt.SaveChannelRequest{
+	if _, err := c.ResourceManagement.SaveChannel(resmgmt.SaveChannelRequest{
 		ChannelID:     c.ChannelID,
 		ChannelConfig: r,
 	}); err != nil {
 		return err
 	}
 
-	fmt.Fprintf(c.Out, "successfully updated channel '%s'\n", c.ChannelID)
+	fmt.Fprintf(c.Settings.Streams.Out, "successfully updated channel '%s'\n", c.ChannelID)
 
 	return nil
 }

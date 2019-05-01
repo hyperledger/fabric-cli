@@ -7,134 +7,131 @@ SPDX-License-Identifier: Apache-2.0
 package fabric
 
 import (
+	"os"
+
 	"github.com/hyperledger/fabric-cli/pkg/environment"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/event"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
+	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
+	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
-// client is a base fabric client
-type client struct {
-	factory Factory
+type factory struct {
+	config  string
+	context *environment.Context
 }
 
-// newClient creates a base fabric client that populates the default factory and
-// applies options.
-func newSDKClient(profile *environment.Profile, options []Option) *client {
-	c := &client{
-		factory: NewFactory(profile),
-	}
+// interface implementation check
+var _ Factory = &factory{}
 
-	for _, option := range options {
-		option(c)
-	}
-
-	return c
-}
-
-// ChannelClient encapsulates the SDK channel client
-type ChannelClient struct {
-	*client
-	Channel
-}
-
-// NewChannelClient returns a new channel client
-func NewChannelClient(profile *environment.Profile, options ...Option) (*ChannelClient, error) {
-	c := &ChannelClient{
-		client: newSDKClient(profile, options),
-	}
-
-	client, err := c.factory.Channel()
+// NewFactory creates a factory for the given profile/context
+func NewFactory(config *environment.Config) (Factory, error) {
+	context, err := config.GetCurrentContext()
 	if err != nil {
 		return nil, err
 	}
 
-	c.Channel = client
-
-	return c, nil
-}
-
-// EventClient encapsulates the SDK event client
-type EventClient struct {
-	*client
-	Event
-}
-
-// NewEventClient returns a new event client
-func NewEventClient(profile *environment.Profile, options ...Option) (*EventClient, error) {
-	c := &EventClient{
-		client: newSDKClient(profile, options),
-	}
-
-	client, err := c.factory.Event()
+	network, err := config.GetCurrentContextNetwork()
 	if err != nil {
 		return nil, err
 	}
 
-	c.Event = client
-
-	return c, nil
+	return &factory{
+		config:  network.ConfigPath,
+		context: context,
+	}, nil
 }
 
-// LedgerClient encapsulates the SDK ledger client
-type LedgerClient struct {
-	*client
-	Ledger
-}
-
-// NewLedgerClient returns a new ledger client
-func NewLedgerClient(profile *environment.Profile, options ...Option) (*LedgerClient, error) {
-	c := &LedgerClient{
-		client: newSDKClient(profile, options),
-	}
-
-	client, err := c.factory.Ledger()
+func (f *factory) SDK() (SDK, error) {
+	sdk, err := fabsdk.New(config.FromFile(os.ExpandEnv(f.config)))
 	if err != nil {
 		return nil, err
 	}
 
-	c.Ledger = client
-
-	return c, nil
+	return sdk, nil
 }
 
-// ResourceManagementClient encapsulates the SDK resmgmt client
-type ResourceManagementClient struct {
-	*client
-	ResourceManagement
-}
-
-// NewResourceManagementClient returns a new resource management client
-func NewResourceManagementClient(profile *environment.Profile, options ...Option) (*ResourceManagementClient, error) {
-	c := &ResourceManagementClient{
-		client: newSDKClient(profile, options),
-	}
-
-	client, err := c.factory.ResourceManagement()
+func (f *factory) Channel() (Channel, error) {
+	sdk, err := f.SDK()
 	if err != nil {
 		return nil, err
 	}
 
-	c.ResourceManagement = client
+	ctx := sdk.ChannelContext(f.context.Channel)
 
-	return c, nil
-}
-
-// MSPClient encapsulates the SDK msp client
-type MSPClient struct {
-	*client
-	MSP
-}
-
-// NewMSPClient returns a new msp client
-func NewMSPClient(profile *environment.Profile, options ...Option) (*MSPClient, error) {
-	c := &MSPClient{
-		client: newSDKClient(profile, options),
-	}
-
-	client, err := c.factory.MSP()
+	client, err := channel.New(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	c.MSP = client
+	return client, nil
+}
 
-	return c, nil
+func (f *factory) Event() (Event, error) {
+	sdk, err := f.SDK()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.ChannelContext(f.context.Channel)
+
+	client, err := event.New(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
+func (f *factory) Ledger() (Ledger, error) {
+	sdk, err := f.SDK()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.ChannelContext(f.context.Channel)
+
+	client, err := ledger.New(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
+func (f *factory) ResourceManagement() (ResourceManagement, error) {
+	sdk, err := f.SDK()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.Context(fabsdk.WithUser(f.context.User),
+		fabsdk.WithOrg(f.context.Organization))
+
+	client, err := resmgmt.New(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
+func (f *factory) MSP() (MSP, error) {
+	sdk, err := f.SDK()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.Context(fabsdk.WithUser(f.context.User),
+		fabsdk.WithOrg(f.context.Organization))
+
+	client, err := msp.New(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }

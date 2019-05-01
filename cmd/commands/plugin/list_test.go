@@ -78,10 +78,13 @@ var _ = Describe("PluginListImplementation", func() {
 	})
 
 	JustBeforeEach(func() {
-		impl = &plugin.ListCommand{
-			Out:     out,
-			Handler: handler,
+		impl = &plugin.ListCommand{}
+		impl.Settings = &environment.Settings{
+			Streams: environment.Streams{
+				Out: out,
+			},
 		}
+		impl.Handler = handler
 	})
 
 	It("should not be nil", func() {

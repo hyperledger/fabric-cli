@@ -30,23 +30,39 @@ func NewFabricCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd.SetOutput(settings.Streams.Out)
 
-	// load all plugins into the root command
-	loadPlugins(cmd, settings, &plugin.DefaultHandler{
+	return cmd
+}
+
+// NewDefaultFabricCommand returns a new default root commad for fabric
+func NewDefaultFabricCommand(settings *environment.Settings, args []string) *cobra.Command {
+	cmd := NewFabricCommand(settings)
+	flags := cmd.PersistentFlags()
+
+	settings.AddFlags(flags)
+	flags.Parse(args)
+
+	if err := settings.Init(flags); err != nil {
+		fmt.Fprintf(settings.Streams.Err, "An error occurred while loading configurations: %v\n", err)
+		os.Exit(1)
+	}
+
+	// must resolve home and config file before loading config flags
+	settings.Config.AddFlags(flags)
+
+	if err := loadPlugins(cmd, settings, &plugin.DefaultHandler{
 		Dir:      settings.Home.Plugins(),
 		Filename: plugin.DefaultFilename,
-	})
+	}); err != nil {
+		fmt.Fprintf(settings.Streams.Err, "An error occurred while loading plugins: %v\n", err)
+		os.Exit(1)
+	}
 
 	return cmd
 }
 
 func main() {
-	settings, err := environment.GetSettings()
-	if err != nil {
-		fmt.Fprintf(environment.DefaultStreams.Err, "%v\n", err)
-		os.Exit(1)
-	}
-
-	cmd := NewFabricCommand(settings)
+	settings := environment.NewDefaultSettings()
+	cmd := NewDefaultFabricCommand(settings, os.Args[1:])
 
 	if err := cmd.Execute(); err != nil {
 		fmt.Fprintf(settings.Streams.Err, "%v\n", err)
@@ -58,18 +74,17 @@ func main() {
 
 // loadPlugins processes all of the installed plugins, wraps them with cobra,
 // and adds them to the root command
-func loadPlugins(cmd *cobra.Command, settings *environment.Settings, handler plugin.Handler) {
+func loadPlugins(cmd *cobra.Command, settings *environment.Settings, handler plugin.Handler) error {
 	if settings.DisablePlugins {
-		return
+		return nil
 	}
 
 	plugins, err := handler.GetPlugins()
 	if err != nil {
-		fmt.Fprintf(settings.Streams.Err, "An error occurred while loading plugins: %s", err)
-		return
+		return err
 	}
 
-	settings.SetupPluginEnv()
+	settings.SetupPluginEnvironment()
 
 	for _, plugin := range plugins {
 		p := plugin
@@ -89,4 +104,6 @@ func loadPlugins(cmd *cobra.Command, settings *environment.Settings, handler plu
 
 		cmd.AddCommand(c)
 	}
+
+	return nil
 }

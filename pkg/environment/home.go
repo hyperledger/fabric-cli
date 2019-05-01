@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-// DefaultHome is the default directory for the user
+// DefaultHome is the default cli home directory
 const DefaultHome = Home("${HOME}/.fabric")
 
 // Home is the location of the configuration files
@@ -35,7 +35,9 @@ func (h Home) Plugins() string {
 
 // Init creates a home directory if it does not already exist
 func (h Home) Init() error {
+	// continue if the home directory already exists
 	if _, err := os.Stat(h.String()); os.IsNotExist(err) {
+		// create a new home directory
 		if err = os.MkdirAll(h.String(), 0755); err != nil {
 			return err
 		}

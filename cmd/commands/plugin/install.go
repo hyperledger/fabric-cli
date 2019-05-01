@@ -9,58 +9,54 @@ package plugin
 import (
 	"errors"
 	"fmt"
-	"io"
-	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/hyperledger/fabric-cli/cmd/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/plugin"
 )
 
 // NewPluginInstallCommand creates a new "fabric plugin install" command
 func NewPluginInstallCommand(settings *environment.Settings) *cobra.Command {
-	c := InstallCommand{
-		Out: settings.Streams.Out,
-		Handler: &plugin.DefaultHandler{
-			Dir:      settings.Home.Plugins(),
-			Filename: plugin.DefaultFilename,
-		},
+	c := InstallCommand{}
+
+	c.Settings = settings
+	c.Handler = &plugin.DefaultHandler{
+		Dir:      settings.Home.Plugins(),
+		Filename: plugin.DefaultFilename,
 	}
 
 	cmd := &cobra.Command{
 		Use:   "install <plugin-path>",
 		Short: "Install a plugin from the local filesystem",
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return c.Complete(args)
+		Args:  c.ParseArgs(),
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			return c.Validate()
 		},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return c.Run()
 		},
 	}
 
-	cmd.SetOutput(c.Out)
+	c.AddArg(&c.Path)
+
+	cmd.SetOutput(c.Settings.Streams.Out)
 
 	return cmd
 }
 
 // InstallCommand implements the plugin install command
 type InstallCommand struct {
-	Out     io.Writer
+	common.Command
 	Handler plugin.Handler
 
-	path string
+	Path string
 }
 
-// Complete populates required fields for Run
-func (cmd *InstallCommand) Complete(args []string) error {
-	if len(args) == 0 {
-		return errors.New("plugin path not specified")
-	}
-
-	cmd.path = strings.TrimSpace(args[0])
-
-	if len(cmd.path) == 0 {
+// Validate checks the required parameters for run
+func (c *InstallCommand) Validate() error {
+	if len(c.Path) == 0 {
 		return errors.New("plugin path not specified")
 	}
 
@@ -68,13 +64,13 @@ func (cmd *InstallCommand) Complete(args []string) error {
 }
 
 // Run executes the command
-func (cmd *InstallCommand) Run() error {
-	err := cmd.Handler.InstallPlugin(cmd.path)
+func (c *InstallCommand) Run() error {
+	err := c.Handler.InstallPlugin(c.Path)
 	if err != nil {
 		return err
 	}
 
-	fmt.Fprintln(cmd.Out, "successfully installed the plugin")
+	fmt.Fprintln(c.Settings.Streams.Out, "successfully installed the plugin")
 
 	return nil
 }
