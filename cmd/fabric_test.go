@@ -60,6 +60,7 @@ var _ = Describe("DefaultFabricCommand", func() {
 		Expect(fmt.Sprint(out)).To(ContainSubstring("context"))
 		Expect(fmt.Sprint(out)).To(ContainSubstring("channel"))
 		Expect(fmt.Sprint(out)).To(ContainSubstring("plugin"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("chaincode"))
 	})
 })
 

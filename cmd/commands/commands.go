@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package commands
 
 import (
+	"github.com/hyperledger/fabric-cli/cmd/commands/chaincode"
 	"github.com/hyperledger/fabric-cli/cmd/commands/channel"
 	"github.com/hyperledger/fabric-cli/cmd/commands/context"
 	"github.com/hyperledger/fabric-cli/cmd/commands/network"
@@ -30,5 +31,8 @@ func All(settings *environment.Settings) []*cobra.Command {
 
 		// fabric channel [subcommand]
 		channel.NewChannelCommand(settings),
+
+		// fabric channel [subcommand]
+		chaincode.NewChaincodeCommand(settings),
 	}
 }

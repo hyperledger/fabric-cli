@@ -60,7 +60,11 @@ func (f *factory) Channel() (Channel, error) {
 		return nil, err
 	}
 
-	ctx := sdk.ChannelContext(f.context.Channel)
+	ctx := sdk.ChannelContext(
+		f.context.Channel,
+		fabsdk.WithUser(f.context.User),
+		fabsdk.WithOrg(f.context.Organization),
+	)
 
 	client, err := channel.New(ctx)
 	if err != nil {
@@ -76,7 +80,11 @@ func (f *factory) Event() (Event, error) {
 		return nil, err
 	}
 
-	ctx := sdk.ChannelContext(f.context.Channel)
+	ctx := sdk.ChannelContext(
+		f.context.Channel,
+		fabsdk.WithUser(f.context.User),
+		fabsdk.WithOrg(f.context.Organization),
+	)
 
 	client, err := event.New(ctx)
 	if err != nil {
@@ -92,7 +100,11 @@ func (f *factory) Ledger() (Ledger, error) {
 		return nil, err
 	}
 
-	ctx := sdk.ChannelContext(f.context.Channel)
+	ctx := sdk.ChannelContext(
+		f.context.Channel,
+		fabsdk.WithUser(f.context.User),
+		fabsdk.WithOrg(f.context.Organization),
+	)
 
 	client, err := ledger.New(ctx)
 	if err != nil {
