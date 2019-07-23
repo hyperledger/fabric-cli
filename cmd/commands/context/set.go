@@ -42,6 +42,7 @@ func NewContextSetCommand(settings *environment.Settings) *cobra.Command {
 	flags.StringVar(&c.Context.Organization, "organization", "", "set the organization context")
 	flags.StringVar(&c.Context.Channel, "channel", "", "set the channel context")
 	flags.StringVar(&c.Context.User, "user", "", "set the users context")
+	flags.StringArrayVar(&c.Context.Peers, "peers", []string{}, "set the peers context")
 
 	cmd.SetOutput(c.Settings.Streams.Out)
 
@@ -61,7 +62,6 @@ func (c *SetCommand) Validate() error {
 	if c.Context == nil ||
 		(len(c.Context.Network) == 0 &&
 			len(c.Context.Organization) == 0 &&
-			len(c.Context.Channel) == 0 &&
 			len(c.Context.User) == 0) {
 		return errors.New("context details not specified")
 	}
