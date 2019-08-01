@@ -8,46 +8,49 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"os"
 
-	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+
+	"github.com/hyperledger/fabric-cli/cmd/common"
+	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
 // NewHomeCommand is a fabric plugin for "fabric home"
 func NewHomeCommand() *cobra.Command {
-	hcmd := &homeCommand{
-		out: os.Stdout,
-	}
+	c := &HomeCommand{}
 
 	cmd := &cobra.Command{
 		Use:   "home",
 		Short: "output the current fabric home directory",
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			settings, err := environment.GetSettings()
-			if err != nil {
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			settings := environment.NewDefaultSettings()
+
+			if err := settings.Init(&pflag.FlagSet{}); err != nil {
+				fmt.Fprintln(os.Stderr, err)
 				return err
 			}
 
-			hcmd.home = settings.Home
+			c.Settings = settings
+
 			return nil
 		},
-		Run: func(cmd *cobra.Command, args []string) {
-			hcmd.run()
+		Run: func(_ *cobra.Command, _ []string) {
+			c.run()
 		},
 	}
 
 	return cmd
 }
 
-type homeCommand struct {
-	home environment.Home
-	out  io.Writer
+// HomeCommand implements a home command
+type HomeCommand struct {
+	common.Command
 }
 
-func (h *homeCommand) run() {
-	fmt.Fprintln(h.out, h.home)
+func (c *HomeCommand) run() {
+	fmt.Fprintln(c.Settings.Streams.Out, c.Settings.Home)
 }
 
 func main() {
