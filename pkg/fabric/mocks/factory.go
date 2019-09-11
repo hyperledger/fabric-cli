@@ -8,11 +8,21 @@ import (
 )
 
 type Factory struct {
+	SDKStub        func() (fabric.SDK, error)
+	sDKMutex       sync.RWMutex
+	sDKArgsForCall []struct{}
+	sDKReturns     struct {
+		result1 fabric.SDK
+		result2 error
+	}
+	sDKReturnsOnCall map[int]struct {
+		result1 fabric.SDK
+		result2 error
+	}
 	ChannelStub        func() (fabric.Channel, error)
 	channelMutex       sync.RWMutex
-	channelArgsForCall []struct {
-	}
-	channelReturns struct {
+	channelArgsForCall []struct{}
+	channelReturns     struct {
 		result1 fabric.Channel
 		result2 error
 	}
@@ -22,9 +32,8 @@ type Factory struct {
 	}
 	EventStub        func() (fabric.Event, error)
 	eventMutex       sync.RWMutex
-	eventArgsForCall []struct {
-	}
-	eventReturns struct {
+	eventArgsForCall []struct{}
+	eventReturns     struct {
 		result1 fabric.Event
 		result2 error
 	}
@@ -34,9 +43,8 @@ type Factory struct {
 	}
 	LedgerStub        func() (fabric.Ledger, error)
 	ledgerMutex       sync.RWMutex
-	ledgerArgsForCall []struct {
-	}
-	ledgerReturns struct {
+	ledgerArgsForCall []struct{}
+	ledgerReturns     struct {
 		result1 fabric.Ledger
 		result2 error
 	}
@@ -44,23 +52,10 @@ type Factory struct {
 		result1 fabric.Ledger
 		result2 error
 	}
-	MSPStub        func() (fabric.MSP, error)
-	mSPMutex       sync.RWMutex
-	mSPArgsForCall []struct {
-	}
-	mSPReturns struct {
-		result1 fabric.MSP
-		result2 error
-	}
-	mSPReturnsOnCall map[int]struct {
-		result1 fabric.MSP
-		result2 error
-	}
 	ResourceManagementStub        func() (fabric.ResourceManagement, error)
 	resourceManagementMutex       sync.RWMutex
-	resourceManagementArgsForCall []struct {
-	}
-	resourceManagementReturns struct {
+	resourceManagementArgsForCall []struct{}
+	resourceManagementReturns     struct {
 		result1 fabric.ResourceManagement
 		result2 error
 	}
@@ -68,27 +63,68 @@ type Factory struct {
 		result1 fabric.ResourceManagement
 		result2 error
 	}
-	SDKStub        func() (fabric.SDK, error)
-	sDKMutex       sync.RWMutex
-	sDKArgsForCall []struct {
-	}
-	sDKReturns struct {
-		result1 fabric.SDK
+	MSPStub        func() (fabric.MSP, error)
+	mSPMutex       sync.RWMutex
+	mSPArgsForCall []struct{}
+	mSPReturns     struct {
+		result1 fabric.MSP
 		result2 error
 	}
-	sDKReturnsOnCall map[int]struct {
-		result1 fabric.SDK
+	mSPReturnsOnCall map[int]struct {
+		result1 fabric.MSP
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
+func (fake *Factory) SDK() (fabric.SDK, error) {
+	fake.sDKMutex.Lock()
+	ret, specificReturn := fake.sDKReturnsOnCall[len(fake.sDKArgsForCall)]
+	fake.sDKArgsForCall = append(fake.sDKArgsForCall, struct{}{})
+	fake.recordInvocation("SDK", []interface{}{})
+	fake.sDKMutex.Unlock()
+	if fake.SDKStub != nil {
+		return fake.SDKStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.sDKReturns.result1, fake.sDKReturns.result2
+}
+
+func (fake *Factory) SDKCallCount() int {
+	fake.sDKMutex.RLock()
+	defer fake.sDKMutex.RUnlock()
+	return len(fake.sDKArgsForCall)
+}
+
+func (fake *Factory) SDKReturns(result1 fabric.SDK, result2 error) {
+	fake.SDKStub = nil
+	fake.sDKReturns = struct {
+		result1 fabric.SDK
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *Factory) SDKReturnsOnCall(i int, result1 fabric.SDK, result2 error) {
+	fake.SDKStub = nil
+	if fake.sDKReturnsOnCall == nil {
+		fake.sDKReturnsOnCall = make(map[int]struct {
+			result1 fabric.SDK
+			result2 error
+		})
+	}
+	fake.sDKReturnsOnCall[i] = struct {
+		result1 fabric.SDK
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *Factory) Channel() (fabric.Channel, error) {
 	fake.channelMutex.Lock()
 	ret, specificReturn := fake.channelReturnsOnCall[len(fake.channelArgsForCall)]
-	fake.channelArgsForCall = append(fake.channelArgsForCall, struct {
-	}{})
+	fake.channelArgsForCall = append(fake.channelArgsForCall, struct{}{})
 	fake.recordInvocation("Channel", []interface{}{})
 	fake.channelMutex.Unlock()
 	if fake.ChannelStub != nil {
@@ -97,8 +133,7 @@ func (fake *Factory) Channel() (fabric.Channel, error) {
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.channelReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.channelReturns.result1, fake.channelReturns.result2
 }
 
 func (fake *Factory) ChannelCallCount() int {
@@ -107,15 +142,7 @@ func (fake *Factory) ChannelCallCount() int {
 	return len(fake.channelArgsForCall)
 }
 
-func (fake *Factory) ChannelCalls(stub func() (fabric.Channel, error)) {
-	fake.channelMutex.Lock()
-	defer fake.channelMutex.Unlock()
-	fake.ChannelStub = stub
-}
-
 func (fake *Factory) ChannelReturns(result1 fabric.Channel, result2 error) {
-	fake.channelMutex.Lock()
-	defer fake.channelMutex.Unlock()
 	fake.ChannelStub = nil
 	fake.channelReturns = struct {
 		result1 fabric.Channel
@@ -124,8 +151,6 @@ func (fake *Factory) ChannelReturns(result1 fabric.Channel, result2 error) {
 }
 
 func (fake *Factory) ChannelReturnsOnCall(i int, result1 fabric.Channel, result2 error) {
-	fake.channelMutex.Lock()
-	defer fake.channelMutex.Unlock()
 	fake.ChannelStub = nil
 	if fake.channelReturnsOnCall == nil {
 		fake.channelReturnsOnCall = make(map[int]struct {
@@ -142,8 +167,7 @@ func (fake *Factory) ChannelReturnsOnCall(i int, result1 fabric.Channel, result2
 func (fake *Factory) Event() (fabric.Event, error) {
 	fake.eventMutex.Lock()
 	ret, specificReturn := fake.eventReturnsOnCall[len(fake.eventArgsForCall)]
-	fake.eventArgsForCall = append(fake.eventArgsForCall, struct {
-	}{})
+	fake.eventArgsForCall = append(fake.eventArgsForCall, struct{}{})
 	fake.recordInvocation("Event", []interface{}{})
 	fake.eventMutex.Unlock()
 	if fake.EventStub != nil {
@@ -152,8 +176,7 @@ func (fake *Factory) Event() (fabric.Event, error) {
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.eventReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.eventReturns.result1, fake.eventReturns.result2
 }
 
 func (fake *Factory) EventCallCount() int {
@@ -162,15 +185,7 @@ func (fake *Factory) EventCallCount() int {
 	return len(fake.eventArgsForCall)
 }
 
-func (fake *Factory) EventCalls(stub func() (fabric.Event, error)) {
-	fake.eventMutex.Lock()
-	defer fake.eventMutex.Unlock()
-	fake.EventStub = stub
-}
-
 func (fake *Factory) EventReturns(result1 fabric.Event, result2 error) {
-	fake.eventMutex.Lock()
-	defer fake.eventMutex.Unlock()
 	fake.EventStub = nil
 	fake.eventReturns = struct {
 		result1 fabric.Event
@@ -179,8 +194,6 @@ func (fake *Factory) EventReturns(result1 fabric.Event, result2 error) {
 }
 
 func (fake *Factory) EventReturnsOnCall(i int, result1 fabric.Event, result2 error) {
-	fake.eventMutex.Lock()
-	defer fake.eventMutex.Unlock()
 	fake.EventStub = nil
 	if fake.eventReturnsOnCall == nil {
 		fake.eventReturnsOnCall = make(map[int]struct {
@@ -197,8 +210,7 @@ func (fake *Factory) EventReturnsOnCall(i int, result1 fabric.Event, result2 err
 func (fake *Factory) Ledger() (fabric.Ledger, error) {
 	fake.ledgerMutex.Lock()
 	ret, specificReturn := fake.ledgerReturnsOnCall[len(fake.ledgerArgsForCall)]
-	fake.ledgerArgsForCall = append(fake.ledgerArgsForCall, struct {
-	}{})
+	fake.ledgerArgsForCall = append(fake.ledgerArgsForCall, struct{}{})
 	fake.recordInvocation("Ledger", []interface{}{})
 	fake.ledgerMutex.Unlock()
 	if fake.LedgerStub != nil {
@@ -207,8 +219,7 @@ func (fake *Factory) Ledger() (fabric.Ledger, error) {
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.ledgerReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.ledgerReturns.result1, fake.ledgerReturns.result2
 }
 
 func (fake *Factory) LedgerCallCount() int {
@@ -217,15 +228,7 @@ func (fake *Factory) LedgerCallCount() int {
 	return len(fake.ledgerArgsForCall)
 }
 
-func (fake *Factory) LedgerCalls(stub func() (fabric.Ledger, error)) {
-	fake.ledgerMutex.Lock()
-	defer fake.ledgerMutex.Unlock()
-	fake.LedgerStub = stub
-}
-
 func (fake *Factory) LedgerReturns(result1 fabric.Ledger, result2 error) {
-	fake.ledgerMutex.Lock()
-	defer fake.ledgerMutex.Unlock()
 	fake.LedgerStub = nil
 	fake.ledgerReturns = struct {
 		result1 fabric.Ledger
@@ -234,8 +237,6 @@ func (fake *Factory) LedgerReturns(result1 fabric.Ledger, result2 error) {
 }
 
 func (fake *Factory) LedgerReturnsOnCall(i int, result1 fabric.Ledger, result2 error) {
-	fake.ledgerMutex.Lock()
-	defer fake.ledgerMutex.Unlock()
 	fake.LedgerStub = nil
 	if fake.ledgerReturnsOnCall == nil {
 		fake.ledgerReturnsOnCall = make(map[int]struct {
@@ -249,66 +250,10 @@ func (fake *Factory) LedgerReturnsOnCall(i int, result1 fabric.Ledger, result2 e
 	}{result1, result2}
 }
 
-func (fake *Factory) MSP() (fabric.MSP, error) {
-	fake.mSPMutex.Lock()
-	ret, specificReturn := fake.mSPReturnsOnCall[len(fake.mSPArgsForCall)]
-	fake.mSPArgsForCall = append(fake.mSPArgsForCall, struct {
-	}{})
-	fake.recordInvocation("MSP", []interface{}{})
-	fake.mSPMutex.Unlock()
-	if fake.MSPStub != nil {
-		return fake.MSPStub()
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.mSPReturns
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *Factory) MSPCallCount() int {
-	fake.mSPMutex.RLock()
-	defer fake.mSPMutex.RUnlock()
-	return len(fake.mSPArgsForCall)
-}
-
-func (fake *Factory) MSPCalls(stub func() (fabric.MSP, error)) {
-	fake.mSPMutex.Lock()
-	defer fake.mSPMutex.Unlock()
-	fake.MSPStub = stub
-}
-
-func (fake *Factory) MSPReturns(result1 fabric.MSP, result2 error) {
-	fake.mSPMutex.Lock()
-	defer fake.mSPMutex.Unlock()
-	fake.MSPStub = nil
-	fake.mSPReturns = struct {
-		result1 fabric.MSP
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *Factory) MSPReturnsOnCall(i int, result1 fabric.MSP, result2 error) {
-	fake.mSPMutex.Lock()
-	defer fake.mSPMutex.Unlock()
-	fake.MSPStub = nil
-	if fake.mSPReturnsOnCall == nil {
-		fake.mSPReturnsOnCall = make(map[int]struct {
-			result1 fabric.MSP
-			result2 error
-		})
-	}
-	fake.mSPReturnsOnCall[i] = struct {
-		result1 fabric.MSP
-		result2 error
-	}{result1, result2}
-}
-
 func (fake *Factory) ResourceManagement() (fabric.ResourceManagement, error) {
 	fake.resourceManagementMutex.Lock()
 	ret, specificReturn := fake.resourceManagementReturnsOnCall[len(fake.resourceManagementArgsForCall)]
-	fake.resourceManagementArgsForCall = append(fake.resourceManagementArgsForCall, struct {
-	}{})
+	fake.resourceManagementArgsForCall = append(fake.resourceManagementArgsForCall, struct{}{})
 	fake.recordInvocation("ResourceManagement", []interface{}{})
 	fake.resourceManagementMutex.Unlock()
 	if fake.ResourceManagementStub != nil {
@@ -317,8 +262,7 @@ func (fake *Factory) ResourceManagement() (fabric.ResourceManagement, error) {
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.resourceManagementReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.resourceManagementReturns.result1, fake.resourceManagementReturns.result2
 }
 
 func (fake *Factory) ResourceManagementCallCount() int {
@@ -327,15 +271,7 @@ func (fake *Factory) ResourceManagementCallCount() int {
 	return len(fake.resourceManagementArgsForCall)
 }
 
-func (fake *Factory) ResourceManagementCalls(stub func() (fabric.ResourceManagement, error)) {
-	fake.resourceManagementMutex.Lock()
-	defer fake.resourceManagementMutex.Unlock()
-	fake.ResourceManagementStub = stub
-}
-
 func (fake *Factory) ResourceManagementReturns(result1 fabric.ResourceManagement, result2 error) {
-	fake.resourceManagementMutex.Lock()
-	defer fake.resourceManagementMutex.Unlock()
 	fake.ResourceManagementStub = nil
 	fake.resourceManagementReturns = struct {
 		result1 fabric.ResourceManagement
@@ -344,8 +280,6 @@ func (fake *Factory) ResourceManagementReturns(result1 fabric.ResourceManagement
 }
 
 func (fake *Factory) ResourceManagementReturnsOnCall(i int, result1 fabric.ResourceManagement, result2 error) {
-	fake.resourceManagementMutex.Lock()
-	defer fake.resourceManagementMutex.Unlock()
 	fake.ResourceManagementStub = nil
 	if fake.resourceManagementReturnsOnCall == nil {
 		fake.resourceManagementReturnsOnCall = make(map[int]struct {
@@ -359,57 +293,45 @@ func (fake *Factory) ResourceManagementReturnsOnCall(i int, result1 fabric.Resou
 	}{result1, result2}
 }
 
-func (fake *Factory) SDK() (fabric.SDK, error) {
-	fake.sDKMutex.Lock()
-	ret, specificReturn := fake.sDKReturnsOnCall[len(fake.sDKArgsForCall)]
-	fake.sDKArgsForCall = append(fake.sDKArgsForCall, struct {
-	}{})
-	fake.recordInvocation("SDK", []interface{}{})
-	fake.sDKMutex.Unlock()
-	if fake.SDKStub != nil {
-		return fake.SDKStub()
+func (fake *Factory) MSP() (fabric.MSP, error) {
+	fake.mSPMutex.Lock()
+	ret, specificReturn := fake.mSPReturnsOnCall[len(fake.mSPArgsForCall)]
+	fake.mSPArgsForCall = append(fake.mSPArgsForCall, struct{}{})
+	fake.recordInvocation("MSP", []interface{}{})
+	fake.mSPMutex.Unlock()
+	if fake.MSPStub != nil {
+		return fake.MSPStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.sDKReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.mSPReturns.result1, fake.mSPReturns.result2
 }
 
-func (fake *Factory) SDKCallCount() int {
-	fake.sDKMutex.RLock()
-	defer fake.sDKMutex.RUnlock()
-	return len(fake.sDKArgsForCall)
+func (fake *Factory) MSPCallCount() int {
+	fake.mSPMutex.RLock()
+	defer fake.mSPMutex.RUnlock()
+	return len(fake.mSPArgsForCall)
 }
 
-func (fake *Factory) SDKCalls(stub func() (fabric.SDK, error)) {
-	fake.sDKMutex.Lock()
-	defer fake.sDKMutex.Unlock()
-	fake.SDKStub = stub
-}
-
-func (fake *Factory) SDKReturns(result1 fabric.SDK, result2 error) {
-	fake.sDKMutex.Lock()
-	defer fake.sDKMutex.Unlock()
-	fake.SDKStub = nil
-	fake.sDKReturns = struct {
-		result1 fabric.SDK
+func (fake *Factory) MSPReturns(result1 fabric.MSP, result2 error) {
+	fake.MSPStub = nil
+	fake.mSPReturns = struct {
+		result1 fabric.MSP
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *Factory) SDKReturnsOnCall(i int, result1 fabric.SDK, result2 error) {
-	fake.sDKMutex.Lock()
-	defer fake.sDKMutex.Unlock()
-	fake.SDKStub = nil
-	if fake.sDKReturnsOnCall == nil {
-		fake.sDKReturnsOnCall = make(map[int]struct {
-			result1 fabric.SDK
+func (fake *Factory) MSPReturnsOnCall(i int, result1 fabric.MSP, result2 error) {
+	fake.MSPStub = nil
+	if fake.mSPReturnsOnCall == nil {
+		fake.mSPReturnsOnCall = make(map[int]struct {
+			result1 fabric.MSP
 			result2 error
 		})
 	}
-	fake.sDKReturnsOnCall[i] = struct {
-		result1 fabric.SDK
+	fake.mSPReturnsOnCall[i] = struct {
+		result1 fabric.MSP
 		result2 error
 	}{result1, result2}
 }
@@ -417,18 +339,18 @@ func (fake *Factory) SDKReturnsOnCall(i int, result1 fabric.SDK, result2 error) 
 func (fake *Factory) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.sDKMutex.RLock()
+	defer fake.sDKMutex.RUnlock()
 	fake.channelMutex.RLock()
 	defer fake.channelMutex.RUnlock()
 	fake.eventMutex.RLock()
 	defer fake.eventMutex.RUnlock()
 	fake.ledgerMutex.RLock()
 	defer fake.ledgerMutex.RUnlock()
-	fake.mSPMutex.RLock()
-	defer fake.mSPMutex.RUnlock()
 	fake.resourceManagementMutex.RLock()
 	defer fake.resourceManagementMutex.RUnlock()
-	fake.sDKMutex.RLock()
-	defer fake.sDKMutex.RUnlock()
+	fake.mSPMutex.RLock()
+	defer fake.mSPMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

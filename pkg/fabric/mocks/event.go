@@ -9,10 +9,10 @@ import (
 )
 
 type Event struct {
-	RegisterBlockEventStub        func(...fab.BlockFilter) (fab.Registration, <-chan *fab.BlockEvent, error)
+	RegisterBlockEventStub        func(filter ...fab.BlockFilter) (fab.Registration, <-chan *fab.BlockEvent, error)
 	registerBlockEventMutex       sync.RWMutex
 	registerBlockEventArgsForCall []struct {
-		arg1 []fab.BlockFilter
+		filter []fab.BlockFilter
 	}
 	registerBlockEventReturns struct {
 		result1 fab.Registration
@@ -24,11 +24,11 @@ type Event struct {
 		result2 <-chan *fab.BlockEvent
 		result3 error
 	}
-	RegisterChaincodeEventStub        func(string, string) (fab.Registration, <-chan *fab.CCEvent, error)
+	RegisterChaincodeEventStub        func(ccID, eventFilter string) (fab.Registration, <-chan *fab.CCEvent, error)
 	registerChaincodeEventMutex       sync.RWMutex
 	registerChaincodeEventArgsForCall []struct {
-		arg1 string
-		arg2 string
+		ccID        string
+		eventFilter string
 	}
 	registerChaincodeEventReturns struct {
 		result1 fab.Registration
@@ -42,9 +42,8 @@ type Event struct {
 	}
 	RegisterFilteredBlockEventStub        func() (fab.Registration, <-chan *fab.FilteredBlockEvent, error)
 	registerFilteredBlockEventMutex       sync.RWMutex
-	registerFilteredBlockEventArgsForCall []struct {
-	}
-	registerFilteredBlockEventReturns struct {
+	registerFilteredBlockEventArgsForCall []struct{}
+	registerFilteredBlockEventReturns     struct {
 		result1 fab.Registration
 		result2 <-chan *fab.FilteredBlockEvent
 		result3 error
@@ -54,10 +53,10 @@ type Event struct {
 		result2 <-chan *fab.FilteredBlockEvent
 		result3 error
 	}
-	RegisterTxStatusEventStub        func(string) (fab.Registration, <-chan *fab.TxStatusEvent, error)
+	RegisterTxStatusEventStub        func(txID string) (fab.Registration, <-chan *fab.TxStatusEvent, error)
 	registerTxStatusEventMutex       sync.RWMutex
 	registerTxStatusEventArgsForCall []struct {
-		arg1 string
+		txID string
 	}
 	registerTxStatusEventReturns struct {
 		result1 fab.Registration
@@ -69,31 +68,30 @@ type Event struct {
 		result2 <-chan *fab.TxStatusEvent
 		result3 error
 	}
-	UnregisterStub        func(fab.Registration)
+	UnregisterStub        func(reg fab.Registration)
 	unregisterMutex       sync.RWMutex
 	unregisterArgsForCall []struct {
-		arg1 fab.Registration
+		reg fab.Registration
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *Event) RegisterBlockEvent(arg1 ...fab.BlockFilter) (fab.Registration, <-chan *fab.BlockEvent, error) {
+func (fake *Event) RegisterBlockEvent(filter ...fab.BlockFilter) (fab.Registration, <-chan *fab.BlockEvent, error) {
 	fake.registerBlockEventMutex.Lock()
 	ret, specificReturn := fake.registerBlockEventReturnsOnCall[len(fake.registerBlockEventArgsForCall)]
 	fake.registerBlockEventArgsForCall = append(fake.registerBlockEventArgsForCall, struct {
-		arg1 []fab.BlockFilter
-	}{arg1})
-	fake.recordInvocation("RegisterBlockEvent", []interface{}{arg1})
+		filter []fab.BlockFilter
+	}{filter})
+	fake.recordInvocation("RegisterBlockEvent", []interface{}{filter})
 	fake.registerBlockEventMutex.Unlock()
 	if fake.RegisterBlockEventStub != nil {
-		return fake.RegisterBlockEventStub(arg1...)
+		return fake.RegisterBlockEventStub(filter...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.registerBlockEventReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fake.registerBlockEventReturns.result1, fake.registerBlockEventReturns.result2, fake.registerBlockEventReturns.result3
 }
 
 func (fake *Event) RegisterBlockEventCallCount() int {
@@ -102,22 +100,13 @@ func (fake *Event) RegisterBlockEventCallCount() int {
 	return len(fake.registerBlockEventArgsForCall)
 }
 
-func (fake *Event) RegisterBlockEventCalls(stub func(...fab.BlockFilter) (fab.Registration, <-chan *fab.BlockEvent, error)) {
-	fake.registerBlockEventMutex.Lock()
-	defer fake.registerBlockEventMutex.Unlock()
-	fake.RegisterBlockEventStub = stub
-}
-
 func (fake *Event) RegisterBlockEventArgsForCall(i int) []fab.BlockFilter {
 	fake.registerBlockEventMutex.RLock()
 	defer fake.registerBlockEventMutex.RUnlock()
-	argsForCall := fake.registerBlockEventArgsForCall[i]
-	return argsForCall.arg1
+	return fake.registerBlockEventArgsForCall[i].filter
 }
 
 func (fake *Event) RegisterBlockEventReturns(result1 fab.Registration, result2 <-chan *fab.BlockEvent, result3 error) {
-	fake.registerBlockEventMutex.Lock()
-	defer fake.registerBlockEventMutex.Unlock()
 	fake.RegisterBlockEventStub = nil
 	fake.registerBlockEventReturns = struct {
 		result1 fab.Registration
@@ -127,8 +116,6 @@ func (fake *Event) RegisterBlockEventReturns(result1 fab.Registration, result2 <
 }
 
 func (fake *Event) RegisterBlockEventReturnsOnCall(i int, result1 fab.Registration, result2 <-chan *fab.BlockEvent, result3 error) {
-	fake.registerBlockEventMutex.Lock()
-	defer fake.registerBlockEventMutex.Unlock()
 	fake.RegisterBlockEventStub = nil
 	if fake.registerBlockEventReturnsOnCall == nil {
 		fake.registerBlockEventReturnsOnCall = make(map[int]struct {
@@ -144,23 +131,22 @@ func (fake *Event) RegisterBlockEventReturnsOnCall(i int, result1 fab.Registrati
 	}{result1, result2, result3}
 }
 
-func (fake *Event) RegisterChaincodeEvent(arg1 string, arg2 string) (fab.Registration, <-chan *fab.CCEvent, error) {
+func (fake *Event) RegisterChaincodeEvent(ccID string, eventFilter string) (fab.Registration, <-chan *fab.CCEvent, error) {
 	fake.registerChaincodeEventMutex.Lock()
 	ret, specificReturn := fake.registerChaincodeEventReturnsOnCall[len(fake.registerChaincodeEventArgsForCall)]
 	fake.registerChaincodeEventArgsForCall = append(fake.registerChaincodeEventArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("RegisterChaincodeEvent", []interface{}{arg1, arg2})
+		ccID        string
+		eventFilter string
+	}{ccID, eventFilter})
+	fake.recordInvocation("RegisterChaincodeEvent", []interface{}{ccID, eventFilter})
 	fake.registerChaincodeEventMutex.Unlock()
 	if fake.RegisterChaincodeEventStub != nil {
-		return fake.RegisterChaincodeEventStub(arg1, arg2)
+		return fake.RegisterChaincodeEventStub(ccID, eventFilter)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.registerChaincodeEventReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fake.registerChaincodeEventReturns.result1, fake.registerChaincodeEventReturns.result2, fake.registerChaincodeEventReturns.result3
 }
 
 func (fake *Event) RegisterChaincodeEventCallCount() int {
@@ -169,22 +155,13 @@ func (fake *Event) RegisterChaincodeEventCallCount() int {
 	return len(fake.registerChaincodeEventArgsForCall)
 }
 
-func (fake *Event) RegisterChaincodeEventCalls(stub func(string, string) (fab.Registration, <-chan *fab.CCEvent, error)) {
-	fake.registerChaincodeEventMutex.Lock()
-	defer fake.registerChaincodeEventMutex.Unlock()
-	fake.RegisterChaincodeEventStub = stub
-}
-
 func (fake *Event) RegisterChaincodeEventArgsForCall(i int) (string, string) {
 	fake.registerChaincodeEventMutex.RLock()
 	defer fake.registerChaincodeEventMutex.RUnlock()
-	argsForCall := fake.registerChaincodeEventArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return fake.registerChaincodeEventArgsForCall[i].ccID, fake.registerChaincodeEventArgsForCall[i].eventFilter
 }
 
 func (fake *Event) RegisterChaincodeEventReturns(result1 fab.Registration, result2 <-chan *fab.CCEvent, result3 error) {
-	fake.registerChaincodeEventMutex.Lock()
-	defer fake.registerChaincodeEventMutex.Unlock()
 	fake.RegisterChaincodeEventStub = nil
 	fake.registerChaincodeEventReturns = struct {
 		result1 fab.Registration
@@ -194,8 +171,6 @@ func (fake *Event) RegisterChaincodeEventReturns(result1 fab.Registration, resul
 }
 
 func (fake *Event) RegisterChaincodeEventReturnsOnCall(i int, result1 fab.Registration, result2 <-chan *fab.CCEvent, result3 error) {
-	fake.registerChaincodeEventMutex.Lock()
-	defer fake.registerChaincodeEventMutex.Unlock()
 	fake.RegisterChaincodeEventStub = nil
 	if fake.registerChaincodeEventReturnsOnCall == nil {
 		fake.registerChaincodeEventReturnsOnCall = make(map[int]struct {
@@ -214,8 +189,7 @@ func (fake *Event) RegisterChaincodeEventReturnsOnCall(i int, result1 fab.Regist
 func (fake *Event) RegisterFilteredBlockEvent() (fab.Registration, <-chan *fab.FilteredBlockEvent, error) {
 	fake.registerFilteredBlockEventMutex.Lock()
 	ret, specificReturn := fake.registerFilteredBlockEventReturnsOnCall[len(fake.registerFilteredBlockEventArgsForCall)]
-	fake.registerFilteredBlockEventArgsForCall = append(fake.registerFilteredBlockEventArgsForCall, struct {
-	}{})
+	fake.registerFilteredBlockEventArgsForCall = append(fake.registerFilteredBlockEventArgsForCall, struct{}{})
 	fake.recordInvocation("RegisterFilteredBlockEvent", []interface{}{})
 	fake.registerFilteredBlockEventMutex.Unlock()
 	if fake.RegisterFilteredBlockEventStub != nil {
@@ -224,8 +198,7 @@ func (fake *Event) RegisterFilteredBlockEvent() (fab.Registration, <-chan *fab.F
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.registerFilteredBlockEventReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fake.registerFilteredBlockEventReturns.result1, fake.registerFilteredBlockEventReturns.result2, fake.registerFilteredBlockEventReturns.result3
 }
 
 func (fake *Event) RegisterFilteredBlockEventCallCount() int {
@@ -234,15 +207,7 @@ func (fake *Event) RegisterFilteredBlockEventCallCount() int {
 	return len(fake.registerFilteredBlockEventArgsForCall)
 }
 
-func (fake *Event) RegisterFilteredBlockEventCalls(stub func() (fab.Registration, <-chan *fab.FilteredBlockEvent, error)) {
-	fake.registerFilteredBlockEventMutex.Lock()
-	defer fake.registerFilteredBlockEventMutex.Unlock()
-	fake.RegisterFilteredBlockEventStub = stub
-}
-
 func (fake *Event) RegisterFilteredBlockEventReturns(result1 fab.Registration, result2 <-chan *fab.FilteredBlockEvent, result3 error) {
-	fake.registerFilteredBlockEventMutex.Lock()
-	defer fake.registerFilteredBlockEventMutex.Unlock()
 	fake.RegisterFilteredBlockEventStub = nil
 	fake.registerFilteredBlockEventReturns = struct {
 		result1 fab.Registration
@@ -252,8 +217,6 @@ func (fake *Event) RegisterFilteredBlockEventReturns(result1 fab.Registration, r
 }
 
 func (fake *Event) RegisterFilteredBlockEventReturnsOnCall(i int, result1 fab.Registration, result2 <-chan *fab.FilteredBlockEvent, result3 error) {
-	fake.registerFilteredBlockEventMutex.Lock()
-	defer fake.registerFilteredBlockEventMutex.Unlock()
 	fake.RegisterFilteredBlockEventStub = nil
 	if fake.registerFilteredBlockEventReturnsOnCall == nil {
 		fake.registerFilteredBlockEventReturnsOnCall = make(map[int]struct {
@@ -269,22 +232,21 @@ func (fake *Event) RegisterFilteredBlockEventReturnsOnCall(i int, result1 fab.Re
 	}{result1, result2, result3}
 }
 
-func (fake *Event) RegisterTxStatusEvent(arg1 string) (fab.Registration, <-chan *fab.TxStatusEvent, error) {
+func (fake *Event) RegisterTxStatusEvent(txID string) (fab.Registration, <-chan *fab.TxStatusEvent, error) {
 	fake.registerTxStatusEventMutex.Lock()
 	ret, specificReturn := fake.registerTxStatusEventReturnsOnCall[len(fake.registerTxStatusEventArgsForCall)]
 	fake.registerTxStatusEventArgsForCall = append(fake.registerTxStatusEventArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("RegisterTxStatusEvent", []interface{}{arg1})
+		txID string
+	}{txID})
+	fake.recordInvocation("RegisterTxStatusEvent", []interface{}{txID})
 	fake.registerTxStatusEventMutex.Unlock()
 	if fake.RegisterTxStatusEventStub != nil {
-		return fake.RegisterTxStatusEventStub(arg1)
+		return fake.RegisterTxStatusEventStub(txID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.registerTxStatusEventReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fake.registerTxStatusEventReturns.result1, fake.registerTxStatusEventReturns.result2, fake.registerTxStatusEventReturns.result3
 }
 
 func (fake *Event) RegisterTxStatusEventCallCount() int {
@@ -293,22 +255,13 @@ func (fake *Event) RegisterTxStatusEventCallCount() int {
 	return len(fake.registerTxStatusEventArgsForCall)
 }
 
-func (fake *Event) RegisterTxStatusEventCalls(stub func(string) (fab.Registration, <-chan *fab.TxStatusEvent, error)) {
-	fake.registerTxStatusEventMutex.Lock()
-	defer fake.registerTxStatusEventMutex.Unlock()
-	fake.RegisterTxStatusEventStub = stub
-}
-
 func (fake *Event) RegisterTxStatusEventArgsForCall(i int) string {
 	fake.registerTxStatusEventMutex.RLock()
 	defer fake.registerTxStatusEventMutex.RUnlock()
-	argsForCall := fake.registerTxStatusEventArgsForCall[i]
-	return argsForCall.arg1
+	return fake.registerTxStatusEventArgsForCall[i].txID
 }
 
 func (fake *Event) RegisterTxStatusEventReturns(result1 fab.Registration, result2 <-chan *fab.TxStatusEvent, result3 error) {
-	fake.registerTxStatusEventMutex.Lock()
-	defer fake.registerTxStatusEventMutex.Unlock()
 	fake.RegisterTxStatusEventStub = nil
 	fake.registerTxStatusEventReturns = struct {
 		result1 fab.Registration
@@ -318,8 +271,6 @@ func (fake *Event) RegisterTxStatusEventReturns(result1 fab.Registration, result
 }
 
 func (fake *Event) RegisterTxStatusEventReturnsOnCall(i int, result1 fab.Registration, result2 <-chan *fab.TxStatusEvent, result3 error) {
-	fake.registerTxStatusEventMutex.Lock()
-	defer fake.registerTxStatusEventMutex.Unlock()
 	fake.RegisterTxStatusEventStub = nil
 	if fake.registerTxStatusEventReturnsOnCall == nil {
 		fake.registerTxStatusEventReturnsOnCall = make(map[int]struct {
@@ -335,15 +286,15 @@ func (fake *Event) RegisterTxStatusEventReturnsOnCall(i int, result1 fab.Registr
 	}{result1, result2, result3}
 }
 
-func (fake *Event) Unregister(arg1 fab.Registration) {
+func (fake *Event) Unregister(reg fab.Registration) {
 	fake.unregisterMutex.Lock()
 	fake.unregisterArgsForCall = append(fake.unregisterArgsForCall, struct {
-		arg1 fab.Registration
-	}{arg1})
-	fake.recordInvocation("Unregister", []interface{}{arg1})
+		reg fab.Registration
+	}{reg})
+	fake.recordInvocation("Unregister", []interface{}{reg})
 	fake.unregisterMutex.Unlock()
 	if fake.UnregisterStub != nil {
-		fake.UnregisterStub(arg1)
+		fake.UnregisterStub(reg)
 	}
 }
 
@@ -353,17 +304,10 @@ func (fake *Event) UnregisterCallCount() int {
 	return len(fake.unregisterArgsForCall)
 }
 
-func (fake *Event) UnregisterCalls(stub func(fab.Registration)) {
-	fake.unregisterMutex.Lock()
-	defer fake.unregisterMutex.Unlock()
-	fake.UnregisterStub = stub
-}
-
 func (fake *Event) UnregisterArgsForCall(i int) fab.Registration {
 	fake.unregisterMutex.RLock()
 	defer fake.unregisterMutex.RUnlock()
-	argsForCall := fake.unregisterArgsForCall[i]
-	return argsForCall.arg1
+	return fake.unregisterArgsForCall[i].reg
 }
 
 func (fake *Event) Invocations() map[string][][]interface{} {

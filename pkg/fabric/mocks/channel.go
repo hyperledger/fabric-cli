@@ -11,11 +11,11 @@ import (
 )
 
 type Channel struct {
-	ExecuteStub        func(channel.Request, ...channel.RequestOption) (channel.Response, error)
+	ExecuteStub        func(request channel.Request, options ...channel.RequestOption) (channel.Response, error)
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct {
-		arg1 channel.Request
-		arg2 []channel.RequestOption
+		request channel.Request
+		options []channel.RequestOption
 	}
 	executeReturns struct {
 		result1 channel.Response
@@ -25,12 +25,12 @@ type Channel struct {
 		result1 channel.Response
 		result2 error
 	}
-	InvokeHandlerStub        func(invoke.Handler, channel.Request, ...channel.RequestOption) (channel.Response, error)
+	InvokeHandlerStub        func(handler invoke.Handler, request channel.Request, options ...channel.RequestOption) (channel.Response, error)
 	invokeHandlerMutex       sync.RWMutex
 	invokeHandlerArgsForCall []struct {
-		arg1 invoke.Handler
-		arg2 channel.Request
-		arg3 []channel.RequestOption
+		handler invoke.Handler
+		request channel.Request
+		options []channel.RequestOption
 	}
 	invokeHandlerReturns struct {
 		result1 channel.Response
@@ -40,11 +40,11 @@ type Channel struct {
 		result1 channel.Response
 		result2 error
 	}
-	QueryStub        func(channel.Request, ...channel.RequestOption) (channel.Response, error)
+	QueryStub        func(request channel.Request, options ...channel.RequestOption) (channel.Response, error)
 	queryMutex       sync.RWMutex
 	queryArgsForCall []struct {
-		arg1 channel.Request
-		arg2 []channel.RequestOption
+		request channel.Request
+		options []channel.RequestOption
 	}
 	queryReturns struct {
 		result1 channel.Response
@@ -54,11 +54,11 @@ type Channel struct {
 		result1 channel.Response
 		result2 error
 	}
-	RegisterChaincodeEventStub        func(string, string) (fab.Registration, <-chan *fab.CCEvent, error)
+	RegisterChaincodeEventStub        func(chainCodeID string, eventFilter string) (fab.Registration, <-chan *fab.CCEvent, error)
 	registerChaincodeEventMutex       sync.RWMutex
 	registerChaincodeEventArgsForCall []struct {
-		arg1 string
-		arg2 string
+		chainCodeID string
+		eventFilter string
 	}
 	registerChaincodeEventReturns struct {
 		result1 fab.Registration
@@ -70,32 +70,31 @@ type Channel struct {
 		result2 <-chan *fab.CCEvent
 		result3 error
 	}
-	UnregisterChaincodeEventStub        func(fab.Registration)
+	UnregisterChaincodeEventStub        func(registration fab.Registration)
 	unregisterChaincodeEventMutex       sync.RWMutex
 	unregisterChaincodeEventArgsForCall []struct {
-		arg1 fab.Registration
+		registration fab.Registration
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *Channel) Execute(arg1 channel.Request, arg2 ...channel.RequestOption) (channel.Response, error) {
+func (fake *Channel) Execute(request channel.Request, options ...channel.RequestOption) (channel.Response, error) {
 	fake.executeMutex.Lock()
 	ret, specificReturn := fake.executeReturnsOnCall[len(fake.executeArgsForCall)]
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
-		arg1 channel.Request
-		arg2 []channel.RequestOption
-	}{arg1, arg2})
-	fake.recordInvocation("Execute", []interface{}{arg1, arg2})
+		request channel.Request
+		options []channel.RequestOption
+	}{request, options})
+	fake.recordInvocation("Execute", []interface{}{request, options})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
-		return fake.ExecuteStub(arg1, arg2...)
+		return fake.ExecuteStub(request, options...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.executeReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.executeReturns.result1, fake.executeReturns.result2
 }
 
 func (fake *Channel) ExecuteCallCount() int {
@@ -104,22 +103,13 @@ func (fake *Channel) ExecuteCallCount() int {
 	return len(fake.executeArgsForCall)
 }
 
-func (fake *Channel) ExecuteCalls(stub func(channel.Request, ...channel.RequestOption) (channel.Response, error)) {
-	fake.executeMutex.Lock()
-	defer fake.executeMutex.Unlock()
-	fake.ExecuteStub = stub
-}
-
 func (fake *Channel) ExecuteArgsForCall(i int) (channel.Request, []channel.RequestOption) {
 	fake.executeMutex.RLock()
 	defer fake.executeMutex.RUnlock()
-	argsForCall := fake.executeArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return fake.executeArgsForCall[i].request, fake.executeArgsForCall[i].options
 }
 
 func (fake *Channel) ExecuteReturns(result1 channel.Response, result2 error) {
-	fake.executeMutex.Lock()
-	defer fake.executeMutex.Unlock()
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
 		result1 channel.Response
@@ -128,8 +118,6 @@ func (fake *Channel) ExecuteReturns(result1 channel.Response, result2 error) {
 }
 
 func (fake *Channel) ExecuteReturnsOnCall(i int, result1 channel.Response, result2 error) {
-	fake.executeMutex.Lock()
-	defer fake.executeMutex.Unlock()
 	fake.ExecuteStub = nil
 	if fake.executeReturnsOnCall == nil {
 		fake.executeReturnsOnCall = make(map[int]struct {
@@ -143,24 +131,23 @@ func (fake *Channel) ExecuteReturnsOnCall(i int, result1 channel.Response, resul
 	}{result1, result2}
 }
 
-func (fake *Channel) InvokeHandler(arg1 invoke.Handler, arg2 channel.Request, arg3 ...channel.RequestOption) (channel.Response, error) {
+func (fake *Channel) InvokeHandler(handler invoke.Handler, request channel.Request, options ...channel.RequestOption) (channel.Response, error) {
 	fake.invokeHandlerMutex.Lock()
 	ret, specificReturn := fake.invokeHandlerReturnsOnCall[len(fake.invokeHandlerArgsForCall)]
 	fake.invokeHandlerArgsForCall = append(fake.invokeHandlerArgsForCall, struct {
-		arg1 invoke.Handler
-		arg2 channel.Request
-		arg3 []channel.RequestOption
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("InvokeHandler", []interface{}{arg1, arg2, arg3})
+		handler invoke.Handler
+		request channel.Request
+		options []channel.RequestOption
+	}{handler, request, options})
+	fake.recordInvocation("InvokeHandler", []interface{}{handler, request, options})
 	fake.invokeHandlerMutex.Unlock()
 	if fake.InvokeHandlerStub != nil {
-		return fake.InvokeHandlerStub(arg1, arg2, arg3...)
+		return fake.InvokeHandlerStub(handler, request, options...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.invokeHandlerReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.invokeHandlerReturns.result1, fake.invokeHandlerReturns.result2
 }
 
 func (fake *Channel) InvokeHandlerCallCount() int {
@@ -169,22 +156,13 @@ func (fake *Channel) InvokeHandlerCallCount() int {
 	return len(fake.invokeHandlerArgsForCall)
 }
 
-func (fake *Channel) InvokeHandlerCalls(stub func(invoke.Handler, channel.Request, ...channel.RequestOption) (channel.Response, error)) {
-	fake.invokeHandlerMutex.Lock()
-	defer fake.invokeHandlerMutex.Unlock()
-	fake.InvokeHandlerStub = stub
-}
-
 func (fake *Channel) InvokeHandlerArgsForCall(i int) (invoke.Handler, channel.Request, []channel.RequestOption) {
 	fake.invokeHandlerMutex.RLock()
 	defer fake.invokeHandlerMutex.RUnlock()
-	argsForCall := fake.invokeHandlerArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return fake.invokeHandlerArgsForCall[i].handler, fake.invokeHandlerArgsForCall[i].request, fake.invokeHandlerArgsForCall[i].options
 }
 
 func (fake *Channel) InvokeHandlerReturns(result1 channel.Response, result2 error) {
-	fake.invokeHandlerMutex.Lock()
-	defer fake.invokeHandlerMutex.Unlock()
 	fake.InvokeHandlerStub = nil
 	fake.invokeHandlerReturns = struct {
 		result1 channel.Response
@@ -193,8 +171,6 @@ func (fake *Channel) InvokeHandlerReturns(result1 channel.Response, result2 erro
 }
 
 func (fake *Channel) InvokeHandlerReturnsOnCall(i int, result1 channel.Response, result2 error) {
-	fake.invokeHandlerMutex.Lock()
-	defer fake.invokeHandlerMutex.Unlock()
 	fake.InvokeHandlerStub = nil
 	if fake.invokeHandlerReturnsOnCall == nil {
 		fake.invokeHandlerReturnsOnCall = make(map[int]struct {
@@ -208,23 +184,22 @@ func (fake *Channel) InvokeHandlerReturnsOnCall(i int, result1 channel.Response,
 	}{result1, result2}
 }
 
-func (fake *Channel) Query(arg1 channel.Request, arg2 ...channel.RequestOption) (channel.Response, error) {
+func (fake *Channel) Query(request channel.Request, options ...channel.RequestOption) (channel.Response, error) {
 	fake.queryMutex.Lock()
 	ret, specificReturn := fake.queryReturnsOnCall[len(fake.queryArgsForCall)]
 	fake.queryArgsForCall = append(fake.queryArgsForCall, struct {
-		arg1 channel.Request
-		arg2 []channel.RequestOption
-	}{arg1, arg2})
-	fake.recordInvocation("Query", []interface{}{arg1, arg2})
+		request channel.Request
+		options []channel.RequestOption
+	}{request, options})
+	fake.recordInvocation("Query", []interface{}{request, options})
 	fake.queryMutex.Unlock()
 	if fake.QueryStub != nil {
-		return fake.QueryStub(arg1, arg2...)
+		return fake.QueryStub(request, options...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.queryReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.queryReturns.result1, fake.queryReturns.result2
 }
 
 func (fake *Channel) QueryCallCount() int {
@@ -233,22 +208,13 @@ func (fake *Channel) QueryCallCount() int {
 	return len(fake.queryArgsForCall)
 }
 
-func (fake *Channel) QueryCalls(stub func(channel.Request, ...channel.RequestOption) (channel.Response, error)) {
-	fake.queryMutex.Lock()
-	defer fake.queryMutex.Unlock()
-	fake.QueryStub = stub
-}
-
 func (fake *Channel) QueryArgsForCall(i int) (channel.Request, []channel.RequestOption) {
 	fake.queryMutex.RLock()
 	defer fake.queryMutex.RUnlock()
-	argsForCall := fake.queryArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return fake.queryArgsForCall[i].request, fake.queryArgsForCall[i].options
 }
 
 func (fake *Channel) QueryReturns(result1 channel.Response, result2 error) {
-	fake.queryMutex.Lock()
-	defer fake.queryMutex.Unlock()
 	fake.QueryStub = nil
 	fake.queryReturns = struct {
 		result1 channel.Response
@@ -257,8 +223,6 @@ func (fake *Channel) QueryReturns(result1 channel.Response, result2 error) {
 }
 
 func (fake *Channel) QueryReturnsOnCall(i int, result1 channel.Response, result2 error) {
-	fake.queryMutex.Lock()
-	defer fake.queryMutex.Unlock()
 	fake.QueryStub = nil
 	if fake.queryReturnsOnCall == nil {
 		fake.queryReturnsOnCall = make(map[int]struct {
@@ -272,23 +236,22 @@ func (fake *Channel) QueryReturnsOnCall(i int, result1 channel.Response, result2
 	}{result1, result2}
 }
 
-func (fake *Channel) RegisterChaincodeEvent(arg1 string, arg2 string) (fab.Registration, <-chan *fab.CCEvent, error) {
+func (fake *Channel) RegisterChaincodeEvent(chainCodeID string, eventFilter string) (fab.Registration, <-chan *fab.CCEvent, error) {
 	fake.registerChaincodeEventMutex.Lock()
 	ret, specificReturn := fake.registerChaincodeEventReturnsOnCall[len(fake.registerChaincodeEventArgsForCall)]
 	fake.registerChaincodeEventArgsForCall = append(fake.registerChaincodeEventArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("RegisterChaincodeEvent", []interface{}{arg1, arg2})
+		chainCodeID string
+		eventFilter string
+	}{chainCodeID, eventFilter})
+	fake.recordInvocation("RegisterChaincodeEvent", []interface{}{chainCodeID, eventFilter})
 	fake.registerChaincodeEventMutex.Unlock()
 	if fake.RegisterChaincodeEventStub != nil {
-		return fake.RegisterChaincodeEventStub(arg1, arg2)
+		return fake.RegisterChaincodeEventStub(chainCodeID, eventFilter)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.registerChaincodeEventReturns
-	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+	return fake.registerChaincodeEventReturns.result1, fake.registerChaincodeEventReturns.result2, fake.registerChaincodeEventReturns.result3
 }
 
 func (fake *Channel) RegisterChaincodeEventCallCount() int {
@@ -297,22 +260,13 @@ func (fake *Channel) RegisterChaincodeEventCallCount() int {
 	return len(fake.registerChaincodeEventArgsForCall)
 }
 
-func (fake *Channel) RegisterChaincodeEventCalls(stub func(string, string) (fab.Registration, <-chan *fab.CCEvent, error)) {
-	fake.registerChaincodeEventMutex.Lock()
-	defer fake.registerChaincodeEventMutex.Unlock()
-	fake.RegisterChaincodeEventStub = stub
-}
-
 func (fake *Channel) RegisterChaincodeEventArgsForCall(i int) (string, string) {
 	fake.registerChaincodeEventMutex.RLock()
 	defer fake.registerChaincodeEventMutex.RUnlock()
-	argsForCall := fake.registerChaincodeEventArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return fake.registerChaincodeEventArgsForCall[i].chainCodeID, fake.registerChaincodeEventArgsForCall[i].eventFilter
 }
 
 func (fake *Channel) RegisterChaincodeEventReturns(result1 fab.Registration, result2 <-chan *fab.CCEvent, result3 error) {
-	fake.registerChaincodeEventMutex.Lock()
-	defer fake.registerChaincodeEventMutex.Unlock()
 	fake.RegisterChaincodeEventStub = nil
 	fake.registerChaincodeEventReturns = struct {
 		result1 fab.Registration
@@ -322,8 +276,6 @@ func (fake *Channel) RegisterChaincodeEventReturns(result1 fab.Registration, res
 }
 
 func (fake *Channel) RegisterChaincodeEventReturnsOnCall(i int, result1 fab.Registration, result2 <-chan *fab.CCEvent, result3 error) {
-	fake.registerChaincodeEventMutex.Lock()
-	defer fake.registerChaincodeEventMutex.Unlock()
 	fake.RegisterChaincodeEventStub = nil
 	if fake.registerChaincodeEventReturnsOnCall == nil {
 		fake.registerChaincodeEventReturnsOnCall = make(map[int]struct {
@@ -339,15 +291,15 @@ func (fake *Channel) RegisterChaincodeEventReturnsOnCall(i int, result1 fab.Regi
 	}{result1, result2, result3}
 }
 
-func (fake *Channel) UnregisterChaincodeEvent(arg1 fab.Registration) {
+func (fake *Channel) UnregisterChaincodeEvent(registration fab.Registration) {
 	fake.unregisterChaincodeEventMutex.Lock()
 	fake.unregisterChaincodeEventArgsForCall = append(fake.unregisterChaincodeEventArgsForCall, struct {
-		arg1 fab.Registration
-	}{arg1})
-	fake.recordInvocation("UnregisterChaincodeEvent", []interface{}{arg1})
+		registration fab.Registration
+	}{registration})
+	fake.recordInvocation("UnregisterChaincodeEvent", []interface{}{registration})
 	fake.unregisterChaincodeEventMutex.Unlock()
 	if fake.UnregisterChaincodeEventStub != nil {
-		fake.UnregisterChaincodeEventStub(arg1)
+		fake.UnregisterChaincodeEventStub(registration)
 	}
 }
 
@@ -357,17 +309,10 @@ func (fake *Channel) UnregisterChaincodeEventCallCount() int {
 	return len(fake.unregisterChaincodeEventArgsForCall)
 }
 
-func (fake *Channel) UnregisterChaincodeEventCalls(stub func(fab.Registration)) {
-	fake.unregisterChaincodeEventMutex.Lock()
-	defer fake.unregisterChaincodeEventMutex.Unlock()
-	fake.UnregisterChaincodeEventStub = stub
-}
-
 func (fake *Channel) UnregisterChaincodeEventArgsForCall(i int) fab.Registration {
 	fake.unregisterChaincodeEventMutex.RLock()
 	defer fake.unregisterChaincodeEventMutex.RUnlock()
-	argsForCall := fake.unregisterChaincodeEventArgsForCall[i]
-	return argsForCall.arg1
+	return fake.unregisterChaincodeEventArgsForCall[i].registration
 }
 
 func (fake *Channel) Invocations() map[string][][]interface{} {

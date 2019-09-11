@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"os"
 
-	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

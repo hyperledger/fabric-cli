@@ -6,14 +6,14 @@ import (
 
 	"github.com/hyperledger/fabric-cli/pkg/fabric"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
-	mspa "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
+	mspctx "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 )
 
 type MSP struct {
-	AddAffiliationStub        func(*msp.AffiliationRequest) (*msp.AffiliationResponse, error)
+	AddAffiliationStub        func(request *msp.AffiliationRequest) (*msp.AffiliationResponse, error)
 	addAffiliationMutex       sync.RWMutex
 	addAffiliationArgsForCall []struct {
-		arg1 *msp.AffiliationRequest
+		request *msp.AffiliationRequest
 	}
 	addAffiliationReturns struct {
 		result1 *msp.AffiliationResponse
@@ -23,10 +23,10 @@ type MSP struct {
 		result1 *msp.AffiliationResponse
 		result2 error
 	}
-	CreateIdentityStub        func(*msp.IdentityRequest) (*msp.IdentityResponse, error)
+	CreateIdentityStub        func(request *msp.IdentityRequest) (*msp.IdentityResponse, error)
 	createIdentityMutex       sync.RWMutex
 	createIdentityArgsForCall []struct {
-		arg1 *msp.IdentityRequest
+		request *msp.IdentityRequest
 	}
 	createIdentityReturns struct {
 		result1 *msp.IdentityResponse
@@ -36,24 +36,24 @@ type MSP struct {
 		result1 *msp.IdentityResponse
 		result2 error
 	}
-	CreateSigningIdentityStub        func(...mspa.SigningIdentityOption) (mspa.SigningIdentity, error)
+	CreateSigningIdentityStub        func(opts ...mspctx.SigningIdentityOption) (mspctx.SigningIdentity, error)
 	createSigningIdentityMutex       sync.RWMutex
 	createSigningIdentityArgsForCall []struct {
-		arg1 []mspa.SigningIdentityOption
+		opts []mspctx.SigningIdentityOption
 	}
 	createSigningIdentityReturns struct {
-		result1 mspa.SigningIdentity
+		result1 mspctx.SigningIdentity
 		result2 error
 	}
 	createSigningIdentityReturnsOnCall map[int]struct {
-		result1 mspa.SigningIdentity
+		result1 mspctx.SigningIdentity
 		result2 error
 	}
-	EnrollStub        func(string, ...msp.EnrollmentOption) error
+	EnrollStub        func(enrollmentID string, opts ...msp.EnrollmentOption) error
 	enrollMutex       sync.RWMutex
 	enrollArgsForCall []struct {
-		arg1 string
-		arg2 []msp.EnrollmentOption
+		enrollmentID string
+		opts         []msp.EnrollmentOption
 	}
 	enrollReturns struct {
 		result1 error
@@ -61,11 +61,11 @@ type MSP struct {
 	enrollReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetAffiliationStub        func(string, ...msp.RequestOption) (*msp.AffiliationResponse, error)
+	GetAffiliationStub        func(affiliation string, options ...msp.RequestOption) (*msp.AffiliationResponse, error)
 	getAffiliationMutex       sync.RWMutex
 	getAffiliationArgsForCall []struct {
-		arg1 string
-		arg2 []msp.RequestOption
+		affiliation string
+		options     []msp.RequestOption
 	}
 	getAffiliationReturns struct {
 		result1 *msp.AffiliationResponse
@@ -75,10 +75,10 @@ type MSP struct {
 		result1 *msp.AffiliationResponse
 		result2 error
 	}
-	GetAllAffiliationsStub        func(...msp.RequestOption) (*msp.AffiliationResponse, error)
+	GetAllAffiliationsStub        func(options ...msp.RequestOption) (*msp.AffiliationResponse, error)
 	getAllAffiliationsMutex       sync.RWMutex
 	getAllAffiliationsArgsForCall []struct {
-		arg1 []msp.RequestOption
+		options []msp.RequestOption
 	}
 	getAllAffiliationsReturns struct {
 		result1 *msp.AffiliationResponse
@@ -88,10 +88,10 @@ type MSP struct {
 		result1 *msp.AffiliationResponse
 		result2 error
 	}
-	GetAllIdentitiesStub        func(...msp.RequestOption) ([]*msp.IdentityResponse, error)
+	GetAllIdentitiesStub        func(options ...msp.RequestOption) ([]*msp.IdentityResponse, error)
 	getAllIdentitiesMutex       sync.RWMutex
 	getAllIdentitiesArgsForCall []struct {
-		arg1 []msp.RequestOption
+		options []msp.RequestOption
 	}
 	getAllIdentitiesReturns struct {
 		result1 []*msp.IdentityResponse
@@ -103,9 +103,8 @@ type MSP struct {
 	}
 	GetCAInfoStub        func() (*msp.GetCAInfoResponse, error)
 	getCAInfoMutex       sync.RWMutex
-	getCAInfoArgsForCall []struct {
-	}
-	getCAInfoReturns struct {
+	getCAInfoArgsForCall []struct{}
+	getCAInfoReturns     struct {
 		result1 *msp.GetCAInfoResponse
 		result2 error
 	}
@@ -113,11 +112,11 @@ type MSP struct {
 		result1 *msp.GetCAInfoResponse
 		result2 error
 	}
-	GetIdentityStub        func(string, ...msp.RequestOption) (*msp.IdentityResponse, error)
+	GetIdentityStub        func(ID string, options ...msp.RequestOption) (*msp.IdentityResponse, error)
 	getIdentityMutex       sync.RWMutex
 	getIdentityArgsForCall []struct {
-		arg1 string
-		arg2 []msp.RequestOption
+		ID      string
+		options []msp.RequestOption
 	}
 	getIdentityReturns struct {
 		result1 *msp.IdentityResponse
@@ -127,23 +126,23 @@ type MSP struct {
 		result1 *msp.IdentityResponse
 		result2 error
 	}
-	GetSigningIdentityStub        func(string) (mspa.SigningIdentity, error)
+	GetSigningIdentityStub        func(id string) (mspctx.SigningIdentity, error)
 	getSigningIdentityMutex       sync.RWMutex
 	getSigningIdentityArgsForCall []struct {
-		arg1 string
+		id string
 	}
 	getSigningIdentityReturns struct {
-		result1 mspa.SigningIdentity
+		result1 mspctx.SigningIdentity
 		result2 error
 	}
 	getSigningIdentityReturnsOnCall map[int]struct {
-		result1 mspa.SigningIdentity
+		result1 mspctx.SigningIdentity
 		result2 error
 	}
-	ModifyAffiliationStub        func(*msp.ModifyAffiliationRequest) (*msp.AffiliationResponse, error)
+	ModifyAffiliationStub        func(request *msp.ModifyAffiliationRequest) (*msp.AffiliationResponse, error)
 	modifyAffiliationMutex       sync.RWMutex
 	modifyAffiliationArgsForCall []struct {
-		arg1 *msp.ModifyAffiliationRequest
+		request *msp.ModifyAffiliationRequest
 	}
 	modifyAffiliationReturns struct {
 		result1 *msp.AffiliationResponse
@@ -153,10 +152,10 @@ type MSP struct {
 		result1 *msp.AffiliationResponse
 		result2 error
 	}
-	ModifyIdentityStub        func(*msp.IdentityRequest) (*msp.IdentityResponse, error)
+	ModifyIdentityStub        func(request *msp.IdentityRequest) (*msp.IdentityResponse, error)
 	modifyIdentityMutex       sync.RWMutex
 	modifyIdentityArgsForCall []struct {
-		arg1 *msp.IdentityRequest
+		request *msp.IdentityRequest
 	}
 	modifyIdentityReturns struct {
 		result1 *msp.IdentityResponse
@@ -166,11 +165,11 @@ type MSP struct {
 		result1 *msp.IdentityResponse
 		result2 error
 	}
-	ReenrollStub        func(string, ...msp.EnrollmentOption) error
+	ReenrollStub        func(enrollmentID string, opts ...msp.EnrollmentOption) error
 	reenrollMutex       sync.RWMutex
 	reenrollArgsForCall []struct {
-		arg1 string
-		arg2 []msp.EnrollmentOption
+		enrollmentID string
+		opts         []msp.EnrollmentOption
 	}
 	reenrollReturns struct {
 		result1 error
@@ -178,10 +177,10 @@ type MSP struct {
 	reenrollReturnsOnCall map[int]struct {
 		result1 error
 	}
-	RegisterStub        func(*msp.RegistrationRequest) (string, error)
+	RegisterStub        func(request *msp.RegistrationRequest) (string, error)
 	registerMutex       sync.RWMutex
 	registerArgsForCall []struct {
-		arg1 *msp.RegistrationRequest
+		request *msp.RegistrationRequest
 	}
 	registerReturns struct {
 		result1 string
@@ -191,10 +190,10 @@ type MSP struct {
 		result1 string
 		result2 error
 	}
-	RemoveAffiliationStub        func(*msp.AffiliationRequest) (*msp.AffiliationResponse, error)
+	RemoveAffiliationStub        func(request *msp.AffiliationRequest) (*msp.AffiliationResponse, error)
 	removeAffiliationMutex       sync.RWMutex
 	removeAffiliationArgsForCall []struct {
-		arg1 *msp.AffiliationRequest
+		request *msp.AffiliationRequest
 	}
 	removeAffiliationReturns struct {
 		result1 *msp.AffiliationResponse
@@ -204,10 +203,10 @@ type MSP struct {
 		result1 *msp.AffiliationResponse
 		result2 error
 	}
-	RemoveIdentityStub        func(*msp.RemoveIdentityRequest) (*msp.IdentityResponse, error)
+	RemoveIdentityStub        func(request *msp.RemoveIdentityRequest) (*msp.IdentityResponse, error)
 	removeIdentityMutex       sync.RWMutex
 	removeIdentityArgsForCall []struct {
-		arg1 *msp.RemoveIdentityRequest
+		request *msp.RemoveIdentityRequest
 	}
 	removeIdentityReturns struct {
 		result1 *msp.IdentityResponse
@@ -217,10 +216,10 @@ type MSP struct {
 		result1 *msp.IdentityResponse
 		result2 error
 	}
-	RevokeStub        func(*msp.RevocationRequest) (*msp.RevocationResponse, error)
+	RevokeStub        func(request *msp.RevocationRequest) (*msp.RevocationResponse, error)
 	revokeMutex       sync.RWMutex
 	revokeArgsForCall []struct {
-		arg1 *msp.RevocationRequest
+		request *msp.RevocationRequest
 	}
 	revokeReturns struct {
 		result1 *msp.RevocationResponse
@@ -234,22 +233,21 @@ type MSP struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *MSP) AddAffiliation(arg1 *msp.AffiliationRequest) (*msp.AffiliationResponse, error) {
+func (fake *MSP) AddAffiliation(request *msp.AffiliationRequest) (*msp.AffiliationResponse, error) {
 	fake.addAffiliationMutex.Lock()
 	ret, specificReturn := fake.addAffiliationReturnsOnCall[len(fake.addAffiliationArgsForCall)]
 	fake.addAffiliationArgsForCall = append(fake.addAffiliationArgsForCall, struct {
-		arg1 *msp.AffiliationRequest
-	}{arg1})
-	fake.recordInvocation("AddAffiliation", []interface{}{arg1})
+		request *msp.AffiliationRequest
+	}{request})
+	fake.recordInvocation("AddAffiliation", []interface{}{request})
 	fake.addAffiliationMutex.Unlock()
 	if fake.AddAffiliationStub != nil {
-		return fake.AddAffiliationStub(arg1)
+		return fake.AddAffiliationStub(request)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.addAffiliationReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.addAffiliationReturns.result1, fake.addAffiliationReturns.result2
 }
 
 func (fake *MSP) AddAffiliationCallCount() int {
@@ -258,22 +256,13 @@ func (fake *MSP) AddAffiliationCallCount() int {
 	return len(fake.addAffiliationArgsForCall)
 }
 
-func (fake *MSP) AddAffiliationCalls(stub func(*msp.AffiliationRequest) (*msp.AffiliationResponse, error)) {
-	fake.addAffiliationMutex.Lock()
-	defer fake.addAffiliationMutex.Unlock()
-	fake.AddAffiliationStub = stub
-}
-
 func (fake *MSP) AddAffiliationArgsForCall(i int) *msp.AffiliationRequest {
 	fake.addAffiliationMutex.RLock()
 	defer fake.addAffiliationMutex.RUnlock()
-	argsForCall := fake.addAffiliationArgsForCall[i]
-	return argsForCall.arg1
+	return fake.addAffiliationArgsForCall[i].request
 }
 
 func (fake *MSP) AddAffiliationReturns(result1 *msp.AffiliationResponse, result2 error) {
-	fake.addAffiliationMutex.Lock()
-	defer fake.addAffiliationMutex.Unlock()
 	fake.AddAffiliationStub = nil
 	fake.addAffiliationReturns = struct {
 		result1 *msp.AffiliationResponse
@@ -282,8 +271,6 @@ func (fake *MSP) AddAffiliationReturns(result1 *msp.AffiliationResponse, result2
 }
 
 func (fake *MSP) AddAffiliationReturnsOnCall(i int, result1 *msp.AffiliationResponse, result2 error) {
-	fake.addAffiliationMutex.Lock()
-	defer fake.addAffiliationMutex.Unlock()
 	fake.AddAffiliationStub = nil
 	if fake.addAffiliationReturnsOnCall == nil {
 		fake.addAffiliationReturnsOnCall = make(map[int]struct {
@@ -297,22 +284,21 @@ func (fake *MSP) AddAffiliationReturnsOnCall(i int, result1 *msp.AffiliationResp
 	}{result1, result2}
 }
 
-func (fake *MSP) CreateIdentity(arg1 *msp.IdentityRequest) (*msp.IdentityResponse, error) {
+func (fake *MSP) CreateIdentity(request *msp.IdentityRequest) (*msp.IdentityResponse, error) {
 	fake.createIdentityMutex.Lock()
 	ret, specificReturn := fake.createIdentityReturnsOnCall[len(fake.createIdentityArgsForCall)]
 	fake.createIdentityArgsForCall = append(fake.createIdentityArgsForCall, struct {
-		arg1 *msp.IdentityRequest
-	}{arg1})
-	fake.recordInvocation("CreateIdentity", []interface{}{arg1})
+		request *msp.IdentityRequest
+	}{request})
+	fake.recordInvocation("CreateIdentity", []interface{}{request})
 	fake.createIdentityMutex.Unlock()
 	if fake.CreateIdentityStub != nil {
-		return fake.CreateIdentityStub(arg1)
+		return fake.CreateIdentityStub(request)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createIdentityReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.createIdentityReturns.result1, fake.createIdentityReturns.result2
 }
 
 func (fake *MSP) CreateIdentityCallCount() int {
@@ -321,22 +307,13 @@ func (fake *MSP) CreateIdentityCallCount() int {
 	return len(fake.createIdentityArgsForCall)
 }
 
-func (fake *MSP) CreateIdentityCalls(stub func(*msp.IdentityRequest) (*msp.IdentityResponse, error)) {
-	fake.createIdentityMutex.Lock()
-	defer fake.createIdentityMutex.Unlock()
-	fake.CreateIdentityStub = stub
-}
-
 func (fake *MSP) CreateIdentityArgsForCall(i int) *msp.IdentityRequest {
 	fake.createIdentityMutex.RLock()
 	defer fake.createIdentityMutex.RUnlock()
-	argsForCall := fake.createIdentityArgsForCall[i]
-	return argsForCall.arg1
+	return fake.createIdentityArgsForCall[i].request
 }
 
 func (fake *MSP) CreateIdentityReturns(result1 *msp.IdentityResponse, result2 error) {
-	fake.createIdentityMutex.Lock()
-	defer fake.createIdentityMutex.Unlock()
 	fake.CreateIdentityStub = nil
 	fake.createIdentityReturns = struct {
 		result1 *msp.IdentityResponse
@@ -345,8 +322,6 @@ func (fake *MSP) CreateIdentityReturns(result1 *msp.IdentityResponse, result2 er
 }
 
 func (fake *MSP) CreateIdentityReturnsOnCall(i int, result1 *msp.IdentityResponse, result2 error) {
-	fake.createIdentityMutex.Lock()
-	defer fake.createIdentityMutex.Unlock()
 	fake.CreateIdentityStub = nil
 	if fake.createIdentityReturnsOnCall == nil {
 		fake.createIdentityReturnsOnCall = make(map[int]struct {
@@ -360,22 +335,21 @@ func (fake *MSP) CreateIdentityReturnsOnCall(i int, result1 *msp.IdentityRespons
 	}{result1, result2}
 }
 
-func (fake *MSP) CreateSigningIdentity(arg1 ...mspa.SigningIdentityOption) (mspa.SigningIdentity, error) {
+func (fake *MSP) CreateSigningIdentity(opts ...mspctx.SigningIdentityOption) (mspctx.SigningIdentity, error) {
 	fake.createSigningIdentityMutex.Lock()
 	ret, specificReturn := fake.createSigningIdentityReturnsOnCall[len(fake.createSigningIdentityArgsForCall)]
 	fake.createSigningIdentityArgsForCall = append(fake.createSigningIdentityArgsForCall, struct {
-		arg1 []mspa.SigningIdentityOption
-	}{arg1})
-	fake.recordInvocation("CreateSigningIdentity", []interface{}{arg1})
+		opts []mspctx.SigningIdentityOption
+	}{opts})
+	fake.recordInvocation("CreateSigningIdentity", []interface{}{opts})
 	fake.createSigningIdentityMutex.Unlock()
 	if fake.CreateSigningIdentityStub != nil {
-		return fake.CreateSigningIdentityStub(arg1...)
+		return fake.CreateSigningIdentityStub(opts...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createSigningIdentityReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.createSigningIdentityReturns.result1, fake.createSigningIdentityReturns.result2
 }
 
 func (fake *MSP) CreateSigningIdentityCallCount() int {
@@ -384,62 +358,50 @@ func (fake *MSP) CreateSigningIdentityCallCount() int {
 	return len(fake.createSigningIdentityArgsForCall)
 }
 
-func (fake *MSP) CreateSigningIdentityCalls(stub func(...mspa.SigningIdentityOption) (mspa.SigningIdentity, error)) {
-	fake.createSigningIdentityMutex.Lock()
-	defer fake.createSigningIdentityMutex.Unlock()
-	fake.CreateSigningIdentityStub = stub
-}
-
-func (fake *MSP) CreateSigningIdentityArgsForCall(i int) []mspa.SigningIdentityOption {
+func (fake *MSP) CreateSigningIdentityArgsForCall(i int) []mspctx.SigningIdentityOption {
 	fake.createSigningIdentityMutex.RLock()
 	defer fake.createSigningIdentityMutex.RUnlock()
-	argsForCall := fake.createSigningIdentityArgsForCall[i]
-	return argsForCall.arg1
+	return fake.createSigningIdentityArgsForCall[i].opts
 }
 
-func (fake *MSP) CreateSigningIdentityReturns(result1 mspa.SigningIdentity, result2 error) {
-	fake.createSigningIdentityMutex.Lock()
-	defer fake.createSigningIdentityMutex.Unlock()
+func (fake *MSP) CreateSigningIdentityReturns(result1 mspctx.SigningIdentity, result2 error) {
 	fake.CreateSigningIdentityStub = nil
 	fake.createSigningIdentityReturns = struct {
-		result1 mspa.SigningIdentity
+		result1 mspctx.SigningIdentity
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *MSP) CreateSigningIdentityReturnsOnCall(i int, result1 mspa.SigningIdentity, result2 error) {
-	fake.createSigningIdentityMutex.Lock()
-	defer fake.createSigningIdentityMutex.Unlock()
+func (fake *MSP) CreateSigningIdentityReturnsOnCall(i int, result1 mspctx.SigningIdentity, result2 error) {
 	fake.CreateSigningIdentityStub = nil
 	if fake.createSigningIdentityReturnsOnCall == nil {
 		fake.createSigningIdentityReturnsOnCall = make(map[int]struct {
-			result1 mspa.SigningIdentity
+			result1 mspctx.SigningIdentity
 			result2 error
 		})
 	}
 	fake.createSigningIdentityReturnsOnCall[i] = struct {
-		result1 mspa.SigningIdentity
+		result1 mspctx.SigningIdentity
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *MSP) Enroll(arg1 string, arg2 ...msp.EnrollmentOption) error {
+func (fake *MSP) Enroll(enrollmentID string, opts ...msp.EnrollmentOption) error {
 	fake.enrollMutex.Lock()
 	ret, specificReturn := fake.enrollReturnsOnCall[len(fake.enrollArgsForCall)]
 	fake.enrollArgsForCall = append(fake.enrollArgsForCall, struct {
-		arg1 string
-		arg2 []msp.EnrollmentOption
-	}{arg1, arg2})
-	fake.recordInvocation("Enroll", []interface{}{arg1, arg2})
+		enrollmentID string
+		opts         []msp.EnrollmentOption
+	}{enrollmentID, opts})
+	fake.recordInvocation("Enroll", []interface{}{enrollmentID, opts})
 	fake.enrollMutex.Unlock()
 	if fake.EnrollStub != nil {
-		return fake.EnrollStub(arg1, arg2...)
+		return fake.EnrollStub(enrollmentID, opts...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.enrollReturns
-	return fakeReturns.result1
+	return fake.enrollReturns.result1
 }
 
 func (fake *MSP) EnrollCallCount() int {
@@ -448,22 +410,13 @@ func (fake *MSP) EnrollCallCount() int {
 	return len(fake.enrollArgsForCall)
 }
 
-func (fake *MSP) EnrollCalls(stub func(string, ...msp.EnrollmentOption) error) {
-	fake.enrollMutex.Lock()
-	defer fake.enrollMutex.Unlock()
-	fake.EnrollStub = stub
-}
-
 func (fake *MSP) EnrollArgsForCall(i int) (string, []msp.EnrollmentOption) {
 	fake.enrollMutex.RLock()
 	defer fake.enrollMutex.RUnlock()
-	argsForCall := fake.enrollArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return fake.enrollArgsForCall[i].enrollmentID, fake.enrollArgsForCall[i].opts
 }
 
 func (fake *MSP) EnrollReturns(result1 error) {
-	fake.enrollMutex.Lock()
-	defer fake.enrollMutex.Unlock()
 	fake.EnrollStub = nil
 	fake.enrollReturns = struct {
 		result1 error
@@ -471,8 +424,6 @@ func (fake *MSP) EnrollReturns(result1 error) {
 }
 
 func (fake *MSP) EnrollReturnsOnCall(i int, result1 error) {
-	fake.enrollMutex.Lock()
-	defer fake.enrollMutex.Unlock()
 	fake.EnrollStub = nil
 	if fake.enrollReturnsOnCall == nil {
 		fake.enrollReturnsOnCall = make(map[int]struct {
@@ -484,23 +435,22 @@ func (fake *MSP) EnrollReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *MSP) GetAffiliation(arg1 string, arg2 ...msp.RequestOption) (*msp.AffiliationResponse, error) {
+func (fake *MSP) GetAffiliation(affiliation string, options ...msp.RequestOption) (*msp.AffiliationResponse, error) {
 	fake.getAffiliationMutex.Lock()
 	ret, specificReturn := fake.getAffiliationReturnsOnCall[len(fake.getAffiliationArgsForCall)]
 	fake.getAffiliationArgsForCall = append(fake.getAffiliationArgsForCall, struct {
-		arg1 string
-		arg2 []msp.RequestOption
-	}{arg1, arg2})
-	fake.recordInvocation("GetAffiliation", []interface{}{arg1, arg2})
+		affiliation string
+		options     []msp.RequestOption
+	}{affiliation, options})
+	fake.recordInvocation("GetAffiliation", []interface{}{affiliation, options})
 	fake.getAffiliationMutex.Unlock()
 	if fake.GetAffiliationStub != nil {
-		return fake.GetAffiliationStub(arg1, arg2...)
+		return fake.GetAffiliationStub(affiliation, options...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getAffiliationReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.getAffiliationReturns.result1, fake.getAffiliationReturns.result2
 }
 
 func (fake *MSP) GetAffiliationCallCount() int {
@@ -509,22 +459,13 @@ func (fake *MSP) GetAffiliationCallCount() int {
 	return len(fake.getAffiliationArgsForCall)
 }
 
-func (fake *MSP) GetAffiliationCalls(stub func(string, ...msp.RequestOption) (*msp.AffiliationResponse, error)) {
-	fake.getAffiliationMutex.Lock()
-	defer fake.getAffiliationMutex.Unlock()
-	fake.GetAffiliationStub = stub
-}
-
 func (fake *MSP) GetAffiliationArgsForCall(i int) (string, []msp.RequestOption) {
 	fake.getAffiliationMutex.RLock()
 	defer fake.getAffiliationMutex.RUnlock()
-	argsForCall := fake.getAffiliationArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return fake.getAffiliationArgsForCall[i].affiliation, fake.getAffiliationArgsForCall[i].options
 }
 
 func (fake *MSP) GetAffiliationReturns(result1 *msp.AffiliationResponse, result2 error) {
-	fake.getAffiliationMutex.Lock()
-	defer fake.getAffiliationMutex.Unlock()
 	fake.GetAffiliationStub = nil
 	fake.getAffiliationReturns = struct {
 		result1 *msp.AffiliationResponse
@@ -533,8 +474,6 @@ func (fake *MSP) GetAffiliationReturns(result1 *msp.AffiliationResponse, result2
 }
 
 func (fake *MSP) GetAffiliationReturnsOnCall(i int, result1 *msp.AffiliationResponse, result2 error) {
-	fake.getAffiliationMutex.Lock()
-	defer fake.getAffiliationMutex.Unlock()
 	fake.GetAffiliationStub = nil
 	if fake.getAffiliationReturnsOnCall == nil {
 		fake.getAffiliationReturnsOnCall = make(map[int]struct {
@@ -548,22 +487,21 @@ func (fake *MSP) GetAffiliationReturnsOnCall(i int, result1 *msp.AffiliationResp
 	}{result1, result2}
 }
 
-func (fake *MSP) GetAllAffiliations(arg1 ...msp.RequestOption) (*msp.AffiliationResponse, error) {
+func (fake *MSP) GetAllAffiliations(options ...msp.RequestOption) (*msp.AffiliationResponse, error) {
 	fake.getAllAffiliationsMutex.Lock()
 	ret, specificReturn := fake.getAllAffiliationsReturnsOnCall[len(fake.getAllAffiliationsArgsForCall)]
 	fake.getAllAffiliationsArgsForCall = append(fake.getAllAffiliationsArgsForCall, struct {
-		arg1 []msp.RequestOption
-	}{arg1})
-	fake.recordInvocation("GetAllAffiliations", []interface{}{arg1})
+		options []msp.RequestOption
+	}{options})
+	fake.recordInvocation("GetAllAffiliations", []interface{}{options})
 	fake.getAllAffiliationsMutex.Unlock()
 	if fake.GetAllAffiliationsStub != nil {
-		return fake.GetAllAffiliationsStub(arg1...)
+		return fake.GetAllAffiliationsStub(options...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getAllAffiliationsReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.getAllAffiliationsReturns.result1, fake.getAllAffiliationsReturns.result2
 }
 
 func (fake *MSP) GetAllAffiliationsCallCount() int {
@@ -572,22 +510,13 @@ func (fake *MSP) GetAllAffiliationsCallCount() int {
 	return len(fake.getAllAffiliationsArgsForCall)
 }
 
-func (fake *MSP) GetAllAffiliationsCalls(stub func(...msp.RequestOption) (*msp.AffiliationResponse, error)) {
-	fake.getAllAffiliationsMutex.Lock()
-	defer fake.getAllAffiliationsMutex.Unlock()
-	fake.GetAllAffiliationsStub = stub
-}
-
 func (fake *MSP) GetAllAffiliationsArgsForCall(i int) []msp.RequestOption {
 	fake.getAllAffiliationsMutex.RLock()
 	defer fake.getAllAffiliationsMutex.RUnlock()
-	argsForCall := fake.getAllAffiliationsArgsForCall[i]
-	return argsForCall.arg1
+	return fake.getAllAffiliationsArgsForCall[i].options
 }
 
 func (fake *MSP) GetAllAffiliationsReturns(result1 *msp.AffiliationResponse, result2 error) {
-	fake.getAllAffiliationsMutex.Lock()
-	defer fake.getAllAffiliationsMutex.Unlock()
 	fake.GetAllAffiliationsStub = nil
 	fake.getAllAffiliationsReturns = struct {
 		result1 *msp.AffiliationResponse
@@ -596,8 +525,6 @@ func (fake *MSP) GetAllAffiliationsReturns(result1 *msp.AffiliationResponse, res
 }
 
 func (fake *MSP) GetAllAffiliationsReturnsOnCall(i int, result1 *msp.AffiliationResponse, result2 error) {
-	fake.getAllAffiliationsMutex.Lock()
-	defer fake.getAllAffiliationsMutex.Unlock()
 	fake.GetAllAffiliationsStub = nil
 	if fake.getAllAffiliationsReturnsOnCall == nil {
 		fake.getAllAffiliationsReturnsOnCall = make(map[int]struct {
@@ -611,22 +538,21 @@ func (fake *MSP) GetAllAffiliationsReturnsOnCall(i int, result1 *msp.Affiliation
 	}{result1, result2}
 }
 
-func (fake *MSP) GetAllIdentities(arg1 ...msp.RequestOption) ([]*msp.IdentityResponse, error) {
+func (fake *MSP) GetAllIdentities(options ...msp.RequestOption) ([]*msp.IdentityResponse, error) {
 	fake.getAllIdentitiesMutex.Lock()
 	ret, specificReturn := fake.getAllIdentitiesReturnsOnCall[len(fake.getAllIdentitiesArgsForCall)]
 	fake.getAllIdentitiesArgsForCall = append(fake.getAllIdentitiesArgsForCall, struct {
-		arg1 []msp.RequestOption
-	}{arg1})
-	fake.recordInvocation("GetAllIdentities", []interface{}{arg1})
+		options []msp.RequestOption
+	}{options})
+	fake.recordInvocation("GetAllIdentities", []interface{}{options})
 	fake.getAllIdentitiesMutex.Unlock()
 	if fake.GetAllIdentitiesStub != nil {
-		return fake.GetAllIdentitiesStub(arg1...)
+		return fake.GetAllIdentitiesStub(options...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getAllIdentitiesReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.getAllIdentitiesReturns.result1, fake.getAllIdentitiesReturns.result2
 }
 
 func (fake *MSP) GetAllIdentitiesCallCount() int {
@@ -635,22 +561,13 @@ func (fake *MSP) GetAllIdentitiesCallCount() int {
 	return len(fake.getAllIdentitiesArgsForCall)
 }
 
-func (fake *MSP) GetAllIdentitiesCalls(stub func(...msp.RequestOption) ([]*msp.IdentityResponse, error)) {
-	fake.getAllIdentitiesMutex.Lock()
-	defer fake.getAllIdentitiesMutex.Unlock()
-	fake.GetAllIdentitiesStub = stub
-}
-
 func (fake *MSP) GetAllIdentitiesArgsForCall(i int) []msp.RequestOption {
 	fake.getAllIdentitiesMutex.RLock()
 	defer fake.getAllIdentitiesMutex.RUnlock()
-	argsForCall := fake.getAllIdentitiesArgsForCall[i]
-	return argsForCall.arg1
+	return fake.getAllIdentitiesArgsForCall[i].options
 }
 
 func (fake *MSP) GetAllIdentitiesReturns(result1 []*msp.IdentityResponse, result2 error) {
-	fake.getAllIdentitiesMutex.Lock()
-	defer fake.getAllIdentitiesMutex.Unlock()
 	fake.GetAllIdentitiesStub = nil
 	fake.getAllIdentitiesReturns = struct {
 		result1 []*msp.IdentityResponse
@@ -659,8 +576,6 @@ func (fake *MSP) GetAllIdentitiesReturns(result1 []*msp.IdentityResponse, result
 }
 
 func (fake *MSP) GetAllIdentitiesReturnsOnCall(i int, result1 []*msp.IdentityResponse, result2 error) {
-	fake.getAllIdentitiesMutex.Lock()
-	defer fake.getAllIdentitiesMutex.Unlock()
 	fake.GetAllIdentitiesStub = nil
 	if fake.getAllIdentitiesReturnsOnCall == nil {
 		fake.getAllIdentitiesReturnsOnCall = make(map[int]struct {
@@ -677,8 +592,7 @@ func (fake *MSP) GetAllIdentitiesReturnsOnCall(i int, result1 []*msp.IdentityRes
 func (fake *MSP) GetCAInfo() (*msp.GetCAInfoResponse, error) {
 	fake.getCAInfoMutex.Lock()
 	ret, specificReturn := fake.getCAInfoReturnsOnCall[len(fake.getCAInfoArgsForCall)]
-	fake.getCAInfoArgsForCall = append(fake.getCAInfoArgsForCall, struct {
-	}{})
+	fake.getCAInfoArgsForCall = append(fake.getCAInfoArgsForCall, struct{}{})
 	fake.recordInvocation("GetCAInfo", []interface{}{})
 	fake.getCAInfoMutex.Unlock()
 	if fake.GetCAInfoStub != nil {
@@ -687,8 +601,7 @@ func (fake *MSP) GetCAInfo() (*msp.GetCAInfoResponse, error) {
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getCAInfoReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.getCAInfoReturns.result1, fake.getCAInfoReturns.result2
 }
 
 func (fake *MSP) GetCAInfoCallCount() int {
@@ -697,15 +610,7 @@ func (fake *MSP) GetCAInfoCallCount() int {
 	return len(fake.getCAInfoArgsForCall)
 }
 
-func (fake *MSP) GetCAInfoCalls(stub func() (*msp.GetCAInfoResponse, error)) {
-	fake.getCAInfoMutex.Lock()
-	defer fake.getCAInfoMutex.Unlock()
-	fake.GetCAInfoStub = stub
-}
-
 func (fake *MSP) GetCAInfoReturns(result1 *msp.GetCAInfoResponse, result2 error) {
-	fake.getCAInfoMutex.Lock()
-	defer fake.getCAInfoMutex.Unlock()
 	fake.GetCAInfoStub = nil
 	fake.getCAInfoReturns = struct {
 		result1 *msp.GetCAInfoResponse
@@ -714,8 +619,6 @@ func (fake *MSP) GetCAInfoReturns(result1 *msp.GetCAInfoResponse, result2 error)
 }
 
 func (fake *MSP) GetCAInfoReturnsOnCall(i int, result1 *msp.GetCAInfoResponse, result2 error) {
-	fake.getCAInfoMutex.Lock()
-	defer fake.getCAInfoMutex.Unlock()
 	fake.GetCAInfoStub = nil
 	if fake.getCAInfoReturnsOnCall == nil {
 		fake.getCAInfoReturnsOnCall = make(map[int]struct {
@@ -729,23 +632,22 @@ func (fake *MSP) GetCAInfoReturnsOnCall(i int, result1 *msp.GetCAInfoResponse, r
 	}{result1, result2}
 }
 
-func (fake *MSP) GetIdentity(arg1 string, arg2 ...msp.RequestOption) (*msp.IdentityResponse, error) {
+func (fake *MSP) GetIdentity(ID string, options ...msp.RequestOption) (*msp.IdentityResponse, error) {
 	fake.getIdentityMutex.Lock()
 	ret, specificReturn := fake.getIdentityReturnsOnCall[len(fake.getIdentityArgsForCall)]
 	fake.getIdentityArgsForCall = append(fake.getIdentityArgsForCall, struct {
-		arg1 string
-		arg2 []msp.RequestOption
-	}{arg1, arg2})
-	fake.recordInvocation("GetIdentity", []interface{}{arg1, arg2})
+		ID      string
+		options []msp.RequestOption
+	}{ID, options})
+	fake.recordInvocation("GetIdentity", []interface{}{ID, options})
 	fake.getIdentityMutex.Unlock()
 	if fake.GetIdentityStub != nil {
-		return fake.GetIdentityStub(arg1, arg2...)
+		return fake.GetIdentityStub(ID, options...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getIdentityReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.getIdentityReturns.result1, fake.getIdentityReturns.result2
 }
 
 func (fake *MSP) GetIdentityCallCount() int {
@@ -754,22 +656,13 @@ func (fake *MSP) GetIdentityCallCount() int {
 	return len(fake.getIdentityArgsForCall)
 }
 
-func (fake *MSP) GetIdentityCalls(stub func(string, ...msp.RequestOption) (*msp.IdentityResponse, error)) {
-	fake.getIdentityMutex.Lock()
-	defer fake.getIdentityMutex.Unlock()
-	fake.GetIdentityStub = stub
-}
-
 func (fake *MSP) GetIdentityArgsForCall(i int) (string, []msp.RequestOption) {
 	fake.getIdentityMutex.RLock()
 	defer fake.getIdentityMutex.RUnlock()
-	argsForCall := fake.getIdentityArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return fake.getIdentityArgsForCall[i].ID, fake.getIdentityArgsForCall[i].options
 }
 
 func (fake *MSP) GetIdentityReturns(result1 *msp.IdentityResponse, result2 error) {
-	fake.getIdentityMutex.Lock()
-	defer fake.getIdentityMutex.Unlock()
 	fake.GetIdentityStub = nil
 	fake.getIdentityReturns = struct {
 		result1 *msp.IdentityResponse
@@ -778,8 +671,6 @@ func (fake *MSP) GetIdentityReturns(result1 *msp.IdentityResponse, result2 error
 }
 
 func (fake *MSP) GetIdentityReturnsOnCall(i int, result1 *msp.IdentityResponse, result2 error) {
-	fake.getIdentityMutex.Lock()
-	defer fake.getIdentityMutex.Unlock()
 	fake.GetIdentityStub = nil
 	if fake.getIdentityReturnsOnCall == nil {
 		fake.getIdentityReturnsOnCall = make(map[int]struct {
@@ -793,22 +684,21 @@ func (fake *MSP) GetIdentityReturnsOnCall(i int, result1 *msp.IdentityResponse, 
 	}{result1, result2}
 }
 
-func (fake *MSP) GetSigningIdentity(arg1 string) (mspa.SigningIdentity, error) {
+func (fake *MSP) GetSigningIdentity(id string) (mspctx.SigningIdentity, error) {
 	fake.getSigningIdentityMutex.Lock()
 	ret, specificReturn := fake.getSigningIdentityReturnsOnCall[len(fake.getSigningIdentityArgsForCall)]
 	fake.getSigningIdentityArgsForCall = append(fake.getSigningIdentityArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("GetSigningIdentity", []interface{}{arg1})
+		id string
+	}{id})
+	fake.recordInvocation("GetSigningIdentity", []interface{}{id})
 	fake.getSigningIdentityMutex.Unlock()
 	if fake.GetSigningIdentityStub != nil {
-		return fake.GetSigningIdentityStub(arg1)
+		return fake.GetSigningIdentityStub(id)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getSigningIdentityReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.getSigningIdentityReturns.result1, fake.getSigningIdentityReturns.result2
 }
 
 func (fake *MSP) GetSigningIdentityCallCount() int {
@@ -817,61 +707,49 @@ func (fake *MSP) GetSigningIdentityCallCount() int {
 	return len(fake.getSigningIdentityArgsForCall)
 }
 
-func (fake *MSP) GetSigningIdentityCalls(stub func(string) (mspa.SigningIdentity, error)) {
-	fake.getSigningIdentityMutex.Lock()
-	defer fake.getSigningIdentityMutex.Unlock()
-	fake.GetSigningIdentityStub = stub
-}
-
 func (fake *MSP) GetSigningIdentityArgsForCall(i int) string {
 	fake.getSigningIdentityMutex.RLock()
 	defer fake.getSigningIdentityMutex.RUnlock()
-	argsForCall := fake.getSigningIdentityArgsForCall[i]
-	return argsForCall.arg1
+	return fake.getSigningIdentityArgsForCall[i].id
 }
 
-func (fake *MSP) GetSigningIdentityReturns(result1 mspa.SigningIdentity, result2 error) {
-	fake.getSigningIdentityMutex.Lock()
-	defer fake.getSigningIdentityMutex.Unlock()
+func (fake *MSP) GetSigningIdentityReturns(result1 mspctx.SigningIdentity, result2 error) {
 	fake.GetSigningIdentityStub = nil
 	fake.getSigningIdentityReturns = struct {
-		result1 mspa.SigningIdentity
+		result1 mspctx.SigningIdentity
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *MSP) GetSigningIdentityReturnsOnCall(i int, result1 mspa.SigningIdentity, result2 error) {
-	fake.getSigningIdentityMutex.Lock()
-	defer fake.getSigningIdentityMutex.Unlock()
+func (fake *MSP) GetSigningIdentityReturnsOnCall(i int, result1 mspctx.SigningIdentity, result2 error) {
 	fake.GetSigningIdentityStub = nil
 	if fake.getSigningIdentityReturnsOnCall == nil {
 		fake.getSigningIdentityReturnsOnCall = make(map[int]struct {
-			result1 mspa.SigningIdentity
+			result1 mspctx.SigningIdentity
 			result2 error
 		})
 	}
 	fake.getSigningIdentityReturnsOnCall[i] = struct {
-		result1 mspa.SigningIdentity
+		result1 mspctx.SigningIdentity
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *MSP) ModifyAffiliation(arg1 *msp.ModifyAffiliationRequest) (*msp.AffiliationResponse, error) {
+func (fake *MSP) ModifyAffiliation(request *msp.ModifyAffiliationRequest) (*msp.AffiliationResponse, error) {
 	fake.modifyAffiliationMutex.Lock()
 	ret, specificReturn := fake.modifyAffiliationReturnsOnCall[len(fake.modifyAffiliationArgsForCall)]
 	fake.modifyAffiliationArgsForCall = append(fake.modifyAffiliationArgsForCall, struct {
-		arg1 *msp.ModifyAffiliationRequest
-	}{arg1})
-	fake.recordInvocation("ModifyAffiliation", []interface{}{arg1})
+		request *msp.ModifyAffiliationRequest
+	}{request})
+	fake.recordInvocation("ModifyAffiliation", []interface{}{request})
 	fake.modifyAffiliationMutex.Unlock()
 	if fake.ModifyAffiliationStub != nil {
-		return fake.ModifyAffiliationStub(arg1)
+		return fake.ModifyAffiliationStub(request)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.modifyAffiliationReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.modifyAffiliationReturns.result1, fake.modifyAffiliationReturns.result2
 }
 
 func (fake *MSP) ModifyAffiliationCallCount() int {
@@ -880,22 +758,13 @@ func (fake *MSP) ModifyAffiliationCallCount() int {
 	return len(fake.modifyAffiliationArgsForCall)
 }
 
-func (fake *MSP) ModifyAffiliationCalls(stub func(*msp.ModifyAffiliationRequest) (*msp.AffiliationResponse, error)) {
-	fake.modifyAffiliationMutex.Lock()
-	defer fake.modifyAffiliationMutex.Unlock()
-	fake.ModifyAffiliationStub = stub
-}
-
 func (fake *MSP) ModifyAffiliationArgsForCall(i int) *msp.ModifyAffiliationRequest {
 	fake.modifyAffiliationMutex.RLock()
 	defer fake.modifyAffiliationMutex.RUnlock()
-	argsForCall := fake.modifyAffiliationArgsForCall[i]
-	return argsForCall.arg1
+	return fake.modifyAffiliationArgsForCall[i].request
 }
 
 func (fake *MSP) ModifyAffiliationReturns(result1 *msp.AffiliationResponse, result2 error) {
-	fake.modifyAffiliationMutex.Lock()
-	defer fake.modifyAffiliationMutex.Unlock()
 	fake.ModifyAffiliationStub = nil
 	fake.modifyAffiliationReturns = struct {
 		result1 *msp.AffiliationResponse
@@ -904,8 +773,6 @@ func (fake *MSP) ModifyAffiliationReturns(result1 *msp.AffiliationResponse, resu
 }
 
 func (fake *MSP) ModifyAffiliationReturnsOnCall(i int, result1 *msp.AffiliationResponse, result2 error) {
-	fake.modifyAffiliationMutex.Lock()
-	defer fake.modifyAffiliationMutex.Unlock()
 	fake.ModifyAffiliationStub = nil
 	if fake.modifyAffiliationReturnsOnCall == nil {
 		fake.modifyAffiliationReturnsOnCall = make(map[int]struct {
@@ -919,22 +786,21 @@ func (fake *MSP) ModifyAffiliationReturnsOnCall(i int, result1 *msp.AffiliationR
 	}{result1, result2}
 }
 
-func (fake *MSP) ModifyIdentity(arg1 *msp.IdentityRequest) (*msp.IdentityResponse, error) {
+func (fake *MSP) ModifyIdentity(request *msp.IdentityRequest) (*msp.IdentityResponse, error) {
 	fake.modifyIdentityMutex.Lock()
 	ret, specificReturn := fake.modifyIdentityReturnsOnCall[len(fake.modifyIdentityArgsForCall)]
 	fake.modifyIdentityArgsForCall = append(fake.modifyIdentityArgsForCall, struct {
-		arg1 *msp.IdentityRequest
-	}{arg1})
-	fake.recordInvocation("ModifyIdentity", []interface{}{arg1})
+		request *msp.IdentityRequest
+	}{request})
+	fake.recordInvocation("ModifyIdentity", []interface{}{request})
 	fake.modifyIdentityMutex.Unlock()
 	if fake.ModifyIdentityStub != nil {
-		return fake.ModifyIdentityStub(arg1)
+		return fake.ModifyIdentityStub(request)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.modifyIdentityReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.modifyIdentityReturns.result1, fake.modifyIdentityReturns.result2
 }
 
 func (fake *MSP) ModifyIdentityCallCount() int {
@@ -943,22 +809,13 @@ func (fake *MSP) ModifyIdentityCallCount() int {
 	return len(fake.modifyIdentityArgsForCall)
 }
 
-func (fake *MSP) ModifyIdentityCalls(stub func(*msp.IdentityRequest) (*msp.IdentityResponse, error)) {
-	fake.modifyIdentityMutex.Lock()
-	defer fake.modifyIdentityMutex.Unlock()
-	fake.ModifyIdentityStub = stub
-}
-
 func (fake *MSP) ModifyIdentityArgsForCall(i int) *msp.IdentityRequest {
 	fake.modifyIdentityMutex.RLock()
 	defer fake.modifyIdentityMutex.RUnlock()
-	argsForCall := fake.modifyIdentityArgsForCall[i]
-	return argsForCall.arg1
+	return fake.modifyIdentityArgsForCall[i].request
 }
 
 func (fake *MSP) ModifyIdentityReturns(result1 *msp.IdentityResponse, result2 error) {
-	fake.modifyIdentityMutex.Lock()
-	defer fake.modifyIdentityMutex.Unlock()
 	fake.ModifyIdentityStub = nil
 	fake.modifyIdentityReturns = struct {
 		result1 *msp.IdentityResponse
@@ -967,8 +824,6 @@ func (fake *MSP) ModifyIdentityReturns(result1 *msp.IdentityResponse, result2 er
 }
 
 func (fake *MSP) ModifyIdentityReturnsOnCall(i int, result1 *msp.IdentityResponse, result2 error) {
-	fake.modifyIdentityMutex.Lock()
-	defer fake.modifyIdentityMutex.Unlock()
 	fake.ModifyIdentityStub = nil
 	if fake.modifyIdentityReturnsOnCall == nil {
 		fake.modifyIdentityReturnsOnCall = make(map[int]struct {
@@ -982,23 +837,22 @@ func (fake *MSP) ModifyIdentityReturnsOnCall(i int, result1 *msp.IdentityRespons
 	}{result1, result2}
 }
 
-func (fake *MSP) Reenroll(arg1 string, arg2 ...msp.EnrollmentOption) error {
+func (fake *MSP) Reenroll(enrollmentID string, opts ...msp.EnrollmentOption) error {
 	fake.reenrollMutex.Lock()
 	ret, specificReturn := fake.reenrollReturnsOnCall[len(fake.reenrollArgsForCall)]
 	fake.reenrollArgsForCall = append(fake.reenrollArgsForCall, struct {
-		arg1 string
-		arg2 []msp.EnrollmentOption
-	}{arg1, arg2})
-	fake.recordInvocation("Reenroll", []interface{}{arg1, arg2})
+		enrollmentID string
+		opts         []msp.EnrollmentOption
+	}{enrollmentID, opts})
+	fake.recordInvocation("Reenroll", []interface{}{enrollmentID, opts})
 	fake.reenrollMutex.Unlock()
 	if fake.ReenrollStub != nil {
-		return fake.ReenrollStub(arg1, arg2...)
+		return fake.ReenrollStub(enrollmentID, opts...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.reenrollReturns
-	return fakeReturns.result1
+	return fake.reenrollReturns.result1
 }
 
 func (fake *MSP) ReenrollCallCount() int {
@@ -1007,22 +861,13 @@ func (fake *MSP) ReenrollCallCount() int {
 	return len(fake.reenrollArgsForCall)
 }
 
-func (fake *MSP) ReenrollCalls(stub func(string, ...msp.EnrollmentOption) error) {
-	fake.reenrollMutex.Lock()
-	defer fake.reenrollMutex.Unlock()
-	fake.ReenrollStub = stub
-}
-
 func (fake *MSP) ReenrollArgsForCall(i int) (string, []msp.EnrollmentOption) {
 	fake.reenrollMutex.RLock()
 	defer fake.reenrollMutex.RUnlock()
-	argsForCall := fake.reenrollArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return fake.reenrollArgsForCall[i].enrollmentID, fake.reenrollArgsForCall[i].opts
 }
 
 func (fake *MSP) ReenrollReturns(result1 error) {
-	fake.reenrollMutex.Lock()
-	defer fake.reenrollMutex.Unlock()
 	fake.ReenrollStub = nil
 	fake.reenrollReturns = struct {
 		result1 error
@@ -1030,8 +875,6 @@ func (fake *MSP) ReenrollReturns(result1 error) {
 }
 
 func (fake *MSP) ReenrollReturnsOnCall(i int, result1 error) {
-	fake.reenrollMutex.Lock()
-	defer fake.reenrollMutex.Unlock()
 	fake.ReenrollStub = nil
 	if fake.reenrollReturnsOnCall == nil {
 		fake.reenrollReturnsOnCall = make(map[int]struct {
@@ -1043,22 +886,21 @@ func (fake *MSP) ReenrollReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *MSP) Register(arg1 *msp.RegistrationRequest) (string, error) {
+func (fake *MSP) Register(request *msp.RegistrationRequest) (string, error) {
 	fake.registerMutex.Lock()
 	ret, specificReturn := fake.registerReturnsOnCall[len(fake.registerArgsForCall)]
 	fake.registerArgsForCall = append(fake.registerArgsForCall, struct {
-		arg1 *msp.RegistrationRequest
-	}{arg1})
-	fake.recordInvocation("Register", []interface{}{arg1})
+		request *msp.RegistrationRequest
+	}{request})
+	fake.recordInvocation("Register", []interface{}{request})
 	fake.registerMutex.Unlock()
 	if fake.RegisterStub != nil {
-		return fake.RegisterStub(arg1)
+		return fake.RegisterStub(request)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.registerReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.registerReturns.result1, fake.registerReturns.result2
 }
 
 func (fake *MSP) RegisterCallCount() int {
@@ -1067,22 +909,13 @@ func (fake *MSP) RegisterCallCount() int {
 	return len(fake.registerArgsForCall)
 }
 
-func (fake *MSP) RegisterCalls(stub func(*msp.RegistrationRequest) (string, error)) {
-	fake.registerMutex.Lock()
-	defer fake.registerMutex.Unlock()
-	fake.RegisterStub = stub
-}
-
 func (fake *MSP) RegisterArgsForCall(i int) *msp.RegistrationRequest {
 	fake.registerMutex.RLock()
 	defer fake.registerMutex.RUnlock()
-	argsForCall := fake.registerArgsForCall[i]
-	return argsForCall.arg1
+	return fake.registerArgsForCall[i].request
 }
 
 func (fake *MSP) RegisterReturns(result1 string, result2 error) {
-	fake.registerMutex.Lock()
-	defer fake.registerMutex.Unlock()
 	fake.RegisterStub = nil
 	fake.registerReturns = struct {
 		result1 string
@@ -1091,8 +924,6 @@ func (fake *MSP) RegisterReturns(result1 string, result2 error) {
 }
 
 func (fake *MSP) RegisterReturnsOnCall(i int, result1 string, result2 error) {
-	fake.registerMutex.Lock()
-	defer fake.registerMutex.Unlock()
 	fake.RegisterStub = nil
 	if fake.registerReturnsOnCall == nil {
 		fake.registerReturnsOnCall = make(map[int]struct {
@@ -1106,22 +937,21 @@ func (fake *MSP) RegisterReturnsOnCall(i int, result1 string, result2 error) {
 	}{result1, result2}
 }
 
-func (fake *MSP) RemoveAffiliation(arg1 *msp.AffiliationRequest) (*msp.AffiliationResponse, error) {
+func (fake *MSP) RemoveAffiliation(request *msp.AffiliationRequest) (*msp.AffiliationResponse, error) {
 	fake.removeAffiliationMutex.Lock()
 	ret, specificReturn := fake.removeAffiliationReturnsOnCall[len(fake.removeAffiliationArgsForCall)]
 	fake.removeAffiliationArgsForCall = append(fake.removeAffiliationArgsForCall, struct {
-		arg1 *msp.AffiliationRequest
-	}{arg1})
-	fake.recordInvocation("RemoveAffiliation", []interface{}{arg1})
+		request *msp.AffiliationRequest
+	}{request})
+	fake.recordInvocation("RemoveAffiliation", []interface{}{request})
 	fake.removeAffiliationMutex.Unlock()
 	if fake.RemoveAffiliationStub != nil {
-		return fake.RemoveAffiliationStub(arg1)
+		return fake.RemoveAffiliationStub(request)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.removeAffiliationReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.removeAffiliationReturns.result1, fake.removeAffiliationReturns.result2
 }
 
 func (fake *MSP) RemoveAffiliationCallCount() int {
@@ -1130,22 +960,13 @@ func (fake *MSP) RemoveAffiliationCallCount() int {
 	return len(fake.removeAffiliationArgsForCall)
 }
 
-func (fake *MSP) RemoveAffiliationCalls(stub func(*msp.AffiliationRequest) (*msp.AffiliationResponse, error)) {
-	fake.removeAffiliationMutex.Lock()
-	defer fake.removeAffiliationMutex.Unlock()
-	fake.RemoveAffiliationStub = stub
-}
-
 func (fake *MSP) RemoveAffiliationArgsForCall(i int) *msp.AffiliationRequest {
 	fake.removeAffiliationMutex.RLock()
 	defer fake.removeAffiliationMutex.RUnlock()
-	argsForCall := fake.removeAffiliationArgsForCall[i]
-	return argsForCall.arg1
+	return fake.removeAffiliationArgsForCall[i].request
 }
 
 func (fake *MSP) RemoveAffiliationReturns(result1 *msp.AffiliationResponse, result2 error) {
-	fake.removeAffiliationMutex.Lock()
-	defer fake.removeAffiliationMutex.Unlock()
 	fake.RemoveAffiliationStub = nil
 	fake.removeAffiliationReturns = struct {
 		result1 *msp.AffiliationResponse
@@ -1154,8 +975,6 @@ func (fake *MSP) RemoveAffiliationReturns(result1 *msp.AffiliationResponse, resu
 }
 
 func (fake *MSP) RemoveAffiliationReturnsOnCall(i int, result1 *msp.AffiliationResponse, result2 error) {
-	fake.removeAffiliationMutex.Lock()
-	defer fake.removeAffiliationMutex.Unlock()
 	fake.RemoveAffiliationStub = nil
 	if fake.removeAffiliationReturnsOnCall == nil {
 		fake.removeAffiliationReturnsOnCall = make(map[int]struct {
@@ -1169,22 +988,21 @@ func (fake *MSP) RemoveAffiliationReturnsOnCall(i int, result1 *msp.AffiliationR
 	}{result1, result2}
 }
 
-func (fake *MSP) RemoveIdentity(arg1 *msp.RemoveIdentityRequest) (*msp.IdentityResponse, error) {
+func (fake *MSP) RemoveIdentity(request *msp.RemoveIdentityRequest) (*msp.IdentityResponse, error) {
 	fake.removeIdentityMutex.Lock()
 	ret, specificReturn := fake.removeIdentityReturnsOnCall[len(fake.removeIdentityArgsForCall)]
 	fake.removeIdentityArgsForCall = append(fake.removeIdentityArgsForCall, struct {
-		arg1 *msp.RemoveIdentityRequest
-	}{arg1})
-	fake.recordInvocation("RemoveIdentity", []interface{}{arg1})
+		request *msp.RemoveIdentityRequest
+	}{request})
+	fake.recordInvocation("RemoveIdentity", []interface{}{request})
 	fake.removeIdentityMutex.Unlock()
 	if fake.RemoveIdentityStub != nil {
-		return fake.RemoveIdentityStub(arg1)
+		return fake.RemoveIdentityStub(request)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.removeIdentityReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.removeIdentityReturns.result1, fake.removeIdentityReturns.result2
 }
 
 func (fake *MSP) RemoveIdentityCallCount() int {
@@ -1193,22 +1011,13 @@ func (fake *MSP) RemoveIdentityCallCount() int {
 	return len(fake.removeIdentityArgsForCall)
 }
 
-func (fake *MSP) RemoveIdentityCalls(stub func(*msp.RemoveIdentityRequest) (*msp.IdentityResponse, error)) {
-	fake.removeIdentityMutex.Lock()
-	defer fake.removeIdentityMutex.Unlock()
-	fake.RemoveIdentityStub = stub
-}
-
 func (fake *MSP) RemoveIdentityArgsForCall(i int) *msp.RemoveIdentityRequest {
 	fake.removeIdentityMutex.RLock()
 	defer fake.removeIdentityMutex.RUnlock()
-	argsForCall := fake.removeIdentityArgsForCall[i]
-	return argsForCall.arg1
+	return fake.removeIdentityArgsForCall[i].request
 }
 
 func (fake *MSP) RemoveIdentityReturns(result1 *msp.IdentityResponse, result2 error) {
-	fake.removeIdentityMutex.Lock()
-	defer fake.removeIdentityMutex.Unlock()
 	fake.RemoveIdentityStub = nil
 	fake.removeIdentityReturns = struct {
 		result1 *msp.IdentityResponse
@@ -1217,8 +1026,6 @@ func (fake *MSP) RemoveIdentityReturns(result1 *msp.IdentityResponse, result2 er
 }
 
 func (fake *MSP) RemoveIdentityReturnsOnCall(i int, result1 *msp.IdentityResponse, result2 error) {
-	fake.removeIdentityMutex.Lock()
-	defer fake.removeIdentityMutex.Unlock()
 	fake.RemoveIdentityStub = nil
 	if fake.removeIdentityReturnsOnCall == nil {
 		fake.removeIdentityReturnsOnCall = make(map[int]struct {
@@ -1232,22 +1039,21 @@ func (fake *MSP) RemoveIdentityReturnsOnCall(i int, result1 *msp.IdentityRespons
 	}{result1, result2}
 }
 
-func (fake *MSP) Revoke(arg1 *msp.RevocationRequest) (*msp.RevocationResponse, error) {
+func (fake *MSP) Revoke(request *msp.RevocationRequest) (*msp.RevocationResponse, error) {
 	fake.revokeMutex.Lock()
 	ret, specificReturn := fake.revokeReturnsOnCall[len(fake.revokeArgsForCall)]
 	fake.revokeArgsForCall = append(fake.revokeArgsForCall, struct {
-		arg1 *msp.RevocationRequest
-	}{arg1})
-	fake.recordInvocation("Revoke", []interface{}{arg1})
+		request *msp.RevocationRequest
+	}{request})
+	fake.recordInvocation("Revoke", []interface{}{request})
 	fake.revokeMutex.Unlock()
 	if fake.RevokeStub != nil {
-		return fake.RevokeStub(arg1)
+		return fake.RevokeStub(request)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.revokeReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fake.revokeReturns.result1, fake.revokeReturns.result2
 }
 
 func (fake *MSP) RevokeCallCount() int {
@@ -1256,22 +1062,13 @@ func (fake *MSP) RevokeCallCount() int {
 	return len(fake.revokeArgsForCall)
 }
 
-func (fake *MSP) RevokeCalls(stub func(*msp.RevocationRequest) (*msp.RevocationResponse, error)) {
-	fake.revokeMutex.Lock()
-	defer fake.revokeMutex.Unlock()
-	fake.RevokeStub = stub
-}
-
 func (fake *MSP) RevokeArgsForCall(i int) *msp.RevocationRequest {
 	fake.revokeMutex.RLock()
 	defer fake.revokeMutex.RUnlock()
-	argsForCall := fake.revokeArgsForCall[i]
-	return argsForCall.arg1
+	return fake.revokeArgsForCall[i].request
 }
 
 func (fake *MSP) RevokeReturns(result1 *msp.RevocationResponse, result2 error) {
-	fake.revokeMutex.Lock()
-	defer fake.revokeMutex.Unlock()
 	fake.RevokeStub = nil
 	fake.revokeReturns = struct {
 		result1 *msp.RevocationResponse
@@ -1280,8 +1077,6 @@ func (fake *MSP) RevokeReturns(result1 *msp.RevocationResponse, result2 error) {
 }
 
 func (fake *MSP) RevokeReturnsOnCall(i int, result1 *msp.RevocationResponse, result2 error) {
-	fake.revokeMutex.Lock()
-	defer fake.revokeMutex.Unlock()
 	fake.RevokeStub = nil
 	if fake.revokeReturnsOnCall == nil {
 		fake.revokeReturnsOnCall = make(map[int]struct {
