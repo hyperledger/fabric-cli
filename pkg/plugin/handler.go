@@ -12,15 +12,24 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	goplugin "plugin"
 
-	yaml "gopkg.in/yaml.v2"
+	"github.com/hyperledger/fabric-cli/pkg/environment"
+	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 )
+
+const pluginFactoryMethod = "New"
+
+// ErrNotAGoPlugin is returned when attempting to load a file that's not a Go plugin
+var ErrNotAGoPlugin = errors.New("not a Go plugin")
 
 // Handler defines the required actions for managing plugins
 type Handler interface {
 	GetPlugins() ([]*Plugin, error)
 	InstallPlugin(path string) error
 	UninstallPlugin(name string) error
+	LoadGoPlugin(path string, settings *environment.Settings) (*cobra.Command, error)
 }
 
 // DefaultHandler is the default plugin handler
@@ -121,4 +130,32 @@ func (h *DefaultHandler) loadPlugin(dir string) (*Plugin, error) {
 	}
 
 	return plugin, nil
+}
+
+// LoadGoPlugin loads a cobra.Command from the Go plugin at the given path. The Go plugin must implement a command factory
+// as follows:
+//
+// 	func New(settings *environment.Settings) *cobra.Command {
+//		return &cobra.Command{...}
+//  }
+//
+// If the file at the given path is not a Go plugin then the error, ErrNotAGoPlugin, is returned.
+// If the Go plugin does not implement the command factory then an error is returned.
+func (h *DefaultHandler) LoadGoPlugin(path string, settings *environment.Settings) (*cobra.Command, error) {
+	p, err := goplugin.Open(path)
+	if err != nil {
+		return nil, ErrNotAGoPlugin
+	}
+
+	cmdFactorySymbol, err := p.Lookup(pluginFactoryMethod)
+	if err != nil {
+		return nil, fmt.Errorf("could not find symbol %s. Plugin must export this method", pluginFactoryMethod)
+	}
+
+	newCmd, ok := cmdFactorySymbol.(func(settings *environment.Settings) *cobra.Command)
+	if !ok {
+		return nil, fmt.Errorf("function %s does not match expected definition func(*environment.Settings) *cobra.Command", pluginFactoryMethod)
+	}
+
+	return newCmd(settings), nil
 }

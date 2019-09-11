@@ -111,6 +111,7 @@ var _ = Describe("LoadPlugins", func() {
 	Context("when plugin handler fails", func() {
 		BeforeEach(func() {
 			handler.GetPluginsReturns(nil, errors.New("handler error"))
+			handler.LoadGoPluginReturns(nil, plugin.ErrNotAGoPlugin)
 		})
 
 		It("should fail to load plugins", func() {
@@ -123,13 +124,56 @@ var _ = Describe("LoadPlugins", func() {
 			handler.GetPluginsReturns([]*plugin.Plugin{
 				{
 					Name: "foo",
+					Command: &plugin.Command{
+						Base: "./plugins",
+					},
 				},
 			}, nil)
+			handler.LoadGoPluginReturns(nil, plugin.ErrNotAGoPlugin)
 		})
 
 		It("should load plugins", func() {
 			Expect(cmd.Execute()).Should(Succeed())
 			Expect(cmd.HasSubCommands()).Should(BeTrue())
+		})
+	})
+
+	Context("when Go plugins have been installed", func() {
+		BeforeEach(func() {
+			handler.GetPluginsReturns([]*plugin.Plugin{
+				{
+					Name: "foo",
+					Command: &plugin.Command{
+						Base: "./plugins",
+					},
+				},
+			}, nil)
+			handler.LoadGoPluginReturns(&cobra.Command{
+				Run: func(cmd *cobra.Command, args []string) {},
+			}, nil)
+		})
+
+		It("should load Go plugins", func() {
+			Expect(cmd.Execute()).Should(Succeed())
+			Expect(cmd.HasSubCommands()).Should(BeTrue())
+		})
+	})
+
+	Context("when invalid Go plugins have been installed", func() {
+		BeforeEach(func() {
+			handler.GetPluginsReturns([]*plugin.Plugin{
+				{
+					Name: "foo",
+					Command: &plugin.Command{
+						Base: "./plugins",
+					},
+				},
+			}, nil)
+			handler.LoadGoPluginReturns(nil, fmt.Errorf("some Go plugin error"))
+		})
+
+		It("should fail to load Go plugins", func() {
+			Expect(err.Error()).To(ContainSubstring("some Go plugin error"))
 		})
 	})
 })

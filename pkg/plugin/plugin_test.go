@@ -9,9 +9,11 @@ package plugin_test
 import (
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 
+	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/plugin"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -179,4 +181,32 @@ var _ = Describe("Plugin", func() {
 		})
 	})
 
+	Describe("LoadGoPlugin", func() {
+		It("should load Go plugin", func() {
+			tmpdir, err := ioutil.TempDir("", "echogoplugin")
+			Expect(err).NotTo(HaveOccurred())
+			defer func() {
+				err := os.RemoveAll(tmpdir)
+				Expect(err).NotTo(HaveOccurred())
+			}()
+
+			pluginPath := filepath.Join(tmpdir, "echogoplugin")
+
+			err = buildGoPlugin("./testdata/plugins/echogoplugin/cmd/echogoplugin.go", pluginPath)
+			Expect(err).NotTo(HaveOccurred())
+
+			cmd, err := handler.LoadGoPlugin(pluginPath, &environment.Settings{Streams: environment.Streams{Out: os.Stdout}})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(cmd).NotTo(BeNil())
+			cmd.SetArgs([]string{"--message", "Hello world!"})
+			Expect(cmd.Execute()).NotTo(HaveOccurred())
+		})
+	})
+
 })
+
+func buildGoPlugin(path, outputPath string) error {
+	cmd := exec.Command("go", "build", "-buildmode=plugin", "-o", outputPath, path)
+	_, err := cmd.CombinedOutput()
+	return err
+}

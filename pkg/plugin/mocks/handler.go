@@ -4,7 +4,9 @@ package mocks
 import (
 	"sync"
 
+	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/plugin"
+	"github.com/spf13/cobra"
 )
 
 type PluginHandler struct {
@@ -30,6 +32,20 @@ type PluginHandler struct {
 	}
 	installPluginReturnsOnCall map[int]struct {
 		result1 error
+	}
+	LoadGoPluginStub        func(string, *environment.Settings) (*cobra.Command, error)
+	loadGoPluginMutex       sync.RWMutex
+	loadGoPluginArgsForCall []struct {
+		arg1 string
+		arg2 *environment.Settings
+	}
+	loadGoPluginReturns struct {
+		result1 *cobra.Command
+		result2 error
+	}
+	loadGoPluginReturnsOnCall map[int]struct {
+		result1 *cobra.Command
+		result2 error
 	}
 	UninstallPluginStub        func(string) error
 	uninstallPluginMutex       sync.RWMutex
@@ -161,6 +177,70 @@ func (fake *PluginHandler) InstallPluginReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *PluginHandler) LoadGoPlugin(arg1 string, arg2 *environment.Settings) (*cobra.Command, error) {
+	fake.loadGoPluginMutex.Lock()
+	ret, specificReturn := fake.loadGoPluginReturnsOnCall[len(fake.loadGoPluginArgsForCall)]
+	fake.loadGoPluginArgsForCall = append(fake.loadGoPluginArgsForCall, struct {
+		arg1 string
+		arg2 *environment.Settings
+	}{arg1, arg2})
+	fake.recordInvocation("LoadGoPlugin", []interface{}{arg1, arg2})
+	fake.loadGoPluginMutex.Unlock()
+	if fake.LoadGoPluginStub != nil {
+		return fake.LoadGoPluginStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.loadGoPluginReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *PluginHandler) LoadGoPluginCallCount() int {
+	fake.loadGoPluginMutex.RLock()
+	defer fake.loadGoPluginMutex.RUnlock()
+	return len(fake.loadGoPluginArgsForCall)
+}
+
+func (fake *PluginHandler) LoadGoPluginCalls(stub func(string, *environment.Settings) (*cobra.Command, error)) {
+	fake.loadGoPluginMutex.Lock()
+	defer fake.loadGoPluginMutex.Unlock()
+	fake.LoadGoPluginStub = stub
+}
+
+func (fake *PluginHandler) LoadGoPluginArgsForCall(i int) (string, *environment.Settings) {
+	fake.loadGoPluginMutex.RLock()
+	defer fake.loadGoPluginMutex.RUnlock()
+	argsForCall := fake.loadGoPluginArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *PluginHandler) LoadGoPluginReturns(result1 *cobra.Command, result2 error) {
+	fake.loadGoPluginMutex.Lock()
+	defer fake.loadGoPluginMutex.Unlock()
+	fake.LoadGoPluginStub = nil
+	fake.loadGoPluginReturns = struct {
+		result1 *cobra.Command
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *PluginHandler) LoadGoPluginReturnsOnCall(i int, result1 *cobra.Command, result2 error) {
+	fake.loadGoPluginMutex.Lock()
+	defer fake.loadGoPluginMutex.Unlock()
+	fake.LoadGoPluginStub = nil
+	if fake.loadGoPluginReturnsOnCall == nil {
+		fake.loadGoPluginReturnsOnCall = make(map[int]struct {
+			result1 *cobra.Command
+			result2 error
+		})
+	}
+	fake.loadGoPluginReturnsOnCall[i] = struct {
+		result1 *cobra.Command
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *PluginHandler) UninstallPlugin(arg1 string) error {
 	fake.uninstallPluginMutex.Lock()
 	ret, specificReturn := fake.uninstallPluginReturnsOnCall[len(fake.uninstallPluginArgsForCall)]
@@ -228,6 +308,8 @@ func (fake *PluginHandler) Invocations() map[string][][]interface{} {
 	defer fake.getPluginsMutex.RUnlock()
 	fake.installPluginMutex.RLock()
 	defer fake.installPluginMutex.RUnlock()
+	fake.loadGoPluginMutex.RLock()
+	defer fake.loadGoPluginMutex.RUnlock()
 	fake.uninstallPluginMutex.RLock()
 	defer fake.uninstallPluginMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

@@ -86,24 +86,38 @@ func loadPlugins(cmd *cobra.Command, settings *environment.Settings, handler plu
 
 	settings.SetupPluginEnvironment()
 
-	for _, plugin := range plugins {
-		p := plugin
-		c := &cobra.Command{
-			Use:   p.Name,
-			Short: p.Description,
-			RunE: func(cmd *cobra.Command, args []string) error {
-				e := exec.Command(os.ExpandEnv(p.Command.Base),
-					append(p.Command.Args, args...)...)
-				e.Env = os.Environ()
-				e.Stdin = settings.Streams.In
-				e.Stdout = settings.Streams.Out
-				e.Stderr = settings.Streams.Err
-				return e.Run()
-			},
+	for _, p := range plugins {
+		c, err := loadPlugin(p, settings, handler)
+		if err != nil {
+			return err
 		}
-
 		cmd.AddCommand(c)
 	}
 
 	return nil
+}
+
+// loadPlugin loads the given plugin as either a Go plugin or a wrapped executable
+func loadPlugin(p *plugin.Plugin, settings *environment.Settings, handler plugin.Handler) (*cobra.Command, error) {
+	path := os.ExpandEnv(p.Command.Base)
+	c, err := handler.LoadGoPlugin(path, settings)
+	if err == nil {
+		return c, nil
+	}
+	if err != plugin.ErrNotAGoPlugin {
+		return nil, err
+	}
+
+	return &cobra.Command{
+		Use:   p.Name,
+		Short: p.Description,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			e := exec.Command(path, append(p.Command.Args, args...)...)
+			e.Env = os.Environ()
+			e.Stdin = settings.Streams.In
+			e.Stdout = settings.Streams.Out
+			e.Stderr = settings.Streams.Err
+			return e.Run()
+		},
+	}, nil
 }
