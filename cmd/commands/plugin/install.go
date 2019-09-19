@@ -22,16 +22,16 @@ func NewPluginInstallCommand(settings *environment.Settings) *cobra.Command {
 	c := InstallCommand{}
 
 	c.Settings = settings
-	c.Handler = &plugin.DefaultHandler{
-		Dir:      settings.Home.Plugins(),
-		Filename: plugin.DefaultFilename,
-	}
 
 	cmd := &cobra.Command{
 		Use:   "install <plugin-path>",
 		Short: "Install a plugin from the local filesystem",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
+			if err := c.Complete(); err != nil {
+				return err
+			}
+
 			return c.Validate()
 		},
 		RunE: func(_ *cobra.Command, _ []string) error {
@@ -72,5 +72,14 @@ func (c *InstallCommand) Run() error {
 
 	fmt.Fprintln(c.Settings.Streams.Out, "successfully installed the plugin")
 
+	return nil
+}
+
+// Complete initializes the plugin handler
+func (c *InstallCommand) Complete() error {
+	c.Handler = &plugin.DefaultHandler{
+		Dir:      c.Settings.Home.Plugins(),
+		Filename: plugin.DefaultFilename,
+	}
 	return nil
 }

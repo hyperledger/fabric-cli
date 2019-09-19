@@ -22,16 +22,16 @@ func NewPluginUninstallCommand(settings *environment.Settings) *cobra.Command {
 	c := UninstallCommand{}
 
 	c.Settings = settings
-	c.Handler = &plugin.DefaultHandler{
-		Dir:      settings.Home.Plugins(),
-		Filename: plugin.DefaultFilename,
-	}
 
 	cmd := &cobra.Command{
 		Use:   "uninstall <plugin-name>",
 		Short: "Uninstall a plugin",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
+			if err := c.Complete(); err != nil {
+				return err
+			}
+
 			return c.Validate()
 		},
 		RunE: func(_ *cobra.Command, _ []string) error {
@@ -72,5 +72,14 @@ func (c *UninstallCommand) Run() error {
 
 	fmt.Fprintln(c.Settings.Streams.Out, "successfully uninstalled the plugin")
 
+	return nil
+}
+
+// Complete initializes the plugin handler
+func (c *UninstallCommand) Complete() error {
+	c.Handler = &plugin.DefaultHandler{
+		Dir:      c.Settings.Home.Plugins(),
+		Filename: plugin.DefaultFilename,
+	}
 	return nil
 }

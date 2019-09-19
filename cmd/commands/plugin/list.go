@@ -21,14 +21,13 @@ func NewPluginListCommand(settings *environment.Settings) *cobra.Command {
 	c := ListCommand{}
 
 	c.Settings = settings
-	c.Handler = &plugin.DefaultHandler{
-		Dir:      settings.Home.Plugins(),
-		Filename: plugin.DefaultFilename,
-	}
 
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "list all installed plugins",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return c.Complete()
+		},
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return c.Run()
 		},
@@ -61,5 +60,14 @@ func (c *ListCommand) Run() error {
 		fmt.Fprint(c.Settings.Streams.Out, plugin.Name, "\n")
 	}
 
+	return nil
+}
+
+// Complete initializes the plugin handler
+func (c *ListCommand) Complete() error {
+	c.Handler = &plugin.DefaultHandler{
+		Dir:      c.Settings.Home.Plugins(),
+		Filename: plugin.DefaultFilename,
+	}
 	return nil
 }
