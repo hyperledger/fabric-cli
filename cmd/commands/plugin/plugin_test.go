@@ -48,7 +48,7 @@ var _ = Describe("PluginCommand", func() {
 			cmd = plugin.NewPluginCommand(settings)
 		})
 
-		It("should create a plugin commmand", func() {
+		It("should create a plugin command", func() {
 			Expect(cmd.Name()).To(Equal("plugin"))
 			Expect(cmd.HasSubCommands()).To(BeTrue())
 			Expect(cmd.Execute()).Should(Succeed())

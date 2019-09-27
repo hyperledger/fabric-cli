@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 GO_CMD		?= go
-LINT_CMD	?= golangci-lint
+LINT_CMD	?= gobin -run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.19.1
 
 BIN_DIR := $(CURDIR)/bin
 CMD_DIR := $(CURDIR)/cmd

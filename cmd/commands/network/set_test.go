@@ -51,7 +51,7 @@ var _ = Describe("SetNetworkCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a set network commmand", func() {
+	It("should create a set network command", func() {
 		Expect(cmd.Name()).To(Equal("set"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

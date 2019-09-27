@@ -52,7 +52,7 @@ var _ = Describe("ChannelConfigCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a channel config commmand", func() {
+	It("should create a channel config command", func() {
 		Expect(cmd.Name()).To(Equal("config"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

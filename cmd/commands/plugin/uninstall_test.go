@@ -51,7 +51,7 @@ var _ = Describe("PluginUninstallCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a plugin uninstall commmand", func() {
+	It("should create a plugin uninstall command", func() {
 		Expect(cmd.Name()).To(Equal("uninstall"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

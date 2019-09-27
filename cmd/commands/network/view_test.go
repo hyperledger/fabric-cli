@@ -49,7 +49,7 @@ var _ = Describe("ViewNetworkCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a view network commmand", func() {
+	It("should create a view network command", func() {
 		Expect(cmd.Name()).To(Equal("view"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

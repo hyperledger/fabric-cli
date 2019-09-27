@@ -49,7 +49,7 @@ var _ = Describe("ListContextCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a list context commmand", func() {
+	It("should create a list context command", func() {
 		Expect(cmd.Name()).To(Equal("list"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

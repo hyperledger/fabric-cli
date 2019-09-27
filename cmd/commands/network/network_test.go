@@ -48,7 +48,7 @@ var _ = Describe("NetworkCommand", func() {
 			cmd = network.NewNetworkCommand(settings)
 		})
 
-		It("should create a network commmand", func() {
+		It("should create a network command", func() {
 			Expect(cmd.Name()).To(Equal("network"))
 			Expect(cmd.HasSubCommands()).To(BeTrue())
 			Expect(cmd.Execute()).Should(Succeed())

@@ -1,0 +1,37 @@
+# Copyright the Hyperledger Fabric contributors. All rights reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: $(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rrr)
+trigger:
+- master
+pr:
+- master
+
+variables:
+  GOPATH: $(Agent.BuildDirectory)/go
+  PATH: $(Agent.BuildDirectory)/go/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+  GOVER: 1.13
+
+jobs:
+- job: Lint
+  pool:
+    vmImage: ubuntu-16.04
+  dependsOn: []
+  timeoutInMinutes: 60
+  steps:
+  - template: install_deps.yml
+  - checkout: self
+  - script: make lint
+    displayName: Run lint
+
+- job: Test
+  pool:
+    vmImage: ubuntu-16.04
+  dependsOn: []
+  timeoutInMinutes: 60
+  steps:
+  - template: install_deps.yml
+  - checkout: self
+  - script: make test
+    displayName: Run test

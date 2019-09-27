@@ -49,7 +49,7 @@ var _ = Describe("ListNetworkCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a list network commmand", func() {
+	It("should create a list network command", func() {
 		Expect(cmd.Name()).To(Equal("list"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

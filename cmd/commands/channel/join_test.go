@@ -51,7 +51,7 @@ var _ = Describe("ChannelJoinCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a channel join commmand", func() {
+	It("should create a channel join command", func() {
 		Expect(cmd.Name()).To(Equal("join"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

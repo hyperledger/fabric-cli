@@ -52,7 +52,7 @@ var _ = Describe("PluginListCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a plugin list commmand", func() {
+	It("should create a plugin list command", func() {
 		Expect(cmd.Name()).To(Equal("list"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

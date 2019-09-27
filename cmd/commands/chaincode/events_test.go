@@ -53,7 +53,7 @@ var _ = Describe("ChaincodeEventsCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a chaincode events commmand", func() {
+	It("should create a chaincode events command", func() {
 		Expect(cmd.Name()).To(Equal("events"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

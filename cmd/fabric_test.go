@@ -51,7 +51,7 @@ var _ = Describe("DefaultFabricCommand", func() {
 		cmd = NewDefaultFabricCommand(settings, []string{})
 	})
 
-	It("should create a fabric commmand", func() {
+	It("should create a fabric command", func() {
 		Expect(cmd.Name()).To(Equal("fabric"))
 		Expect(cmd.HasSubCommands()).To(BeTrue())
 		Expect(cmd.Execute()).Should(Succeed())

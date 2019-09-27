@@ -51,7 +51,7 @@ var _ = Describe("DeleteContextCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a delete context commmand", func() {
+	It("should create a delete context command", func() {
 		Expect(cmd.Name()).To(Equal("delete"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

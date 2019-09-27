@@ -49,7 +49,7 @@ var _ = Describe("CurrentContextCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a view context commmand", func() {
+	It("should create a view context command", func() {
 		Expect(cmd.Name()).To(Equal("view"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

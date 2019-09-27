@@ -51,7 +51,7 @@ var _ = Describe("NetworkDeleteCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a delete network commmand", func() {
+	It("should create a delete network command", func() {
 		Expect(cmd.Name()).To(Equal("delete"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

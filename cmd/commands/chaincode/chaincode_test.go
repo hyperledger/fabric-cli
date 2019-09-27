@@ -50,7 +50,7 @@ var _ = Describe("ChaincodeCommand", func() {
 			cmd = chaincode.NewChaincodeCommand(settings)
 		})
 
-		It("should create a chaincode commmand", func() {
+		It("should create a chaincode command", func() {
 			Expect(cmd.Name()).To(Equal("chaincode"))
 			Expect(cmd.HasSubCommands()).To(BeTrue())
 			Expect(cmd.Execute()).Should(Succeed())

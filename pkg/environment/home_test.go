@@ -71,7 +71,7 @@ var _ = Describe("Home", func() {
 			os.RemoveAll(TestPath)
 		})
 
-		It("should intialize home path", func() {
+		It("should initialize home path", func() {
 			Expect(err).To(BeNil())
 		})
 	})

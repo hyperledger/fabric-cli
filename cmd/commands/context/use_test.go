@@ -51,7 +51,7 @@ var _ = Describe("UseContextCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a set context commmand", func() {
+	It("should create a set context command", func() {
 		Expect(cmd.Name()).To(Equal("use"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})

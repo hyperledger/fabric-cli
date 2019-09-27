@@ -16,13 +16,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-//go:generate counterfeiter -o mocks/factory.go --fake-name Factory . Factory
-//go:generate counterfeiter -o mocks/channel.go --fake-name Channel . Channel
-//go:generate counterfeiter -o mocks/event.go --fake-name Event . Event
-//go:generate counterfeiter -o mocks/ledger.go --fake-name Ledger . Ledger
-//go:generate counterfeiter -o mocks/resmgmt.go --fake-name ResourceManagement . ResourceManagement
-//go:generate counterfeiter -o mocks/msp.go --fake-name MSP . MSP
-//go:generate counterfeiter -o mocks/channelcfg.go --fake-name ChannelCfg github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab.ChannelCfg
+//go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/factory.go --fake-name Factory . Factory
+//go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/channel.go --fake-name Channel . Channel
+//go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/event.go --fake-name Event . Event
+//go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/ledger.go --fake-name Ledger . Ledger
+//go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/resmgmt.go --fake-name ResourceManagement . ResourceManagement
+//go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/msp.go --fake-name MSP . MSP
+//nolint:lll //go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/channelcfg.go --fake-name ChannelCfg github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab.ChannelCfg
 
 func TestFabric(t *testing.T) {
 	RegisterFailHandler(Fail)

@@ -52,7 +52,7 @@ var _ = Describe("ChaincodeInvokeCommand", func() {
 		os.Args = args
 	})
 
-	It("should create a chaincode invoke commmand", func() {
+	It("should create a chaincode invoke command", func() {
 		Expect(cmd.Name()).To(Equal("invoke"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})
