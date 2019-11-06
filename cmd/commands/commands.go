@@ -12,6 +12,7 @@ import (
 	"github.com/hyperledger/fabric-cli/cmd/commands/context"
 	"github.com/hyperledger/fabric-cli/cmd/commands/network"
 	"github.com/hyperledger/fabric-cli/cmd/commands/plugin"
+	"github.com/hyperledger/fabric-cli/cmd/commands/version"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/spf13/cobra"
 )
@@ -34,5 +35,8 @@ func All(settings *environment.Settings) []*cobra.Command {
 
 		// fabric channel [subcommand]
 		chaincode.NewChaincodeCommand(settings),
+
+		// fabric version
+		version.NewVersionCommand(settings),
 	}
 }
