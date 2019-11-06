@@ -9,7 +9,6 @@ package network
 import (
 	"errors"
 	"fmt"
-
 	"github.com/hyperledger/fabric-cli/cmd/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/spf13/cobra"
@@ -58,6 +57,12 @@ func (c *DeleteCommand) Validate() error {
 
 // Run executes the command
 func (c *DeleteCommand) Run() error {
+
+	if _, ok := c.Settings.Config.Networks[c.Name]; !ok {
+		err := fmt.Sprintf("network %s doesn't exist", c.Name)
+		return errors.New(err)
+	}
+
 	err := c.Settings.ModifyConfig(environment.DeleteNetwork(c.Name))
 	if err != nil {
 		return err

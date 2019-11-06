@@ -11,16 +11,14 @@ require (
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
 	github.com/hyperledger/fabric-protos-go v0.0.0-20190821180310-6b6ac9042dfd
-	github.com/hyperledger/fabric-sdk-go v1.0.0-alpha5.0.20190910134818-7c5b61c3218f
+	github.com/hyperledger/fabric-sdk-go v1.0.0-beta1
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.1
-	github.com/myitcv/gobin v0.0.10
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.5.0
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/prometheus/common v0.4.1 // indirect
 	github.com/prometheus/procfs v0.0.0-20190529155944-65bdadfa96ae // indirect
-	github.com/rogpeppe/go-internal v1.2.2 // indirect
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v0.0.4
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -122,6 +121,7 @@ var _ = Describe("ChaincodeEventsImplementation", func() {
 	Describe("Run", func() {
 		var (
 			eventch chan *fab.CCEvent
+			runDone chan struct{}
 		)
 
 		BeforeEach(func() {
@@ -133,13 +133,16 @@ var _ = Describe("ChaincodeEventsImplementation", func() {
 		})
 
 		JustBeforeEach(func() {
+			runDone = make(chan struct{})
 			go func() {
 				err = impl.Run()
+				close(runDone)
 			}()
+		})
 
-			// give the test case a chance to read from the channel
-			time.Sleep(1 * time.Millisecond)
+		AfterEach(func() {
 			close(eventch)
+			<-runDone
 		})
 
 		Context("when channel client succeeds", func() {
@@ -162,6 +165,7 @@ var _ = Describe("ChaincodeEventsImplementation", func() {
 			})
 
 			It("should fail process chaincode events", func() {
+				<-runDone // Wait for goroutine to terminate (we expect error)
 				Expect(err).NotTo(BeNil())
 				Expect(err.Error()).To(ContainSubstring("events error"))
 			})

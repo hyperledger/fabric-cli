@@ -4,70 +4,36 @@ package mocks
 import (
 	"sync"
 
-	mspCfg "github.com/hyperledger/fabric-protos-go/msp"
+	"github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 )
 
 type ChannelCfg struct {
-	IDStub        func() string
-	iDMutex       sync.RWMutex
-	iDArgsForCall []struct{}
-	iDReturns     struct {
-		result1 string
-	}
-	iDReturnsOnCall map[int]struct {
-		result1 string
-	}
-	BlockNumberStub        func() uint64
-	blockNumberMutex       sync.RWMutex
-	blockNumberArgsForCall []struct{}
-	blockNumberReturns     struct {
-		result1 uint64
-	}
-	blockNumberReturnsOnCall map[int]struct {
-		result1 uint64
-	}
-	MSPsStub        func() []*mspCfg.MSPConfig
-	mSPsMutex       sync.RWMutex
-	mSPsArgsForCall []struct{}
-	mSPsReturns     struct {
-		result1 []*mspCfg.MSPConfig
-	}
-	mSPsReturnsOnCall map[int]struct {
-		result1 []*mspCfg.MSPConfig
-	}
 	AnchorPeersStub        func() []*fab.OrgAnchorPeer
 	anchorPeersMutex       sync.RWMutex
-	anchorPeersArgsForCall []struct{}
-	anchorPeersReturns     struct {
+	anchorPeersArgsForCall []struct {
+	}
+	anchorPeersReturns struct {
 		result1 []*fab.OrgAnchorPeer
 	}
 	anchorPeersReturnsOnCall map[int]struct {
 		result1 []*fab.OrgAnchorPeer
 	}
-	OrderersStub        func() []string
-	orderersMutex       sync.RWMutex
-	orderersArgsForCall []struct{}
-	orderersReturns     struct {
-		result1 []string
+	BlockNumberStub        func() uint64
+	blockNumberMutex       sync.RWMutex
+	blockNumberArgsForCall []struct {
 	}
-	orderersReturnsOnCall map[int]struct {
-		result1 []string
+	blockNumberReturns struct {
+		result1 uint64
 	}
-	VersionsStub        func() *fab.Versions
-	versionsMutex       sync.RWMutex
-	versionsArgsForCall []struct{}
-	versionsReturns     struct {
-		result1 *fab.Versions
+	blockNumberReturnsOnCall map[int]struct {
+		result1 uint64
 	}
-	versionsReturnsOnCall map[int]struct {
-		result1 *fab.Versions
-	}
-	HasCapabilityStub        func(group fab.ConfigGroupKey, capability string) bool
+	HasCapabilityStub        func(fab.ConfigGroupKey, string) bool
 	hasCapabilityMutex       sync.RWMutex
 	hasCapabilityArgsForCall []struct {
-		group      fab.ConfigGroupKey
-		capability string
+		arg1 fab.ConfigGroupKey
+		arg2 string
 	}
 	hasCapabilityReturns struct {
 		result1 bool
@@ -75,134 +41,55 @@ type ChannelCfg struct {
 	hasCapabilityReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	IDStub        func() string
+	iDMutex       sync.RWMutex
+	iDArgsForCall []struct {
+	}
+	iDReturns struct {
+		result1 string
+	}
+	iDReturnsOnCall map[int]struct {
+		result1 string
+	}
+	MSPsStub        func() []*msp.MSPConfig
+	mSPsMutex       sync.RWMutex
+	mSPsArgsForCall []struct {
+	}
+	mSPsReturns struct {
+		result1 []*msp.MSPConfig
+	}
+	mSPsReturnsOnCall map[int]struct {
+		result1 []*msp.MSPConfig
+	}
+	OrderersStub        func() []string
+	orderersMutex       sync.RWMutex
+	orderersArgsForCall []struct {
+	}
+	orderersReturns struct {
+		result1 []string
+	}
+	orderersReturnsOnCall map[int]struct {
+		result1 []string
+	}
+	VersionsStub        func() *fab.Versions
+	versionsMutex       sync.RWMutex
+	versionsArgsForCall []struct {
+	}
+	versionsReturns struct {
+		result1 *fab.Versions
+	}
+	versionsReturnsOnCall map[int]struct {
+		result1 *fab.Versions
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *ChannelCfg) ID() string {
-	fake.iDMutex.Lock()
-	ret, specificReturn := fake.iDReturnsOnCall[len(fake.iDArgsForCall)]
-	fake.iDArgsForCall = append(fake.iDArgsForCall, struct{}{})
-	fake.recordInvocation("ID", []interface{}{})
-	fake.iDMutex.Unlock()
-	if fake.IDStub != nil {
-		return fake.IDStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.iDReturns.result1
-}
-
-func (fake *ChannelCfg) IDCallCount() int {
-	fake.iDMutex.RLock()
-	defer fake.iDMutex.RUnlock()
-	return len(fake.iDArgsForCall)
-}
-
-func (fake *ChannelCfg) IDReturns(result1 string) {
-	fake.IDStub = nil
-	fake.iDReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *ChannelCfg) IDReturnsOnCall(i int, result1 string) {
-	fake.IDStub = nil
-	if fake.iDReturnsOnCall == nil {
-		fake.iDReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.iDReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *ChannelCfg) BlockNumber() uint64 {
-	fake.blockNumberMutex.Lock()
-	ret, specificReturn := fake.blockNumberReturnsOnCall[len(fake.blockNumberArgsForCall)]
-	fake.blockNumberArgsForCall = append(fake.blockNumberArgsForCall, struct{}{})
-	fake.recordInvocation("BlockNumber", []interface{}{})
-	fake.blockNumberMutex.Unlock()
-	if fake.BlockNumberStub != nil {
-		return fake.BlockNumberStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.blockNumberReturns.result1
-}
-
-func (fake *ChannelCfg) BlockNumberCallCount() int {
-	fake.blockNumberMutex.RLock()
-	defer fake.blockNumberMutex.RUnlock()
-	return len(fake.blockNumberArgsForCall)
-}
-
-func (fake *ChannelCfg) BlockNumberReturns(result1 uint64) {
-	fake.BlockNumberStub = nil
-	fake.blockNumberReturns = struct {
-		result1 uint64
-	}{result1}
-}
-
-func (fake *ChannelCfg) BlockNumberReturnsOnCall(i int, result1 uint64) {
-	fake.BlockNumberStub = nil
-	if fake.blockNumberReturnsOnCall == nil {
-		fake.blockNumberReturnsOnCall = make(map[int]struct {
-			result1 uint64
-		})
-	}
-	fake.blockNumberReturnsOnCall[i] = struct {
-		result1 uint64
-	}{result1}
-}
-
-func (fake *ChannelCfg) MSPs() []*mspCfg.MSPConfig {
-	fake.mSPsMutex.Lock()
-	ret, specificReturn := fake.mSPsReturnsOnCall[len(fake.mSPsArgsForCall)]
-	fake.mSPsArgsForCall = append(fake.mSPsArgsForCall, struct{}{})
-	fake.recordInvocation("MSPs", []interface{}{})
-	fake.mSPsMutex.Unlock()
-	if fake.MSPsStub != nil {
-		return fake.MSPsStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.mSPsReturns.result1
-}
-
-func (fake *ChannelCfg) MSPsCallCount() int {
-	fake.mSPsMutex.RLock()
-	defer fake.mSPsMutex.RUnlock()
-	return len(fake.mSPsArgsForCall)
-}
-
-func (fake *ChannelCfg) MSPsReturns(result1 []*mspCfg.MSPConfig) {
-	fake.MSPsStub = nil
-	fake.mSPsReturns = struct {
-		result1 []*mspCfg.MSPConfig
-	}{result1}
-}
-
-func (fake *ChannelCfg) MSPsReturnsOnCall(i int, result1 []*mspCfg.MSPConfig) {
-	fake.MSPsStub = nil
-	if fake.mSPsReturnsOnCall == nil {
-		fake.mSPsReturnsOnCall = make(map[int]struct {
-			result1 []*mspCfg.MSPConfig
-		})
-	}
-	fake.mSPsReturnsOnCall[i] = struct {
-		result1 []*mspCfg.MSPConfig
-	}{result1}
 }
 
 func (fake *ChannelCfg) AnchorPeers() []*fab.OrgAnchorPeer {
 	fake.anchorPeersMutex.Lock()
 	ret, specificReturn := fake.anchorPeersReturnsOnCall[len(fake.anchorPeersArgsForCall)]
-	fake.anchorPeersArgsForCall = append(fake.anchorPeersArgsForCall, struct{}{})
+	fake.anchorPeersArgsForCall = append(fake.anchorPeersArgsForCall, struct {
+	}{})
 	fake.recordInvocation("AnchorPeers", []interface{}{})
 	fake.anchorPeersMutex.Unlock()
 	if fake.AnchorPeersStub != nil {
@@ -211,7 +98,8 @@ func (fake *ChannelCfg) AnchorPeers() []*fab.OrgAnchorPeer {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.anchorPeersReturns.result1
+	fakeReturns := fake.anchorPeersReturns
+	return fakeReturns.result1
 }
 
 func (fake *ChannelCfg) AnchorPeersCallCount() int {
@@ -220,7 +108,15 @@ func (fake *ChannelCfg) AnchorPeersCallCount() int {
 	return len(fake.anchorPeersArgsForCall)
 }
 
+func (fake *ChannelCfg) AnchorPeersCalls(stub func() []*fab.OrgAnchorPeer) {
+	fake.anchorPeersMutex.Lock()
+	defer fake.anchorPeersMutex.Unlock()
+	fake.AnchorPeersStub = stub
+}
+
 func (fake *ChannelCfg) AnchorPeersReturns(result1 []*fab.OrgAnchorPeer) {
+	fake.anchorPeersMutex.Lock()
+	defer fake.anchorPeersMutex.Unlock()
 	fake.AnchorPeersStub = nil
 	fake.anchorPeersReturns = struct {
 		result1 []*fab.OrgAnchorPeer
@@ -228,6 +124,8 @@ func (fake *ChannelCfg) AnchorPeersReturns(result1 []*fab.OrgAnchorPeer) {
 }
 
 func (fake *ChannelCfg) AnchorPeersReturnsOnCall(i int, result1 []*fab.OrgAnchorPeer) {
+	fake.anchorPeersMutex.Lock()
+	defer fake.anchorPeersMutex.Unlock()
 	fake.AnchorPeersStub = nil
 	if fake.anchorPeersReturnsOnCall == nil {
 		fake.anchorPeersReturnsOnCall = make(map[int]struct {
@@ -239,10 +137,228 @@ func (fake *ChannelCfg) AnchorPeersReturnsOnCall(i int, result1 []*fab.OrgAnchor
 	}{result1}
 }
 
+func (fake *ChannelCfg) BlockNumber() uint64 {
+	fake.blockNumberMutex.Lock()
+	ret, specificReturn := fake.blockNumberReturnsOnCall[len(fake.blockNumberArgsForCall)]
+	fake.blockNumberArgsForCall = append(fake.blockNumberArgsForCall, struct {
+	}{})
+	fake.recordInvocation("BlockNumber", []interface{}{})
+	fake.blockNumberMutex.Unlock()
+	if fake.BlockNumberStub != nil {
+		return fake.BlockNumberStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.blockNumberReturns
+	return fakeReturns.result1
+}
+
+func (fake *ChannelCfg) BlockNumberCallCount() int {
+	fake.blockNumberMutex.RLock()
+	defer fake.blockNumberMutex.RUnlock()
+	return len(fake.blockNumberArgsForCall)
+}
+
+func (fake *ChannelCfg) BlockNumberCalls(stub func() uint64) {
+	fake.blockNumberMutex.Lock()
+	defer fake.blockNumberMutex.Unlock()
+	fake.BlockNumberStub = stub
+}
+
+func (fake *ChannelCfg) BlockNumberReturns(result1 uint64) {
+	fake.blockNumberMutex.Lock()
+	defer fake.blockNumberMutex.Unlock()
+	fake.BlockNumberStub = nil
+	fake.blockNumberReturns = struct {
+		result1 uint64
+	}{result1}
+}
+
+func (fake *ChannelCfg) BlockNumberReturnsOnCall(i int, result1 uint64) {
+	fake.blockNumberMutex.Lock()
+	defer fake.blockNumberMutex.Unlock()
+	fake.BlockNumberStub = nil
+	if fake.blockNumberReturnsOnCall == nil {
+		fake.blockNumberReturnsOnCall = make(map[int]struct {
+			result1 uint64
+		})
+	}
+	fake.blockNumberReturnsOnCall[i] = struct {
+		result1 uint64
+	}{result1}
+}
+
+func (fake *ChannelCfg) HasCapability(arg1 fab.ConfigGroupKey, arg2 string) bool {
+	fake.hasCapabilityMutex.Lock()
+	ret, specificReturn := fake.hasCapabilityReturnsOnCall[len(fake.hasCapabilityArgsForCall)]
+	fake.hasCapabilityArgsForCall = append(fake.hasCapabilityArgsForCall, struct {
+		arg1 fab.ConfigGroupKey
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("HasCapability", []interface{}{arg1, arg2})
+	fake.hasCapabilityMutex.Unlock()
+	if fake.HasCapabilityStub != nil {
+		return fake.HasCapabilityStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.hasCapabilityReturns
+	return fakeReturns.result1
+}
+
+func (fake *ChannelCfg) HasCapabilityCallCount() int {
+	fake.hasCapabilityMutex.RLock()
+	defer fake.hasCapabilityMutex.RUnlock()
+	return len(fake.hasCapabilityArgsForCall)
+}
+
+func (fake *ChannelCfg) HasCapabilityCalls(stub func(fab.ConfigGroupKey, string) bool) {
+	fake.hasCapabilityMutex.Lock()
+	defer fake.hasCapabilityMutex.Unlock()
+	fake.HasCapabilityStub = stub
+}
+
+func (fake *ChannelCfg) HasCapabilityArgsForCall(i int) (fab.ConfigGroupKey, string) {
+	fake.hasCapabilityMutex.RLock()
+	defer fake.hasCapabilityMutex.RUnlock()
+	argsForCall := fake.hasCapabilityArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *ChannelCfg) HasCapabilityReturns(result1 bool) {
+	fake.hasCapabilityMutex.Lock()
+	defer fake.hasCapabilityMutex.Unlock()
+	fake.HasCapabilityStub = nil
+	fake.hasCapabilityReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *ChannelCfg) HasCapabilityReturnsOnCall(i int, result1 bool) {
+	fake.hasCapabilityMutex.Lock()
+	defer fake.hasCapabilityMutex.Unlock()
+	fake.HasCapabilityStub = nil
+	if fake.hasCapabilityReturnsOnCall == nil {
+		fake.hasCapabilityReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.hasCapabilityReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *ChannelCfg) ID() string {
+	fake.iDMutex.Lock()
+	ret, specificReturn := fake.iDReturnsOnCall[len(fake.iDArgsForCall)]
+	fake.iDArgsForCall = append(fake.iDArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ID", []interface{}{})
+	fake.iDMutex.Unlock()
+	if fake.IDStub != nil {
+		return fake.IDStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.iDReturns
+	return fakeReturns.result1
+}
+
+func (fake *ChannelCfg) IDCallCount() int {
+	fake.iDMutex.RLock()
+	defer fake.iDMutex.RUnlock()
+	return len(fake.iDArgsForCall)
+}
+
+func (fake *ChannelCfg) IDCalls(stub func() string) {
+	fake.iDMutex.Lock()
+	defer fake.iDMutex.Unlock()
+	fake.IDStub = stub
+}
+
+func (fake *ChannelCfg) IDReturns(result1 string) {
+	fake.iDMutex.Lock()
+	defer fake.iDMutex.Unlock()
+	fake.IDStub = nil
+	fake.iDReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *ChannelCfg) IDReturnsOnCall(i int, result1 string) {
+	fake.iDMutex.Lock()
+	defer fake.iDMutex.Unlock()
+	fake.IDStub = nil
+	if fake.iDReturnsOnCall == nil {
+		fake.iDReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.iDReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *ChannelCfg) MSPs() []*msp.MSPConfig {
+	fake.mSPsMutex.Lock()
+	ret, specificReturn := fake.mSPsReturnsOnCall[len(fake.mSPsArgsForCall)]
+	fake.mSPsArgsForCall = append(fake.mSPsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("MSPs", []interface{}{})
+	fake.mSPsMutex.Unlock()
+	if fake.MSPsStub != nil {
+		return fake.MSPsStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.mSPsReturns
+	return fakeReturns.result1
+}
+
+func (fake *ChannelCfg) MSPsCallCount() int {
+	fake.mSPsMutex.RLock()
+	defer fake.mSPsMutex.RUnlock()
+	return len(fake.mSPsArgsForCall)
+}
+
+func (fake *ChannelCfg) MSPsCalls(stub func() []*msp.MSPConfig) {
+	fake.mSPsMutex.Lock()
+	defer fake.mSPsMutex.Unlock()
+	fake.MSPsStub = stub
+}
+
+func (fake *ChannelCfg) MSPsReturns(result1 []*msp.MSPConfig) {
+	fake.mSPsMutex.Lock()
+	defer fake.mSPsMutex.Unlock()
+	fake.MSPsStub = nil
+	fake.mSPsReturns = struct {
+		result1 []*msp.MSPConfig
+	}{result1}
+}
+
+func (fake *ChannelCfg) MSPsReturnsOnCall(i int, result1 []*msp.MSPConfig) {
+	fake.mSPsMutex.Lock()
+	defer fake.mSPsMutex.Unlock()
+	fake.MSPsStub = nil
+	if fake.mSPsReturnsOnCall == nil {
+		fake.mSPsReturnsOnCall = make(map[int]struct {
+			result1 []*msp.MSPConfig
+		})
+	}
+	fake.mSPsReturnsOnCall[i] = struct {
+		result1 []*msp.MSPConfig
+	}{result1}
+}
+
 func (fake *ChannelCfg) Orderers() []string {
 	fake.orderersMutex.Lock()
 	ret, specificReturn := fake.orderersReturnsOnCall[len(fake.orderersArgsForCall)]
-	fake.orderersArgsForCall = append(fake.orderersArgsForCall, struct{}{})
+	fake.orderersArgsForCall = append(fake.orderersArgsForCall, struct {
+	}{})
 	fake.recordInvocation("Orderers", []interface{}{})
 	fake.orderersMutex.Unlock()
 	if fake.OrderersStub != nil {
@@ -251,7 +367,8 @@ func (fake *ChannelCfg) Orderers() []string {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.orderersReturns.result1
+	fakeReturns := fake.orderersReturns
+	return fakeReturns.result1
 }
 
 func (fake *ChannelCfg) OrderersCallCount() int {
@@ -260,7 +377,15 @@ func (fake *ChannelCfg) OrderersCallCount() int {
 	return len(fake.orderersArgsForCall)
 }
 
+func (fake *ChannelCfg) OrderersCalls(stub func() []string) {
+	fake.orderersMutex.Lock()
+	defer fake.orderersMutex.Unlock()
+	fake.OrderersStub = stub
+}
+
 func (fake *ChannelCfg) OrderersReturns(result1 []string) {
+	fake.orderersMutex.Lock()
+	defer fake.orderersMutex.Unlock()
 	fake.OrderersStub = nil
 	fake.orderersReturns = struct {
 		result1 []string
@@ -268,6 +393,8 @@ func (fake *ChannelCfg) OrderersReturns(result1 []string) {
 }
 
 func (fake *ChannelCfg) OrderersReturnsOnCall(i int, result1 []string) {
+	fake.orderersMutex.Lock()
+	defer fake.orderersMutex.Unlock()
 	fake.OrderersStub = nil
 	if fake.orderersReturnsOnCall == nil {
 		fake.orderersReturnsOnCall = make(map[int]struct {
@@ -282,7 +409,8 @@ func (fake *ChannelCfg) OrderersReturnsOnCall(i int, result1 []string) {
 func (fake *ChannelCfg) Versions() *fab.Versions {
 	fake.versionsMutex.Lock()
 	ret, specificReturn := fake.versionsReturnsOnCall[len(fake.versionsArgsForCall)]
-	fake.versionsArgsForCall = append(fake.versionsArgsForCall, struct{}{})
+	fake.versionsArgsForCall = append(fake.versionsArgsForCall, struct {
+	}{})
 	fake.recordInvocation("Versions", []interface{}{})
 	fake.versionsMutex.Unlock()
 	if fake.VersionsStub != nil {
@@ -291,7 +419,8 @@ func (fake *ChannelCfg) Versions() *fab.Versions {
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.versionsReturns.result1
+	fakeReturns := fake.versionsReturns
+	return fakeReturns.result1
 }
 
 func (fake *ChannelCfg) VersionsCallCount() int {
@@ -300,7 +429,15 @@ func (fake *ChannelCfg) VersionsCallCount() int {
 	return len(fake.versionsArgsForCall)
 }
 
+func (fake *ChannelCfg) VersionsCalls(stub func() *fab.Versions) {
+	fake.versionsMutex.Lock()
+	defer fake.versionsMutex.Unlock()
+	fake.VersionsStub = stub
+}
+
 func (fake *ChannelCfg) VersionsReturns(result1 *fab.Versions) {
+	fake.versionsMutex.Lock()
+	defer fake.versionsMutex.Unlock()
 	fake.VersionsStub = nil
 	fake.versionsReturns = struct {
 		result1 *fab.Versions
@@ -308,6 +445,8 @@ func (fake *ChannelCfg) VersionsReturns(result1 *fab.Versions) {
 }
 
 func (fake *ChannelCfg) VersionsReturnsOnCall(i int, result1 *fab.Versions) {
+	fake.versionsMutex.Lock()
+	defer fake.versionsMutex.Unlock()
 	fake.VersionsStub = nil
 	if fake.versionsReturnsOnCall == nil {
 		fake.versionsReturnsOnCall = make(map[int]struct {
@@ -319,72 +458,23 @@ func (fake *ChannelCfg) VersionsReturnsOnCall(i int, result1 *fab.Versions) {
 	}{result1}
 }
 
-func (fake *ChannelCfg) HasCapability(group fab.ConfigGroupKey, capability string) bool {
-	fake.hasCapabilityMutex.Lock()
-	ret, specificReturn := fake.hasCapabilityReturnsOnCall[len(fake.hasCapabilityArgsForCall)]
-	fake.hasCapabilityArgsForCall = append(fake.hasCapabilityArgsForCall, struct {
-		group      fab.ConfigGroupKey
-		capability string
-	}{group, capability})
-	fake.recordInvocation("HasCapability", []interface{}{group, capability})
-	fake.hasCapabilityMutex.Unlock()
-	if fake.HasCapabilityStub != nil {
-		return fake.HasCapabilityStub(group, capability)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.hasCapabilityReturns.result1
-}
-
-func (fake *ChannelCfg) HasCapabilityCallCount() int {
-	fake.hasCapabilityMutex.RLock()
-	defer fake.hasCapabilityMutex.RUnlock()
-	return len(fake.hasCapabilityArgsForCall)
-}
-
-func (fake *ChannelCfg) HasCapabilityArgsForCall(i int) (fab.ConfigGroupKey, string) {
-	fake.hasCapabilityMutex.RLock()
-	defer fake.hasCapabilityMutex.RUnlock()
-	return fake.hasCapabilityArgsForCall[i].group, fake.hasCapabilityArgsForCall[i].capability
-}
-
-func (fake *ChannelCfg) HasCapabilityReturns(result1 bool) {
-	fake.HasCapabilityStub = nil
-	fake.hasCapabilityReturns = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *ChannelCfg) HasCapabilityReturnsOnCall(i int, result1 bool) {
-	fake.HasCapabilityStub = nil
-	if fake.hasCapabilityReturnsOnCall == nil {
-		fake.hasCapabilityReturnsOnCall = make(map[int]struct {
-			result1 bool
-		})
-	}
-	fake.hasCapabilityReturnsOnCall[i] = struct {
-		result1 bool
-	}{result1}
-}
-
 func (fake *ChannelCfg) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.iDMutex.RLock()
-	defer fake.iDMutex.RUnlock()
-	fake.blockNumberMutex.RLock()
-	defer fake.blockNumberMutex.RUnlock()
-	fake.mSPsMutex.RLock()
-	defer fake.mSPsMutex.RUnlock()
 	fake.anchorPeersMutex.RLock()
 	defer fake.anchorPeersMutex.RUnlock()
+	fake.blockNumberMutex.RLock()
+	defer fake.blockNumberMutex.RUnlock()
+	fake.hasCapabilityMutex.RLock()
+	defer fake.hasCapabilityMutex.RUnlock()
+	fake.iDMutex.RLock()
+	defer fake.iDMutex.RUnlock()
+	fake.mSPsMutex.RLock()
+	defer fake.mSPsMutex.RUnlock()
 	fake.orderersMutex.RLock()
 	defer fake.orderersMutex.RUnlock()
 	fake.versionsMutex.RLock()
 	defer fake.versionsMutex.RUnlock()
-	fake.hasCapabilityMutex.RLock()
-	defer fake.hasCapabilityMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
