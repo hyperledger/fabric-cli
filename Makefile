@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-PROJECT_VERSION=1.0.0
+PROJECT_VERSION=dev
 
 GO_CMD		?= go
 LINT_CMD	?= gobin -run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.19.1

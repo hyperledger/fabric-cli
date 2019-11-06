@@ -65,7 +65,6 @@ func main() {
 	cmd := NewDefaultFabricCommand(settings, os.Args[1:])
 
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintf(settings.Streams.Err, "%v\n", err)
 		os.Exit(1)
 	}
 
