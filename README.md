@@ -1,9 +1,10 @@
 [//]: # (SPDX-License-Identifier: CC-BY-4.0)
 
-**Note:** This is a **read-only mirror** of the formal [Gerrit](https://gerrit.hyperledger.org/r/#/admin/projects/fabric-cli) repository,
-where active development is ongoing. Issue tracking is handled in [Jira](https://jira.hyperledger.org/secure/Dashboard.jspa?selectPageId=10104)
+**Note:** Issue tracking is handled in [Jira](https://jira.hyperledger.org/secure/Dashboard.jspa).
+If you find any issues or you want to add new features, please work with Jira.
 
-This repo is going to be used to implement [FAB-10734 Fabric CLI Redesign](https://jira.hyperledger.org/browse/FAB-10734). This is NOT the "official" Fabric CLI and there is not yet any commitment that it is going to be.
+This repo is going to be used to implement [FAB-10734 Fabric CLI Redesign](https://jira.hyperledger.org/browse/FAB-10734).
+This is NOT the "official" Fabric CLI and there is not yet any commitment that it is going to be.
 
 # Hyperledger Fabric CLI
 
@@ -49,9 +50,39 @@ The YAML must specify:
 
 Example plugins can be found in [pkg/plugin/testdata/plugins](pkg/plugin/testdata/plugins).
 
+For example,if you want to integrate `cryptogen` into `fabric` cmd:
+
+1. Prepare the `plugin.yaml`:
+   ```yaml
+    name: cryptogen
+    usage: cryptogen [<flags>] <command> [<args> ...]
+    description: Utility for generating Hyperledger Fabric key material
+    command: cryptogen
+    ```
+2. Exec the command: 
+    ```shell script
+    #PATH is the location of `plugin.yaml`.
+    $fabric plugin install $PATH
+    ```
+3. To enjoy the command:
+    ```
+   $fabric cryptogen ...
+   ```
+You can integrate some **Go Plugins** or **External Command** into **fabric** cmd, 
+
 ## Documentation
 * [Design Document](https://docs.google.com/document/d/1zIQrS4TRgQEx1z9-wwtO8tYOGRyWdUoTdfk49GFx1wY/edit?usp=sharing)
 * [User Stories](https://docs.google.com/document/d/1dxOeM85PgrMNQUJMxB2kwhDthyWnzDxdPvjlwk7x4-w/edit?usp=sharing)
+
+## Contributing
+1. Fork this repo.
+2. Clone the forked repo to your local enviroment (git clone https://github.com/you_username/fabric-cli.git && cd fabric-cli).
+3. Create your feature branch (git checkout -b feature-branch).
+4. Make changes and use `make test` to finish the test.
+5. If test passed, add them (git add .).
+6. Commit your changes (git commit -s).
+7. Push to the github (git push origin feature-branch).
+8. Create new pull request.
 
 ## License <a name="license"></a>
 
