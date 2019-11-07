@@ -24,7 +24,7 @@ func NewNetworkSetCommand(settings *environment.Settings) *cobra.Command {
 	c.Settings = settings
 
 	cmd := &cobra.Command{
-		Use:   "set <network-name>",
+		Use:   "set <network-name> <config-file-path>",
 		Short: "set a network",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
@@ -36,9 +36,7 @@ func NewNetworkSetCommand(settings *environment.Settings) *cobra.Command {
 	}
 
 	c.AddArg(&c.Name)
-
-	flags := cmd.Flags()
-	flags.StringVar(&c.Network.ConfigPath, "path", "", "set the path to the network configurations")
+	c.AddArg(&c.Network.ConfigPath)
 
 	cmd.SetOutput(c.Settings.Streams.Out)
 
