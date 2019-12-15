@@ -77,7 +77,7 @@ type ResourceManagement interface {
 	InstantiateCC(channelID string, req resmgmt.InstantiateCCRequest, options ...resmgmt.RequestOption) (resmgmt.InstantiateCCResponse, error)
 	JoinChannel(channelID string, options ...resmgmt.RequestOption) error
 	QueryChannels(options ...resmgmt.RequestOption) (*pb.ChannelQueryResponse, error)
-	QueryCollectionsConfig(channelID string, chaincodeName string, options ...resmgmt.RequestOption) (*common.CollectionConfigPackage, error)
+	QueryCollectionsConfig(channelID string, chaincodeName string, options ...resmgmt.RequestOption) (*pb.CollectionConfigPackage, error)
 	QueryConfigFromOrderer(channelID string, options ...resmgmt.RequestOption) (fab.ChannelCfg, error)
 	QueryInstalledChaincodes(options ...resmgmt.RequestOption) (*pb.ChaincodeQueryResponse, error)
 	QueryInstantiatedChaincodes(channelID string, options ...resmgmt.RequestOption) (*pb.ChaincodeQueryResponse, error)
