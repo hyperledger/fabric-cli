@@ -10,8 +10,8 @@ require (
 	github.com/cloudflare/cfssl v0.0.0-20190510060611-9c027c93ba9e // indirect
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
-	github.com/hyperledger/fabric-protos-go v0.0.0-20190821180310-6b6ac9042dfd
-	github.com/hyperledger/fabric-sdk-go v1.0.0-beta1
+	github.com/hyperledger/fabric-protos-go v0.0.0-20191121202242-f5500d5e3e85
+	github.com/hyperledger/fabric-sdk-go v1.0.0-beta1.0.20191214123208-6f74e787d798
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.1
 	github.com/onsi/ginkgo v1.8.0

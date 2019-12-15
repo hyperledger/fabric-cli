@@ -96,7 +96,7 @@ type ResourceManagement struct {
 		result1 *peer.ChannelQueryResponse
 		result2 error
 	}
-	QueryCollectionsConfigStub        func(string, string, ...resmgmt.RequestOption) (*common.CollectionConfigPackage, error)
+	QueryCollectionsConfigStub        func(string, string, ...resmgmt.RequestOption) (*peer.CollectionConfigPackage, error)
 	queryCollectionsConfigMutex       sync.RWMutex
 	queryCollectionsConfigArgsForCall []struct {
 		arg1 string
@@ -104,11 +104,11 @@ type ResourceManagement struct {
 		arg3 []resmgmt.RequestOption
 	}
 	queryCollectionsConfigReturns struct {
-		result1 *common.CollectionConfigPackage
+		result1 *peer.CollectionConfigPackage
 		result2 error
 	}
 	queryCollectionsConfigReturnsOnCall map[int]struct {
-		result1 *common.CollectionConfigPackage
+		result1 *peer.CollectionConfigPackage
 		result2 error
 	}
 	QueryConfigFromOrdererStub        func(string, ...resmgmt.RequestOption) (fab.ChannelCfg, error)
@@ -566,7 +566,7 @@ func (fake *ResourceManagement) QueryChannelsReturnsOnCall(i int, result1 *peer.
 	}{result1, result2}
 }
 
-func (fake *ResourceManagement) QueryCollectionsConfig(arg1 string, arg2 string, arg3 ...resmgmt.RequestOption) (*common.CollectionConfigPackage, error) {
+func (fake *ResourceManagement) QueryCollectionsConfig(arg1 string, arg2 string, arg3 ...resmgmt.RequestOption) (*peer.CollectionConfigPackage, error) {
 	fake.queryCollectionsConfigMutex.Lock()
 	ret, specificReturn := fake.queryCollectionsConfigReturnsOnCall[len(fake.queryCollectionsConfigArgsForCall)]
 	fake.queryCollectionsConfigArgsForCall = append(fake.queryCollectionsConfigArgsForCall, struct {
@@ -592,7 +592,7 @@ func (fake *ResourceManagement) QueryCollectionsConfigCallCount() int {
 	return len(fake.queryCollectionsConfigArgsForCall)
 }
 
-func (fake *ResourceManagement) QueryCollectionsConfigCalls(stub func(string, string, ...resmgmt.RequestOption) (*common.CollectionConfigPackage, error)) {
+func (fake *ResourceManagement) QueryCollectionsConfigCalls(stub func(string, string, ...resmgmt.RequestOption) (*peer.CollectionConfigPackage, error)) {
 	fake.queryCollectionsConfigMutex.Lock()
 	defer fake.queryCollectionsConfigMutex.Unlock()
 	fake.QueryCollectionsConfigStub = stub
@@ -605,28 +605,28 @@ func (fake *ResourceManagement) QueryCollectionsConfigArgsForCall(i int) (string
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *ResourceManagement) QueryCollectionsConfigReturns(result1 *common.CollectionConfigPackage, result2 error) {
+func (fake *ResourceManagement) QueryCollectionsConfigReturns(result1 *peer.CollectionConfigPackage, result2 error) {
 	fake.queryCollectionsConfigMutex.Lock()
 	defer fake.queryCollectionsConfigMutex.Unlock()
 	fake.QueryCollectionsConfigStub = nil
 	fake.queryCollectionsConfigReturns = struct {
-		result1 *common.CollectionConfigPackage
+		result1 *peer.CollectionConfigPackage
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *ResourceManagement) QueryCollectionsConfigReturnsOnCall(i int, result1 *common.CollectionConfigPackage, result2 error) {
+func (fake *ResourceManagement) QueryCollectionsConfigReturnsOnCall(i int, result1 *peer.CollectionConfigPackage, result2 error) {
 	fake.queryCollectionsConfigMutex.Lock()
 	defer fake.queryCollectionsConfigMutex.Unlock()
 	fake.QueryCollectionsConfigStub = nil
 	if fake.queryCollectionsConfigReturnsOnCall == nil {
 		fake.queryCollectionsConfigReturnsOnCall = make(map[int]struct {
-			result1 *common.CollectionConfigPackage
+			result1 *peer.CollectionConfigPackage
 			result2 error
 		})
 	}
 	fake.queryCollectionsConfigReturnsOnCall[i] = struct {
-		result1 *common.CollectionConfigPackage
+		result1 *peer.CollectionConfigPackage
 		result2 error
 	}{result1, result2}
 }
