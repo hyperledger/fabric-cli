@@ -11,10 +11,11 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 )
 
 // NewChaincodeQueryCommand creates a new "fabric chaincode query" command
@@ -86,7 +87,7 @@ func (c *QueryCommand) Run() error {
 		Args:        [][]byte{args},
 	}
 
-	resp, err := c.Channel.Query(req)
+	resp, err := c.Channel.Query(req, channel.WithRetry(retry.DefaultChannelOpts))
 	if err != nil {
 		return err
 	}

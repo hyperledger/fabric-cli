@@ -11,10 +11,11 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 )
 
 // NewChaincodeInvokeCommand creates a new "fabric chaincode invoke" command
@@ -86,7 +87,7 @@ func (c *InvokeCommand) Run() error {
 		Args:        [][]byte{args},
 	}
 
-	resp, err := c.Channel.Execute(req)
+	resp, err := c.Channel.Execute(req, channel.WithRetry(retry.DefaultChannelOpts))
 	if err != nil {
 		return err
 	}
