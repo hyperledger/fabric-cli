@@ -56,6 +56,7 @@ var _ = Describe("LifecycleChaincodeCommand", func() {
 			Expect(cmd.Execute()).Should(Succeed())
 			Expect(fmt.Sprint(out)).To(ContainSubstring("lifecycle [command]"))
 			Expect(fmt.Sprint(out)).To(ContainSubstring("package"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("install"))
 		})
 	})
 })
