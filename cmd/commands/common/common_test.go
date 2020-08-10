@@ -1,4 +1,4 @@
-package chaincode
+package common
 
 import (
 	"testing"
@@ -28,25 +28,25 @@ const sampleCollectionsConfigBad = `[
 ]`
 
 func TestGetCollectionsConfigFromBytes(t *testing.T) {
-	config, err := getCollectionsConfigFromBytes([]byte(sampleCollectionsConfigGood))
+	config, err := GetCollectionsConfigFromBytes([]byte(sampleCollectionsConfigGood))
 	assert.Nil(t, err)
 	assert.NotNil(t, config)
 }
 
 func TestGetCollectionsConfigFromBytesError(t *testing.T) {
-	config, err := getCollectionsConfigFromBytes([]byte(sampleCollectionsConfigBad))
+	config, err := GetCollectionsConfigFromBytes([]byte(sampleCollectionsConfigBad))
 	assert.NotNil(t, err)
 	assert.Nil(t, config)
 }
 
 func TestGetChaincodePolicy(t *testing.T) {
-	policy, err := getChaincodePolicy("OR('MSP.member', 'MSP.WITH.DOTS.member', 'MSP-WITH-DASHES.member')")
+	policy, err := GetChaincodePolicy("OR('MSP.member', 'MSP.WITH.DOTS.member', 'MSP-WITH-DASHES.member')")
 	assert.Nil(t, err)
 	assert.NotNil(t, policy)
 }
 
 func TestGetChaincodePolicyError(t *testing.T) {
-	policy, err := getChaincodePolicy("NOT A VALID POLICY)")
+	policy, err := GetChaincodePolicy("NOT A VALID POLICY)")
 	assert.NotNil(t, err)
 	assert.Nil(t, policy)
 }
