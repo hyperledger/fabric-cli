@@ -1,4 +1,4 @@
-package chaincode
+package common
 
 import (
 	"encoding/json"
@@ -11,7 +11,8 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/common/policydsl"
 )
 
-type collectionConfigJSON struct {
+// CollectionConfigJSON contains the parameters for a collection configuration
+type CollectionConfigJSON struct {
 	Name            string `json:"name"`
 	Policy          string `json:"policy"`
 	RequiredCount   int32  `json:"requiredPeerCount"`
@@ -21,7 +22,8 @@ type collectionConfigJSON struct {
 	MemberOnlyWrite bool   `json:"memberOnlyWrite"`
 }
 
-func getCollectionConfigFromFile(path string) ([]*pb.CollectionConfig, error) {
+// GetCollectionConfigFromFile returns the collection config from the given file
+func GetCollectionConfigFromFile(path string) ([]*pb.CollectionConfig, error) {
 	if len(path) == 0 {
 		return nil, nil
 	}
@@ -31,11 +33,12 @@ func getCollectionConfigFromFile(path string) ([]*pb.CollectionConfig, error) {
 		return nil, errors.New("error reading collections config file")
 	}
 
-	return getCollectionsConfigFromBytes(bytes)
+	return GetCollectionsConfigFromBytes(bytes)
 }
 
-func getCollectionsConfigFromBytes(bytes []byte) ([]*pb.CollectionConfig, error) {
-	var cconf []collectionConfigJSON
+// GetCollectionsConfigFromBytes returns the collection config from the given byte array
+func GetCollectionsConfigFromBytes(bytes []byte) ([]*pb.CollectionConfig, error) {
+	var cconf []CollectionConfigJSON
 	if err := json.Unmarshal(bytes, &cconf); err != nil {
 		return nil, errors.New("error unmarshalling collections config")
 	}
@@ -66,7 +69,8 @@ func getCollectionsConfigFromBytes(bytes []byte) ([]*pb.CollectionConfig, error)
 	return ccarray, nil
 }
 
-func getChaincodePolicy(policyString string) (*common.SignaturePolicyEnvelope, error) {
+// GetChaincodePolicy returns the signature policy from the given policy string
+func GetChaincodePolicy(policyString string) (*common.SignaturePolicyEnvelope, error) {
 	if len(policyString) == 0 {
 		return policydsl.AcceptAllPolicy, nil
 	}

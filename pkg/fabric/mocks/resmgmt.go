@@ -195,6 +195,21 @@ type ResourceManagement struct {
 		result1 []resmgmt.LifecycleInstallCCResponse
 		result2 error
 	}
+	LifecycleApproveCCStub        func(channelID string, req resmgmt.LifecycleApproveCCRequest, options ...resmgmt.RequestOption) (fab.TransactionID, error)
+	lifecycleApproveCCMutex       sync.RWMutex
+	lifecycleApproveCCArgsForCall []struct {
+		channelID string
+		req       resmgmt.LifecycleApproveCCRequest
+		options   []resmgmt.RequestOption
+	}
+	lifecycleApproveCCReturns struct {
+		result1 fab.TransactionID
+		result2 error
+	}
+	lifecycleApproveCCReturnsOnCall map[int]struct {
+		result1 fab.TransactionID
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -873,6 +888,59 @@ func (fake *ResourceManagement) LifecycleInstallCCReturnsOnCall(i int, result1 [
 	}{result1, result2}
 }
 
+func (fake *ResourceManagement) LifecycleApproveCC(channelID string, req resmgmt.LifecycleApproveCCRequest, options ...resmgmt.RequestOption) (fab.TransactionID, error) {
+	fake.lifecycleApproveCCMutex.Lock()
+	ret, specificReturn := fake.lifecycleApproveCCReturnsOnCall[len(fake.lifecycleApproveCCArgsForCall)]
+	fake.lifecycleApproveCCArgsForCall = append(fake.lifecycleApproveCCArgsForCall, struct {
+		channelID string
+		req       resmgmt.LifecycleApproveCCRequest
+		options   []resmgmt.RequestOption
+	}{channelID, req, options})
+	fake.recordInvocation("LifecycleApproveCC", []interface{}{channelID, req, options})
+	fake.lifecycleApproveCCMutex.Unlock()
+	if fake.LifecycleApproveCCStub != nil {
+		return fake.LifecycleApproveCCStub(channelID, req, options...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.lifecycleApproveCCReturns.result1, fake.lifecycleApproveCCReturns.result2
+}
+
+func (fake *ResourceManagement) LifecycleApproveCCCallCount() int {
+	fake.lifecycleApproveCCMutex.RLock()
+	defer fake.lifecycleApproveCCMutex.RUnlock()
+	return len(fake.lifecycleApproveCCArgsForCall)
+}
+
+func (fake *ResourceManagement) LifecycleApproveCCArgsForCall(i int) (string, resmgmt.LifecycleApproveCCRequest, []resmgmt.RequestOption) {
+	fake.lifecycleApproveCCMutex.RLock()
+	defer fake.lifecycleApproveCCMutex.RUnlock()
+	return fake.lifecycleApproveCCArgsForCall[i].channelID, fake.lifecycleApproveCCArgsForCall[i].req, fake.lifecycleApproveCCArgsForCall[i].options
+}
+
+func (fake *ResourceManagement) LifecycleApproveCCReturns(result1 fab.TransactionID, result2 error) {
+	fake.LifecycleApproveCCStub = nil
+	fake.lifecycleApproveCCReturns = struct {
+		result1 fab.TransactionID
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ResourceManagement) LifecycleApproveCCReturnsOnCall(i int, result1 fab.TransactionID, result2 error) {
+	fake.LifecycleApproveCCStub = nil
+	if fake.lifecycleApproveCCReturnsOnCall == nil {
+		fake.lifecycleApproveCCReturnsOnCall = make(map[int]struct {
+			result1 fab.TransactionID
+			result2 error
+		})
+	}
+	fake.lifecycleApproveCCReturnsOnCall[i] = struct {
+		result1 fab.TransactionID
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *ResourceManagement) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -902,6 +970,8 @@ func (fake *ResourceManagement) Invocations() map[string][][]interface{} {
 	defer fake.upgradeCCMutex.RUnlock()
 	fake.lifecycleInstallCCMutex.RLock()
 	defer fake.lifecycleInstallCCMutex.RUnlock()
+	fake.lifecycleApproveCCMutex.RLock()
+	defer fake.lifecycleApproveCCMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
