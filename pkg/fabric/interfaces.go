@@ -85,6 +85,7 @@ type ResourceManagement interface {
 	UpgradeCC(channelID string, req resmgmt.UpgradeCCRequest, options ...resmgmt.RequestOption) (resmgmt.UpgradeCCResponse, error)
 	LifecycleInstallCC(req resmgmt.LifecycleInstallCCRequest, options ...resmgmt.RequestOption) ([]resmgmt.LifecycleInstallCCResponse, error)
 	LifecycleApproveCC(channelID string, req resmgmt.LifecycleApproveCCRequest, options ...resmgmt.RequestOption) (fab.TransactionID, error)
+	LifecycleCommitCC(channelID string, req resmgmt.LifecycleCommitCCRequest, options ...resmgmt.RequestOption) (fab.TransactionID, error)
 }
 
 // MSP defines the methods implemented by SDK msp client
