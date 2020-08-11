@@ -25,6 +25,7 @@ func NewCommand(settings *environment.Settings) *cobra.Command {
 		NewPackageCommand(settings),
 		NewInstallCommand(settings),
 		NewApproveCommand(settings),
+		NewCommitCommand(settings),
 	)
 
 	cmd.SetOutput(settings.Streams.Out)

@@ -210,6 +210,21 @@ type ResourceManagement struct {
 		result1 fab.TransactionID
 		result2 error
 	}
+	LifecycleCommitCCStub        func(channelID string, req resmgmt.LifecycleCommitCCRequest, options ...resmgmt.RequestOption) (fab.TransactionID, error)
+	lifecycleCommitCCMutex       sync.RWMutex
+	lifecycleCommitCCArgsForCall []struct {
+		channelID string
+		req       resmgmt.LifecycleCommitCCRequest
+		options   []resmgmt.RequestOption
+	}
+	lifecycleCommitCCReturns struct {
+		result1 fab.TransactionID
+		result2 error
+	}
+	lifecycleCommitCCReturnsOnCall map[int]struct {
+		result1 fab.TransactionID
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -941,6 +956,59 @@ func (fake *ResourceManagement) LifecycleApproveCCReturnsOnCall(i int, result1 f
 	}{result1, result2}
 }
 
+func (fake *ResourceManagement) LifecycleCommitCC(channelID string, req resmgmt.LifecycleCommitCCRequest, options ...resmgmt.RequestOption) (fab.TransactionID, error) {
+	fake.lifecycleCommitCCMutex.Lock()
+	ret, specificReturn := fake.lifecycleCommitCCReturnsOnCall[len(fake.lifecycleCommitCCArgsForCall)]
+	fake.lifecycleCommitCCArgsForCall = append(fake.lifecycleCommitCCArgsForCall, struct {
+		channelID string
+		req       resmgmt.LifecycleCommitCCRequest
+		options   []resmgmt.RequestOption
+	}{channelID, req, options})
+	fake.recordInvocation("LifecycleCommitCC", []interface{}{channelID, req, options})
+	fake.lifecycleCommitCCMutex.Unlock()
+	if fake.LifecycleCommitCCStub != nil {
+		return fake.LifecycleCommitCCStub(channelID, req, options...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.lifecycleCommitCCReturns.result1, fake.lifecycleCommitCCReturns.result2
+}
+
+func (fake *ResourceManagement) LifecycleCommitCCCallCount() int {
+	fake.lifecycleCommitCCMutex.RLock()
+	defer fake.lifecycleCommitCCMutex.RUnlock()
+	return len(fake.lifecycleCommitCCArgsForCall)
+}
+
+func (fake *ResourceManagement) LifecycleCommitCCArgsForCall(i int) (string, resmgmt.LifecycleCommitCCRequest, []resmgmt.RequestOption) {
+	fake.lifecycleCommitCCMutex.RLock()
+	defer fake.lifecycleCommitCCMutex.RUnlock()
+	return fake.lifecycleCommitCCArgsForCall[i].channelID, fake.lifecycleCommitCCArgsForCall[i].req, fake.lifecycleCommitCCArgsForCall[i].options
+}
+
+func (fake *ResourceManagement) LifecycleCommitCCReturns(result1 fab.TransactionID, result2 error) {
+	fake.LifecycleCommitCCStub = nil
+	fake.lifecycleCommitCCReturns = struct {
+		result1 fab.TransactionID
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ResourceManagement) LifecycleCommitCCReturnsOnCall(i int, result1 fab.TransactionID, result2 error) {
+	fake.LifecycleCommitCCStub = nil
+	if fake.lifecycleCommitCCReturnsOnCall == nil {
+		fake.lifecycleCommitCCReturnsOnCall = make(map[int]struct {
+			result1 fab.TransactionID
+			result2 error
+		})
+	}
+	fake.lifecycleCommitCCReturnsOnCall[i] = struct {
+		result1 fab.TransactionID
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *ResourceManagement) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -972,6 +1040,8 @@ func (fake *ResourceManagement) Invocations() map[string][][]interface{} {
 	defer fake.lifecycleInstallCCMutex.RUnlock()
 	fake.lifecycleApproveCCMutex.RLock()
 	defer fake.lifecycleApproveCCMutex.RUnlock()
+	fake.lifecycleCommitCCMutex.RLock()
+	defer fake.lifecycleCommitCCMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

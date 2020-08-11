@@ -19,15 +19,15 @@ import (
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
-// NewApproveCommand creates a new "fabric lifecycle approve" command
-func NewApproveCommand(settings *environment.Settings) *cobra.Command {
-	c := ApproveCommand{}
+// NewCommitCommand creates a new "fabric lifecycle commit" command
+func NewCommitCommand(settings *environment.Settings) *cobra.Command {
+	c := CommitCommand{}
 
 	c.Settings = settings
 
 	cmd := &cobra.Command{
-		Use:   "approve <chaincode-name> <version> <package-id> <sequence>",
-		Short: "approve a chaincode for an org",
+		Use:   "commit <chaincode-name> <version> <sequence>",
+		Short: "commit a chaincode",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {
@@ -47,7 +47,6 @@ func NewApproveCommand(settings *environment.Settings) *cobra.Command {
 
 	c.AddArg(&c.Name)
 	c.AddArg(&c.Version)
-	c.AddArg(&c.PackageID)
 	c.AddArg(&c.Sequence)
 
 	flags := cmd.Flags()
@@ -57,40 +56,37 @@ func NewApproveCommand(settings *environment.Settings) *cobra.Command {
 	flags.BoolVar(&c.InitRequired, "init-required", false, "indicates whether the chaincode requires 'Init' to be invoked")
 	flags.StringVar(&c.EndorsementPlugin, "endorsement-plugin", "", "sets the endorsement plugin")
 	flags.StringVar(&c.ValidationPlugin, "validation-plugin", "", "sets the validation plugin")
+	flags.StringArrayVar(&c.Peers, "peer", []string{}, "sets a peer to which to send the commit (this option may be specified multiple times)")
 
 	cmd.SetOutput(c.Settings.Streams.Out)
 
 	return cmd
 }
 
-// ApproveCommand implements the lifecycle approve command
-type ApproveCommand struct {
+// CommitCommand implements the lifecycle commit command
+type CommitCommand struct {
 	BaseCommand
 
 	Name                string
 	Version             string
-	PackageID           string
+	Sequence            string
 	SignaturePolicy     string
 	ChannelConfigPolicy string
 	CollectionsConfig   string
-	Sequence            string
 	InitRequired        bool
 	EndorsementPlugin   string
 	ValidationPlugin    string
+	Peers               []string
 }
 
 // Validate checks the required parameters for run
-func (c *ApproveCommand) Validate() error {
+func (c *CommitCommand) Validate() error {
 	if c.Name == "" {
 		return errors.New("chaincode name not specified")
 	}
 
 	if c.Version == "" {
 		return errors.New("chaincode version not specified")
-	}
-
-	if c.PackageID == "" {
-		return errors.New("chaincode package ID not specified")
 	}
 
 	if c.Sequence == "" {
@@ -106,11 +102,15 @@ func (c *ApproveCommand) Validate() error {
 		return errors.New("sequence must be greater than 0")
 	}
 
+	if len(c.Peers) == 0 {
+		return errors.New("at least one peer must be specified")
+	}
+
 	return nil
 }
 
 // Run executes the command
-func (c *ApproveCommand) Run() error {
+func (c *CommitCommand) Run() error {
 	context, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
@@ -131,10 +131,9 @@ func (c *ApproveCommand) Run() error {
 		return errors.WithMessage(err, "invalid sequence")
 	}
 
-	req := resmgmt.LifecycleApproveCCRequest{
+	req := resmgmt.LifecycleCommitCCRequest{
 		Name:                c.Name,
 		Version:             c.Version,
-		PackageID:           c.PackageID,
 		Sequence:            sequence,
 		SignaturePolicy:     signaturePolicy,
 		ChannelConfigPolicy: c.ChannelConfigPolicy,
@@ -144,16 +143,21 @@ func (c *ApproveCommand) Run() error {
 		ValidationPlugin:    c.ValidationPlugin,
 	}
 
+	peers := c.Peers
+	if len(peers) == 0 {
+		peers = context.Peers
+	}
+
 	options := []resmgmt.RequestOption{
-		resmgmt.WithTargetEndpoints(context.Peers...),
+		resmgmt.WithTargetEndpoints(peers...),
 		resmgmt.WithRetry(retry.DefaultResMgmtOpts),
 	}
 
-	if _, err := c.ResourceManagement.LifecycleApproveCC(context.Channel, req, options...); err != nil {
+	if _, err := c.ResourceManagement.LifecycleCommitCC(context.Channel, req, options...); err != nil {
 		return err
 	}
 
-	fmt.Fprintf(c.Settings.Streams.Out, "successfully approved chaincode '%s'\n", c.Name)
+	fmt.Fprintf(c.Settings.Streams.Out, "successfully committed chaincode '%s'\n", c.Name)
 
 	return nil
 }
