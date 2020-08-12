@@ -179,12 +179,36 @@ var _ = Describe("LifecycleChaincodeInstallImplementation", func() {
 					CurrentContext: "foo",
 				}
 
-				client.InstallCCReturns([]resmgmt.InstallCCResponse{}, nil)
+				client.LifecycleInstallCCReturns([]resmgmt.LifecycleInstallCCResponse{
+					{
+						Target:    "peer1",
+						Status:    200,
+						PackageID: "pkg1",
+					},
+				}, nil)
 			})
 
 			It("should succeed with chaincode install", func() {
 				Expect(err).To(BeNil())
 				Expect(fmt.Sprint(out)).To(Equal("successfully installed chaincode 'mycc'. Package ID 'pkg1'\n"))
+			})
+		})
+
+		Context("when no responses from client", func() {
+			BeforeEach(func() {
+				settings.Config = &environment.Config{
+					Contexts: map[string]*environment.Context{
+						"foo": {},
+					},
+					CurrentContext: "foo",
+				}
+
+				client.LifecycleInstallCCReturns(nil, nil)
+			})
+
+			It("should succeed with chaincode install", func() {
+				Expect(err).To(BeNil())
+				Expect(fmt.Sprint(out)).To(ContainSubstring("chaincode 'mycc' has already been installed on all peers"))
 			})
 		})
 
