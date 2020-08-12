@@ -13,6 +13,7 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
+	"github.com/hyperledger/fabric-sdk-go/pkg/fab/ccpackager/lifecycle"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -97,7 +98,12 @@ func (c *InstallCommand) Run() error {
 		return err
 	}
 
-	fmt.Fprintf(c.Settings.Streams.Out, "successfully installed chaincode '%s'. Package ID '%s'\n", c.Label, responses[0].PackageID)
+	if len(responses) == 0 {
+		packageID := lifecycle.ComputePackageID(c.Label, pkg)
+		fmt.Fprintf(c.Settings.Streams.Out, "chaincode '%s' has already been installed on all peers. Package ID '%s'\n", c.Label, packageID)
+	} else {
+		fmt.Fprintf(c.Settings.Streams.Out, "successfully installed chaincode '%s'. Package ID '%s'\n", c.Label, responses[0].PackageID)
+	}
 
 	return nil
 }
