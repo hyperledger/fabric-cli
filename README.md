@@ -13,11 +13,10 @@ The Hyperledger Fabric CLI is a tool used to interact with [Fabric networks](htt
 ## Installation
 
 1. Clone this repo
-2. Install `gobin` using `GO111MODULE=off go get -u github.com/myitcv/gobin`
-3. Run `make`
-4. Locate the binary in the `bin` directory
-5. Add the binary to your PATH
-6. Execute `fabric` for more information
+2. Run `make`
+3. Locate the binary in the `bin` directory
+4. Add the binary to your PATH
+5. Execute `fabric` for more information
 
 ## Getting Started
 
@@ -75,14 +74,16 @@ You can integrate some **Go Plugins** or **External Command** into **fabric** cm
 * [User Stories](https://docs.google.com/document/d/1dxOeM85PgrMNQUJMxB2kwhDthyWnzDxdPvjlwk7x4-w/edit?usp=sharing)
 
 ## Contributing
-1. Fork this repo.
+1. Fork this repo on github.
 2. Clone the forked repo to your local enviroment (git clone https://github.com/you_username/fabric-cli.git && cd fabric-cli).
 3. Create your feature branch (git checkout -b feature-branch).
-4. Make changes and use `make test` to finish the test.
-5. If test passed, add them (git add .).
-6. Commit your changes (git commit -s).
-7. Push to the github (git push origin feature-branch).
-8. Create new pull request.
+4. Install `gobin` using `GO111MODULE=off go get -u github.com/myitcv/gobin`
+5. Make changes and use `make test` to finish the test.
+6. If test passed, add them (git add .).
+7. Use `make lint` to verify your code.
+8. If correct, commit your changes (git commit -s).
+9. Push to github (git push origin feature-branch).
+10. Create new Pull Request.
 
 ## License <a name="license"></a>
 
