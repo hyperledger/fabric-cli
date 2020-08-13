@@ -7,7 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package chaincode
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/spf13/cobra"
 
+	"github.com/hyperledger/fabric-cli/cmd/commands/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
@@ -76,15 +76,10 @@ func (c *InvokeCommand) Validate() error {
 
 // Run executes the command
 func (c *InvokeCommand) Run() error {
-	args, err := json.Marshal(c.ChaincodeArgs)
-	if err != nil {
-		return err
-	}
-
 	req := channel.Request{
 		ChaincodeID: c.ChaincodeName,
 		Fcn:         c.ChaincodeFcn,
-		Args:        [][]byte{args},
+		Args:        common.AsByteArgs(c.ChaincodeArgs),
 	}
 
 	resp, err := c.Channel.Execute(req, channel.WithRetry(retry.DefaultChannelOpts))

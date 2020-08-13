@@ -81,3 +81,14 @@ func GetChaincodePolicy(policyString string) (*common.SignaturePolicyEnvelope, e
 	}
 	return policy, nil
 }
+
+// AsByteArgs converts the given string array into an array of byte arrays so that they
+// may be passed as chaincode arguments.
+func AsByteArgs(strArgs []string) [][]byte {
+	args := make([][]byte, len(strArgs))
+	for i, arg := range strArgs {
+		args[i] = []byte(arg)
+	}
+
+	return args
+}

@@ -50,3 +50,10 @@ func TestGetChaincodePolicyError(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Nil(t, policy)
 }
+
+func TestAsByteArgs(t *testing.T) {
+	args := AsByteArgs([]string{"arg1", "arg2"})
+	assert.Len(t, args, 2)
+	assert.Equal(t, "arg1", string(args[0]))
+	assert.Equal(t, "arg2", string(args[1]))
+}
