@@ -23,7 +23,8 @@ func NewContextUseCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "use <context-name>",
-		Short: "change current context",
+		Short: "Change current context",
+		Long:  "Change current context to context-name",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return c.Validate()

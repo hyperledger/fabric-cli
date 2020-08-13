@@ -24,7 +24,8 @@ func NewContextListCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "list all contexts",
+		Short: "List all contexts",
+		Long:  "List all contexts in config.yaml",
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return c.Run()
 		},
@@ -43,7 +44,7 @@ type ListCommand struct {
 // Run executes the command
 func (c *ListCommand) Run() error {
 	if len(c.Settings.Config.Contexts) == 0 {
-		return errors.New("no contexts currently exist")
+		return errors.New("No context currently exists")
 	}
 
 	var names []string

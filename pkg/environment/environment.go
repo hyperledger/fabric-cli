@@ -24,8 +24,8 @@ type Settings struct {
 
 // AddFlags appeneds settings flags onto an existing flag set
 func (s *Settings) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar((*string)(&s.Home), "home", DefaultHome.String(), "set path to configuration files")
-	fs.BoolVar(&s.DisablePlugins, "disable-plugins", false, "disable plugins")
+	fs.StringVar((*string)(&s.Home), "home", DefaultHome.String(), "Set path to configuration files")
+	fs.BoolVar(&s.DisablePlugins, "disable-plugins", false, "Disable plugins")
 }
 
 // Init populates the settings based on a precedence:

@@ -19,6 +19,7 @@ func NewChaincodeCommand(settings *environment.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "chaincode",
 		Short: "Manage chaincode",
+		Long:  "Manage chaincode with events|install|instantiate|invoke|list|package|query|upgrade",
 	}
 
 	cmd.AddCommand(

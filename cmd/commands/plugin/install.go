@@ -26,6 +26,7 @@ func NewPluginInstallCommand(settings *environment.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "install <plugin-path>",
 		Short: "Install a plugin from the local filesystem",
+		Long:  "Install a Go Plugin or custom cmd from the local filesystem",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {

@@ -25,7 +25,8 @@ func NewChannelCreateCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create <channel-id> <tx-path>",
-		Short: "create a new channel",
+		Short: "Create a new channel",
+		Long:  "Create a new channel using the specified channel tx",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, args []string) error {
 			if err := c.Complete(); err != nil {

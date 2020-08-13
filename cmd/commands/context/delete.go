@@ -23,7 +23,8 @@ func NewContextDeleteCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "delete <context-name>",
-		Short: "delete a context",
+		Short: "Delete a context",
+		Long:  "Delete a context in config.yaml",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return c.Validate()

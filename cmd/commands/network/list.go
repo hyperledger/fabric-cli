@@ -24,7 +24,8 @@ func NewNetworkListCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "list all networks",
+		Short: "List all networks",
+		Long:  "List all networks in config.yaml",
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return c.Run()
 		},

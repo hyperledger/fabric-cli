@@ -24,7 +24,8 @@ func NewChannelJoinCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "join <channel-id>",
-		Short: "join a channel",
+		Short: "Join a channel",
+		Long:  "Join Peers to a created channel which is in current context",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {

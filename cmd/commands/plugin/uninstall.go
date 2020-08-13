@@ -26,6 +26,7 @@ func NewPluginUninstallCommand(settings *environment.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "uninstall <plugin-name>",
 		Short: "Uninstall a plugin",
+		Long:  "Uninstall remove a plugin in home/plugin dir",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {

@@ -24,7 +24,8 @@ func NewPluginListCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "list all installed plugins",
+		Short: "List all installed plugins",
+		Long:  "List all installed plugins in the home/plugins dir",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return c.Complete()
 		},

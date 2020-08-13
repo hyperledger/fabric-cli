@@ -26,7 +26,8 @@ func NewChaincodeInvokeCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "invoke <chaincode-name>",
-		Short: "invoke a chaincode",
+		Short: "Invoke a chaincode",
+		Long:  "Invoke a chaincode with chaincode-name args function",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {

@@ -27,7 +27,8 @@ func NewChaincodeUpgradeCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "upgrade <chaincode-name> <version> <path>",
-		Short: "upgrade a chaincode",
+		Short: "Upgrade a chaincode",
+		Long:  "Upgrade a chaincode with chaincode-name version path args collection and policy",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {
@@ -50,9 +51,9 @@ func NewChaincodeUpgradeCommand(settings *environment.Settings) *cobra.Command {
 	c.AddArg(&c.ChaincodePath)
 
 	flags := cmd.Flags()
-	flags.StringArrayVar(&c.ChaincodeArgs, "args", []string{}, "set the upgrade arguments")
-	flags.StringVar(&c.ChaincodePolicy, "policy", "", "set the endorsement policy")
-	flags.StringVar(&c.ChaincodeCollectionsConfig, "collections-config", "", "set the path to the collections config file")
+	flags.StringArrayVar(&c.ChaincodeArgs, "args", []string{}, "Set the upgrade arguments")
+	flags.StringVar(&c.ChaincodePolicy, "policy", "", "Set the endorsement policy")
+	flags.StringVar(&c.ChaincodeCollectionsConfig, "collections-config", "", "Set the path to the collections config file")
 
 	cmd.SetOutput(c.Settings.Streams.Out)
 

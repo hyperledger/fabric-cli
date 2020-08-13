@@ -87,7 +87,7 @@ type Config struct {
 
 // AddFlags appeneds config flags onto an existing flag set
 func (c *Config) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&c.CurrentContext, "context", c.CurrentContext, "override the current context")
+	fs.StringVar(&c.CurrentContext, "context", c.CurrentContext, "Override the current context")
 }
 
 // LoadFromFile populates config based on the specified path

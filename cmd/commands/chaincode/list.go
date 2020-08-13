@@ -23,7 +23,8 @@ func NewChaincodeListCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "list all chaincodes",
+		Short: "List all chaincodes",
+		Long:  "List all chaincodes in current context's peers",
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return c.Complete()
 		},
@@ -33,8 +34,8 @@ func NewChaincodeListCommand(settings *environment.Settings) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVar(&c.Installed, "installed", false, "include chaincode installed on peer's filesystem")
-	flags.BoolVar(&c.Instantiated, "instantiated", false, "include instantiated chaincode")
+	flags.BoolVar(&c.Installed, "installed", false, "Include chaincode installed on peer's filesystem")
+	flags.BoolVar(&c.Instantiated, "instantiated", false, "Include instantiated chaincode")
 
 	cmd.SetOutput(c.Settings.Streams.Out)
 

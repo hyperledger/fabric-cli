@@ -16,6 +16,7 @@ func NewContextCommand(settings *environment.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "context",
 		Short: "Manage contexts",
+		Long:  "Context indicates the Network|Organization|User|Channel|Orderers|Peers info",
 	}
 
 	cmd.AddCommand(
