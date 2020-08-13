@@ -22,7 +22,8 @@ func NewNetworkViewCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "view [network-name]",
-		Short: "view a network",
+		Short: "View a network",
+		Long:  "View a network, to show the Fabric Go SDK config path, default current context's network",
 		Args:  c.ParseArgs(),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return c.Run()

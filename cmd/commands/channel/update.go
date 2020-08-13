@@ -25,7 +25,8 @@ func NewChannelUpdateCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update <channel-id> <tx-path>",
-		Short: "update a channel",
+		Short: "Update a channel",
+		Long:  "Update a channel with channel-id and channel tx",
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {
 				return err

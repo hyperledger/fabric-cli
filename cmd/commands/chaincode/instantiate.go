@@ -27,7 +27,8 @@ func NewChaincodeInstantiateCommand(settings *environment.Settings) *cobra.Comma
 
 	cmd := &cobra.Command{
 		Use:   "instantiate <chaincode-name> <version> <path>",
-		Short: "instantiate a chaincode",
+		Short: "Instantiate a chaincode",
+		Long:  "Instantiate a chaincode with chaincode-name version path",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {
@@ -50,9 +51,9 @@ func NewChaincodeInstantiateCommand(settings *environment.Settings) *cobra.Comma
 	c.AddArg(&c.ChaincodePath)
 
 	flags := cmd.Flags()
-	flags.StringArrayVar(&c.ChaincodeArgs, "args", []string{}, "set the constructor arguments")
-	flags.StringVar(&c.ChaincodePolicy, "policy", "", "set the endorsement policy")
-	flags.StringVar(&c.ChaincodeCollectionsConfig, "collections-config", "", "set the path to the collections config file")
+	flags.StringArrayVar(&c.ChaincodeArgs, "args", []string{}, "Set the constructor arguments")
+	flags.StringVar(&c.ChaincodePolicy, "policy", "", "Set the endorsement policy")
+	flags.StringVar(&c.ChaincodeCollectionsConfig, "collections-config", "", "Set the path to the collections config file")
 
 	cmd.SetOutput(c.Settings.Streams.Out)
 

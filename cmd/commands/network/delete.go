@@ -22,7 +22,8 @@ func NewNetworkDeleteCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "delete <network-name>",
-		Short: "delete a network",
+		Short: "Delete a network",
+		Long:  "Delete a network in config.yaml",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return c.Validate()

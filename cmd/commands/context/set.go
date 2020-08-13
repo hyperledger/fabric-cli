@@ -25,7 +25,8 @@ func NewContextSetCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "set [context-name]",
-		Short: "set a context",
+		Short: "Set a context",
+		Long:  "Set a context into config.yaml",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return c.Validate()
@@ -38,11 +39,11 @@ func NewContextSetCommand(settings *environment.Settings) *cobra.Command {
 	c.AddArg(&c.Name)
 
 	flags := cmd.Flags()
-	flags.StringVar(&c.Context.Network, "network", "", "set the network context")
-	flags.StringVar(&c.Context.Organization, "organization", "", "set the organization context")
-	flags.StringVar(&c.Context.Channel, "channel", "", "set the channel context")
-	flags.StringVar(&c.Context.User, "user", "", "set the users context")
-	flags.StringArrayVar(&c.Context.Peers, "peers", []string{}, "set the peers context")
+	flags.StringVar(&c.Context.Network, "network", "", "Set the network context")
+	flags.StringVar(&c.Context.Organization, "organization", "", "Set the organization context")
+	flags.StringVar(&c.Context.Channel, "channel", "", "Set the channel context")
+	flags.StringVar(&c.Context.User, "user", "", "Set the user context")
+	flags.StringArrayVar(&c.Context.Peers, "peers", []string{}, "Set the peers context")
 
 	cmd.SetOutput(c.Settings.Streams.Out)
 

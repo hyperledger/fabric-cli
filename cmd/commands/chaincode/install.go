@@ -28,7 +28,8 @@ func NewChaincodeInstallCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "install <chaincode-name> <version> <path>",
-		Short: "install a chaincode",
+		Short: "Install a chaincode",
+		Long:  "Install a chaincode to current context's peers",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {

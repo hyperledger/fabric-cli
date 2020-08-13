@@ -30,8 +30,8 @@ const ProgramName = "fabric"
 func NewVersionCommand(settings *environment.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
-		Short: "Print fabric cmd version.",
-		Long:  `Print current version of fabric command line tool.`,
+		Short: "Print fabric cmd version",
+		Long:  "Print current version of fabric command line tool",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 0 {
 				return fmt.Errorf("trailing args detected")

@@ -23,7 +23,8 @@ func NewChannelConfigCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "config <channel-id>",
-		Short: "get the channel configuration",
+		Short: "Get the channel configuration",
+		Long:  "Get the channel-id channel configuration",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {

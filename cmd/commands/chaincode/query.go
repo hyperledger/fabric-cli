@@ -26,7 +26,8 @@ func NewChaincodeQueryCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "query <chaincode-name>",
-		Short: "query a chaincode",
+		Short: "Query a chaincode",
+		Long:  "Query a chaincode with args and function",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {
@@ -47,8 +48,8 @@ func NewChaincodeQueryCommand(settings *environment.Settings) *cobra.Command {
 	c.AddArg(&c.ChaincodeName)
 
 	flags := cmd.Flags()
-	flags.StringVar(&c.ChaincodeFcn, "fcn", "", "set the invoke function")
-	flags.StringArrayVar(&c.ChaincodeArgs, "args", []string{}, "set the invoke arguments")
+	flags.StringVar(&c.ChaincodeFcn, "fcn", "", "Set the invoke function")
+	flags.StringArrayVar(&c.ChaincodeArgs, "args", []string{}, "Set the invoke arguments")
 
 	cmd.SetOutput(c.Settings.Streams.Out)
 

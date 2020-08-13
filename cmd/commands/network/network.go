@@ -16,6 +16,7 @@ func NewNetworkCommand(settings *environment.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "network",
 		Short: "Manage networks",
+		Long:  "Network indicates the Fabric Go SDK' config path",
 	}
 
 	cmd.AddCommand(

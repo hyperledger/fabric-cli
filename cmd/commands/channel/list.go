@@ -23,7 +23,8 @@ func NewChannelListCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "list all joined channels",
+		Short: "List all joined channels",
+		Long:  "List all joined channels, peer is the current context's peer",
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return c.Complete()
 		},

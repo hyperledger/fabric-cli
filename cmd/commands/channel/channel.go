@@ -19,6 +19,7 @@ func NewChannelCommand(settings *environment.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "channel",
 		Short: "Manage channels",
+		Long:  "Manage channels with config|create|join|list|update",
 	}
 
 	cmd.AddCommand(

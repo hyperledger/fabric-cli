@@ -22,7 +22,8 @@ func NewContextViewCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "view [context-name]",
-		Short: "view a context",
+		Short: "View a context",
+		Long:  "View a context, default view current context",
 		Args:  c.ParseArgs(),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return c.Run()

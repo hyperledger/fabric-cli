@@ -17,6 +17,7 @@ func NewPluginCommand(settings *environment.Settings) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "plugin",
 		Short: "Manage plugins",
+		Long:  "Plugin used to install|list|uninstall Go Plugins or custom cmds into fabric command",
 	}
 
 	cmd.AddCommand(

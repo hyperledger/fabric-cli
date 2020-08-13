@@ -25,7 +25,8 @@ func NewNetworkSetCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "set <network-name> <config-file-path>",
-		Short: "set a network",
+		Short: "Set a network",
+		Long:  "Set a network, path indicates the Fabric Go SDK' config path",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return c.Validate()

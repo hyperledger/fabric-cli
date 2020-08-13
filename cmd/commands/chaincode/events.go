@@ -23,7 +23,8 @@ func NewChaincodeEventsCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "events <chaincode-name>",
-		Short: "listen for chaincode events",
+		Short: "Listen for chaincode events",
+		Long:  "Listen for chaincode-name events",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			if err := c.Complete(); err != nil {

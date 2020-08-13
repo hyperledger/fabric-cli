@@ -18,7 +18,8 @@ func NewChaincodePackageCommand(settings *environment.Settings) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "package <chaincode-name> <path>",
-		Short: "package a chaincode (only golang supported)",
+		Short: "Package a chaincode (only golang supported)",
+		Long:  "Package a chaincode into .tgz (only golang supported)",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return c.Validate()
