@@ -59,6 +59,7 @@ var _ = Describe("LifecycleChaincodeCommand", func() {
 			Expect(fmt.Sprint(out)).To(ContainSubstring("install"))
 			Expect(fmt.Sprint(out)).To(ContainSubstring("approve"))
 			Expect(fmt.Sprint(out)).To(ContainSubstring("commit"))
+			Expect(fmt.Sprint(out)).To(ContainSubstring("queryinstalled"))
 		})
 	})
 })

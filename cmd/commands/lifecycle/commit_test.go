@@ -157,18 +157,6 @@ var _ = Describe("LifecycleCommitImplementation", func() {
 			})
 		})
 
-		Context("when at least one peer is not specified", func() {
-			BeforeEach(func() {
-				impl.Name = "mycc"
-				impl.Version = "0.0.0"
-				impl.Sequence = "1"
-			})
-
-			It("should fail when at least one peer is not specified", func() {
-				Expect(err.Error()).To(Equal("at least one peer must be specified"))
-			})
-		})
-
 		Context("when all arguments are set", func() {
 			BeforeEach(func() {
 				impl.Name = "mycc"
