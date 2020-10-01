@@ -127,6 +127,19 @@ type ResourceManagement struct {
 		result1 []resmgmt.LifecycleInstallCCResponse
 		result2 error
 	}
+	LifecycleQueryInstalledCCStub        func(...resmgmt.RequestOption) ([]resmgmt.LifecycleInstalledCC, error)
+	lifecycleQueryInstalledCCMutex       sync.RWMutex
+	lifecycleQueryInstalledCCArgsForCall []struct {
+		arg1 []resmgmt.RequestOption
+	}
+	lifecycleQueryInstalledCCReturns struct {
+		result1 []resmgmt.LifecycleInstalledCC
+		result2 error
+	}
+	lifecycleQueryInstalledCCReturnsOnCall map[int]struct {
+		result1 []resmgmt.LifecycleInstalledCC
+		result2 error
+	}
 	QueryChannelsStub        func(...resmgmt.RequestOption) (*peer.ChannelQueryResponse, error)
 	queryChannelsMutex       sync.RWMutex
 	queryChannelsArgsForCall []struct {
@@ -741,6 +754,69 @@ func (fake *ResourceManagement) LifecycleInstallCCReturnsOnCall(i int, result1 [
 	}{result1, result2}
 }
 
+func (fake *ResourceManagement) LifecycleQueryInstalledCC(arg1 ...resmgmt.RequestOption) ([]resmgmt.LifecycleInstalledCC, error) {
+	fake.lifecycleQueryInstalledCCMutex.Lock()
+	ret, specificReturn := fake.lifecycleQueryInstalledCCReturnsOnCall[len(fake.lifecycleQueryInstalledCCArgsForCall)]
+	fake.lifecycleQueryInstalledCCArgsForCall = append(fake.lifecycleQueryInstalledCCArgsForCall, struct {
+		arg1 []resmgmt.RequestOption
+	}{arg1})
+	fake.recordInvocation("LifecycleQueryInstalledCC", []interface{}{arg1})
+	fake.lifecycleQueryInstalledCCMutex.Unlock()
+	if fake.LifecycleQueryInstalledCCStub != nil {
+		return fake.LifecycleQueryInstalledCCStub(arg1...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.lifecycleQueryInstalledCCReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ResourceManagement) LifecycleQueryInstalledCCCallCount() int {
+	fake.lifecycleQueryInstalledCCMutex.RLock()
+	defer fake.lifecycleQueryInstalledCCMutex.RUnlock()
+	return len(fake.lifecycleQueryInstalledCCArgsForCall)
+}
+
+func (fake *ResourceManagement) LifecycleQueryInstalledCCCalls(stub func(...resmgmt.RequestOption) ([]resmgmt.LifecycleInstalledCC, error)) {
+	fake.lifecycleQueryInstalledCCMutex.Lock()
+	defer fake.lifecycleQueryInstalledCCMutex.Unlock()
+	fake.LifecycleQueryInstalledCCStub = stub
+}
+
+func (fake *ResourceManagement) LifecycleQueryInstalledCCArgsForCall(i int) []resmgmt.RequestOption {
+	fake.lifecycleQueryInstalledCCMutex.RLock()
+	defer fake.lifecycleQueryInstalledCCMutex.RUnlock()
+	argsForCall := fake.lifecycleQueryInstalledCCArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ResourceManagement) LifecycleQueryInstalledCCReturns(result1 []resmgmt.LifecycleInstalledCC, result2 error) {
+	fake.lifecycleQueryInstalledCCMutex.Lock()
+	defer fake.lifecycleQueryInstalledCCMutex.Unlock()
+	fake.LifecycleQueryInstalledCCStub = nil
+	fake.lifecycleQueryInstalledCCReturns = struct {
+		result1 []resmgmt.LifecycleInstalledCC
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ResourceManagement) LifecycleQueryInstalledCCReturnsOnCall(i int, result1 []resmgmt.LifecycleInstalledCC, result2 error) {
+	fake.lifecycleQueryInstalledCCMutex.Lock()
+	defer fake.lifecycleQueryInstalledCCMutex.Unlock()
+	fake.LifecycleQueryInstalledCCStub = nil
+	if fake.lifecycleQueryInstalledCCReturnsOnCall == nil {
+		fake.lifecycleQueryInstalledCCReturnsOnCall = make(map[int]struct {
+			result1 []resmgmt.LifecycleInstalledCC
+			result2 error
+		})
+	}
+	fake.lifecycleQueryInstalledCCReturnsOnCall[i] = struct {
+		result1 []resmgmt.LifecycleInstalledCC
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *ResourceManagement) QueryChannels(arg1 ...resmgmt.RequestOption) (*peer.ChannelQueryResponse, error) {
 	fake.queryChannelsMutex.Lock()
 	ret, specificReturn := fake.queryChannelsReturnsOnCall[len(fake.queryChannelsArgsForCall)]
@@ -1208,6 +1284,8 @@ func (fake *ResourceManagement) Invocations() map[string][][]interface{} {
 	defer fake.lifecycleCommitCCMutex.RUnlock()
 	fake.lifecycleInstallCCMutex.RLock()
 	defer fake.lifecycleInstallCCMutex.RUnlock()
+	fake.lifecycleQueryInstalledCCMutex.RLock()
+	defer fake.lifecycleQueryInstalledCCMutex.RUnlock()
 	fake.queryChannelsMutex.RLock()
 	defer fake.queryChannelsMutex.RUnlock()
 	fake.queryCollectionsConfigMutex.RLock()

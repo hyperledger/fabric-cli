@@ -8,7 +8,7 @@ go 1.12
 
 require (
 	github.com/hyperledger/fabric-protos-go v0.0.0-20200707132912-fee30f3ccd23
-	github.com/hyperledger/fabric-sdk-go v1.0.0-beta3
+	github.com/hyperledger/fabric-sdk-go v1.0.0-beta3.0.20201001192805-45ff9b131d2a
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.9.0

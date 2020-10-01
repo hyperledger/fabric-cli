@@ -7,12 +7,16 @@ SPDX-License-Identifier: Apache-2.0
 package lifecycle
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/cmd/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/fabric"
 )
+
+const jsonFormat = "json"
 
 // NewCommand creates a new "fabric lifecycle" command
 func NewCommand(settings *environment.Settings) *cobra.Command {
@@ -26,6 +30,7 @@ func NewCommand(settings *environment.Settings) *cobra.Command {
 		NewInstallCommand(settings),
 		NewApproveCommand(settings),
 		NewCommitCommand(settings),
+		NewQueryInstalledCommand(settings),
 	)
 
 	cmd.SetOutput(settings.Streams.Out)
@@ -64,4 +69,18 @@ func (c *BaseCommand) Complete() error {
 	}
 
 	return nil
+}
+
+func (c *BaseCommand) printf(format string, a ...interface{}) {
+	_, err := fmt.Fprintf(c.Settings.Streams.Out, format, a...)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (c *BaseCommand) println(a ...interface{}) {
+	_, err := fmt.Fprintln(c.Settings.Streams.Out, a...)
+	if err != nil {
+		panic(err)
+	}
 }

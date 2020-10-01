@@ -102,10 +102,6 @@ func (c *CommitCommand) Validate() error {
 		return errors.New("sequence must be greater than 0")
 	}
 
-	if len(c.Peers) == 0 {
-		return errors.New("at least one peer must be specified")
-	}
-
 	return nil
 }
 
