@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package lifecycle
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -16,7 +17,12 @@ import (
 	"github.com/hyperledger/fabric-cli/pkg/fabric"
 )
 
-const jsonFormat = "json"
+const (
+	jsonFormat = "json"
+
+	outputFormatUsage = `The output format for query results. If set to 'json' then the response is output in JSON format,
+otherwise the response is output in human-readable text.`
+)
 
 // NewCommand creates a new "fabric lifecycle" command
 func NewCommand(settings *environment.Settings) *cobra.Command {
@@ -31,6 +37,7 @@ func NewCommand(settings *environment.Settings) *cobra.Command {
 		NewApproveCommand(settings),
 		NewCommitCommand(settings),
 		NewQueryInstalledCommand(settings),
+		NewQueryApprovedCommand(settings),
 	)
 
 	cmd.SetOutput(settings.Streams.Out)
@@ -83,4 +90,22 @@ func (c *BaseCommand) println(a ...interface{}) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (c *BaseCommand) print(a ...interface{}) {
+	_, err := fmt.Fprint(c.Settings.Streams.Out, a...)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (c *BaseCommand) printJSONResponse(v interface{}) error {
+	respBytes, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	c.print(string(respBytes))
+
+	return nil
 }

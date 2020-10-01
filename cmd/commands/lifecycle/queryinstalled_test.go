@@ -23,8 +23,9 @@ import (
 )
 
 const (
-	plainTextResponse = "Installed chaincodes:\n- Package ID: pkg1, Label: label1\n-- References for channel [channel1]:\n--- Name: cc1, Version: v1\n"
-	jsonResponse      = `[{"package_id":"pkg1","label":"label1","references":{"channel1":[{"name":"cc1","version":"v1"}]}}]`
+	queryInstalledPlainTextResponse = "Installed chaincodes:\n- Package ID: pkg1, Label: label1\n-- " +
+		"References for channel [channel1]:\n--- Name: cc1, Version: v1\n"
+	queryInstalledJSONResponse = `[{"package_id":"pkg1","label":"label1","references":{"channel1":[{"name":"cc1","version":"v1"}]}}]`
 )
 
 var _ = Describe("LifecycleChaincodeQueryInstalledCommand", func() {
@@ -170,7 +171,7 @@ var _ = Describe("LifecycleChaincodeQueryInstalledImplementation", func() {
 
 			It("should succeed with plain text response", func() {
 				Expect(err).To(BeNil())
-				Expect(fmt.Sprint(out)).To(Equal(plainTextResponse))
+				Expect(fmt.Sprint(out)).To(Equal(queryInstalledPlainTextResponse))
 			})
 
 			When("the output format is set to json", func() {
@@ -180,7 +181,7 @@ var _ = Describe("LifecycleChaincodeQueryInstalledImplementation", func() {
 
 				It("should succeed with JSON response", func() {
 					Expect(err).To(BeNil())
-					Expect(fmt.Sprint(out)).To(Equal(jsonResponse))
+					Expect(fmt.Sprint(out)).To(Equal(queryInstalledJSONResponse))
 				})
 			})
 		})
