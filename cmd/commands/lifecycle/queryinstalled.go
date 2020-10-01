@@ -7,9 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package lifecycle
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/pkg/errors"
@@ -17,9 +14,6 @@ import (
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
-
-const outputFormatUsage = `The output format for query results. If set to 'json' then the response it output in JSON format,
-otherwise the response is output in human-readable text.`
 
 // NewQueryInstalledCommand creates a new "fabric lifecycle queryinstalled" command
 func NewQueryInstalledCommand(settings *environment.Settings) *cobra.Command {
@@ -113,14 +107,4 @@ func (c *QueryInstalledCommand) printReferences(refs map[string][]resmgmt.CCRefe
 			c.printf("--- Name: %s, Version: %s\n", ref.Name, ref.Version)
 		}
 	}
-}
-
-func (c *QueryInstalledCommand) printJSONResponse(installedChaincodes []resmgmt.LifecycleInstalledCC) error {
-	respBytes, err := json.Marshal(installedChaincodes)
-	if err != nil {
-		return err
-	}
-
-	_, err = fmt.Fprint(c.Settings.Streams.Out, string(respBytes))
-	return err
 }

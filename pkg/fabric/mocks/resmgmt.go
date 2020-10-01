@@ -127,6 +127,21 @@ type ResourceManagement struct {
 		result1 []resmgmt.LifecycleInstallCCResponse
 		result2 error
 	}
+	LifecycleQueryApprovedCCStub        func(string, resmgmt.LifecycleQueryApprovedCCRequest, ...resmgmt.RequestOption) (resmgmt.LifecycleApprovedChaincodeDefinition, error)
+	lifecycleQueryApprovedCCMutex       sync.RWMutex
+	lifecycleQueryApprovedCCArgsForCall []struct {
+		arg1 string
+		arg2 resmgmt.LifecycleQueryApprovedCCRequest
+		arg3 []resmgmt.RequestOption
+	}
+	lifecycleQueryApprovedCCReturns struct {
+		result1 resmgmt.LifecycleApprovedChaincodeDefinition
+		result2 error
+	}
+	lifecycleQueryApprovedCCReturnsOnCall map[int]struct {
+		result1 resmgmt.LifecycleApprovedChaincodeDefinition
+		result2 error
+	}
 	LifecycleQueryInstalledCCStub        func(...resmgmt.RequestOption) ([]resmgmt.LifecycleInstalledCC, error)
 	lifecycleQueryInstalledCCMutex       sync.RWMutex
 	lifecycleQueryInstalledCCArgsForCall []struct {
@@ -754,6 +769,71 @@ func (fake *ResourceManagement) LifecycleInstallCCReturnsOnCall(i int, result1 [
 	}{result1, result2}
 }
 
+func (fake *ResourceManagement) LifecycleQueryApprovedCC(arg1 string, arg2 resmgmt.LifecycleQueryApprovedCCRequest, arg3 ...resmgmt.RequestOption) (resmgmt.LifecycleApprovedChaincodeDefinition, error) {
+	fake.lifecycleQueryApprovedCCMutex.Lock()
+	ret, specificReturn := fake.lifecycleQueryApprovedCCReturnsOnCall[len(fake.lifecycleQueryApprovedCCArgsForCall)]
+	fake.lifecycleQueryApprovedCCArgsForCall = append(fake.lifecycleQueryApprovedCCArgsForCall, struct {
+		arg1 string
+		arg2 resmgmt.LifecycleQueryApprovedCCRequest
+		arg3 []resmgmt.RequestOption
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("LifecycleQueryApprovedCC", []interface{}{arg1, arg2, arg3})
+	fake.lifecycleQueryApprovedCCMutex.Unlock()
+	if fake.LifecycleQueryApprovedCCStub != nil {
+		return fake.LifecycleQueryApprovedCCStub(arg1, arg2, arg3...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.lifecycleQueryApprovedCCReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ResourceManagement) LifecycleQueryApprovedCCCallCount() int {
+	fake.lifecycleQueryApprovedCCMutex.RLock()
+	defer fake.lifecycleQueryApprovedCCMutex.RUnlock()
+	return len(fake.lifecycleQueryApprovedCCArgsForCall)
+}
+
+func (fake *ResourceManagement) LifecycleQueryApprovedCCCalls(stub func(string, resmgmt.LifecycleQueryApprovedCCRequest, ...resmgmt.RequestOption) (resmgmt.LifecycleApprovedChaincodeDefinition, error)) {
+	fake.lifecycleQueryApprovedCCMutex.Lock()
+	defer fake.lifecycleQueryApprovedCCMutex.Unlock()
+	fake.LifecycleQueryApprovedCCStub = stub
+}
+
+func (fake *ResourceManagement) LifecycleQueryApprovedCCArgsForCall(i int) (string, resmgmt.LifecycleQueryApprovedCCRequest, []resmgmt.RequestOption) {
+	fake.lifecycleQueryApprovedCCMutex.RLock()
+	defer fake.lifecycleQueryApprovedCCMutex.RUnlock()
+	argsForCall := fake.lifecycleQueryApprovedCCArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *ResourceManagement) LifecycleQueryApprovedCCReturns(result1 resmgmt.LifecycleApprovedChaincodeDefinition, result2 error) {
+	fake.lifecycleQueryApprovedCCMutex.Lock()
+	defer fake.lifecycleQueryApprovedCCMutex.Unlock()
+	fake.LifecycleQueryApprovedCCStub = nil
+	fake.lifecycleQueryApprovedCCReturns = struct {
+		result1 resmgmt.LifecycleApprovedChaincodeDefinition
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ResourceManagement) LifecycleQueryApprovedCCReturnsOnCall(i int, result1 resmgmt.LifecycleApprovedChaincodeDefinition, result2 error) {
+	fake.lifecycleQueryApprovedCCMutex.Lock()
+	defer fake.lifecycleQueryApprovedCCMutex.Unlock()
+	fake.LifecycleQueryApprovedCCStub = nil
+	if fake.lifecycleQueryApprovedCCReturnsOnCall == nil {
+		fake.lifecycleQueryApprovedCCReturnsOnCall = make(map[int]struct {
+			result1 resmgmt.LifecycleApprovedChaincodeDefinition
+			result2 error
+		})
+	}
+	fake.lifecycleQueryApprovedCCReturnsOnCall[i] = struct {
+		result1 resmgmt.LifecycleApprovedChaincodeDefinition
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *ResourceManagement) LifecycleQueryInstalledCC(arg1 ...resmgmt.RequestOption) ([]resmgmt.LifecycleInstalledCC, error) {
 	fake.lifecycleQueryInstalledCCMutex.Lock()
 	ret, specificReturn := fake.lifecycleQueryInstalledCCReturnsOnCall[len(fake.lifecycleQueryInstalledCCArgsForCall)]
@@ -1284,6 +1364,8 @@ func (fake *ResourceManagement) Invocations() map[string][][]interface{} {
 	defer fake.lifecycleCommitCCMutex.RUnlock()
 	fake.lifecycleInstallCCMutex.RLock()
 	defer fake.lifecycleInstallCCMutex.RUnlock()
+	fake.lifecycleQueryApprovedCCMutex.RLock()
+	defer fake.lifecycleQueryApprovedCCMutex.RUnlock()
 	fake.lifecycleQueryInstalledCCMutex.RLock()
 	defer fake.lifecycleQueryInstalledCCMutex.RUnlock()
 	fake.queryChannelsMutex.RLock()
