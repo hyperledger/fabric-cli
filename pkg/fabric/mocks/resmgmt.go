@@ -98,6 +98,21 @@ type ResourceManagement struct {
 		result1 fab.TransactionID
 		result2 error
 	}
+	LifecycleCheckCCCommitReadinessStub        func(string, resmgmt.LifecycleCheckCCCommitReadinessRequest, ...resmgmt.RequestOption) (resmgmt.LifecycleCheckCCCommitReadinessResponse, error)
+	lifecycleCheckCCCommitReadinessMutex       sync.RWMutex
+	lifecycleCheckCCCommitReadinessArgsForCall []struct {
+		arg1 string
+		arg2 resmgmt.LifecycleCheckCCCommitReadinessRequest
+		arg3 []resmgmt.RequestOption
+	}
+	lifecycleCheckCCCommitReadinessReturns struct {
+		result1 resmgmt.LifecycleCheckCCCommitReadinessResponse
+		result2 error
+	}
+	lifecycleCheckCCCommitReadinessReturnsOnCall map[int]struct {
+		result1 resmgmt.LifecycleCheckCCCommitReadinessResponse
+		result2 error
+	}
 	LifecycleCommitCCStub        func(string, resmgmt.LifecycleCommitCCRequest, ...resmgmt.RequestOption) (fab.TransactionID, error)
 	lifecycleCommitCCMutex       sync.RWMutex
 	lifecycleCommitCCArgsForCall []struct {
@@ -636,6 +651,71 @@ func (fake *ResourceManagement) LifecycleApproveCCReturnsOnCall(i int, result1 f
 	}
 	fake.lifecycleApproveCCReturnsOnCall[i] = struct {
 		result1 fab.TransactionID
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ResourceManagement) LifecycleCheckCCCommitReadiness(arg1 string, arg2 resmgmt.LifecycleCheckCCCommitReadinessRequest, arg3 ...resmgmt.RequestOption) (resmgmt.LifecycleCheckCCCommitReadinessResponse, error) {
+	fake.lifecycleCheckCCCommitReadinessMutex.Lock()
+	ret, specificReturn := fake.lifecycleCheckCCCommitReadinessReturnsOnCall[len(fake.lifecycleCheckCCCommitReadinessArgsForCall)]
+	fake.lifecycleCheckCCCommitReadinessArgsForCall = append(fake.lifecycleCheckCCCommitReadinessArgsForCall, struct {
+		arg1 string
+		arg2 resmgmt.LifecycleCheckCCCommitReadinessRequest
+		arg3 []resmgmt.RequestOption
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("LifecycleCheckCCCommitReadiness", []interface{}{arg1, arg2, arg3})
+	fake.lifecycleCheckCCCommitReadinessMutex.Unlock()
+	if fake.LifecycleCheckCCCommitReadinessStub != nil {
+		return fake.LifecycleCheckCCCommitReadinessStub(arg1, arg2, arg3...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.lifecycleCheckCCCommitReadinessReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ResourceManagement) LifecycleCheckCCCommitReadinessCallCount() int {
+	fake.lifecycleCheckCCCommitReadinessMutex.RLock()
+	defer fake.lifecycleCheckCCCommitReadinessMutex.RUnlock()
+	return len(fake.lifecycleCheckCCCommitReadinessArgsForCall)
+}
+
+func (fake *ResourceManagement) LifecycleCheckCCCommitReadinessCalls(stub func(string, resmgmt.LifecycleCheckCCCommitReadinessRequest, ...resmgmt.RequestOption) (resmgmt.LifecycleCheckCCCommitReadinessResponse, error)) {
+	fake.lifecycleCheckCCCommitReadinessMutex.Lock()
+	defer fake.lifecycleCheckCCCommitReadinessMutex.Unlock()
+	fake.LifecycleCheckCCCommitReadinessStub = stub
+}
+
+func (fake *ResourceManagement) LifecycleCheckCCCommitReadinessArgsForCall(i int) (string, resmgmt.LifecycleCheckCCCommitReadinessRequest, []resmgmt.RequestOption) {
+	fake.lifecycleCheckCCCommitReadinessMutex.RLock()
+	defer fake.lifecycleCheckCCCommitReadinessMutex.RUnlock()
+	argsForCall := fake.lifecycleCheckCCCommitReadinessArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *ResourceManagement) LifecycleCheckCCCommitReadinessReturns(result1 resmgmt.LifecycleCheckCCCommitReadinessResponse, result2 error) {
+	fake.lifecycleCheckCCCommitReadinessMutex.Lock()
+	defer fake.lifecycleCheckCCCommitReadinessMutex.Unlock()
+	fake.LifecycleCheckCCCommitReadinessStub = nil
+	fake.lifecycleCheckCCCommitReadinessReturns = struct {
+		result1 resmgmt.LifecycleCheckCCCommitReadinessResponse
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ResourceManagement) LifecycleCheckCCCommitReadinessReturnsOnCall(i int, result1 resmgmt.LifecycleCheckCCCommitReadinessResponse, result2 error) {
+	fake.lifecycleCheckCCCommitReadinessMutex.Lock()
+	defer fake.lifecycleCheckCCCommitReadinessMutex.Unlock()
+	fake.LifecycleCheckCCCommitReadinessStub = nil
+	if fake.lifecycleCheckCCCommitReadinessReturnsOnCall == nil {
+		fake.lifecycleCheckCCCommitReadinessReturnsOnCall = make(map[int]struct {
+			result1 resmgmt.LifecycleCheckCCCommitReadinessResponse
+			result2 error
+		})
+	}
+	fake.lifecycleCheckCCCommitReadinessReturnsOnCall[i] = struct {
+		result1 resmgmt.LifecycleCheckCCCommitReadinessResponse
 		result2 error
 	}{result1, result2}
 }
@@ -1360,6 +1440,8 @@ func (fake *ResourceManagement) Invocations() map[string][][]interface{} {
 	defer fake.joinChannelMutex.RUnlock()
 	fake.lifecycleApproveCCMutex.RLock()
 	defer fake.lifecycleApproveCCMutex.RUnlock()
+	fake.lifecycleCheckCCCommitReadinessMutex.RLock()
+	defer fake.lifecycleCheckCCCommitReadinessMutex.RUnlock()
 	fake.lifecycleCommitCCMutex.RLock()
 	defer fake.lifecycleCommitCCMutex.RUnlock()
 	fake.lifecycleInstallCCMutex.RLock()

@@ -78,14 +78,16 @@ func (c *QueryInstalledCommand) Run() error {
 		return c.printJSONResponse(installedChaincodes)
 	}
 
-	return c.printResponse(installedChaincodes)
+	c.printResponse(installedChaincodes)
+
+	return nil
 }
 
-func (c *QueryInstalledCommand) printResponse(installedChaincodes []resmgmt.LifecycleInstalledCC) error {
+func (c *QueryInstalledCommand) printResponse(installedChaincodes []resmgmt.LifecycleInstalledCC) {
 	if len(installedChaincodes) == 0 {
 		c.printf("No installed chaincodes on peer %s", c.Peer)
 
-		return nil
+		return
 	}
 
 	c.println("Installed chaincodes:")
@@ -95,8 +97,6 @@ func (c *QueryInstalledCommand) printResponse(installedChaincodes []resmgmt.Life
 
 		c.printReferences(cc.References)
 	}
-
-	return nil
 }
 
 func (c *QueryInstalledCommand) printReferences(refs map[string][]resmgmt.CCReference) {
