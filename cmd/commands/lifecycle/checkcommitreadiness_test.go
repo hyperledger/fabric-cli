@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"os"
 
-	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,15 +23,11 @@ import (
 )
 
 const (
-	queryApprovedPlainTextResponse = "Name: cc1, Version: v1, Package ID: pkg1, Sequence: 1, Validation Plugin: vscc," +
-		" Endorsement Plugin: escc, Channel Config Policy: ccpolicy, Init Required: true\n- Collection: coll1," +
-		" Blocks to Live: 1, Maximum Peer Count: 2, Required Peer Count: 1, MemberOnlyRead: false, cfg.MemberOnlyWrite: false\n"
-	queryApprovedJSONResponse = `{"name":"cc1","version":"v1","sequence":1,"endorsement_plugin":"escc","validation_plugin":"vscc"` +
-		`,"channel_config_policy":"ccpolicy","collection_config":[{"Payload":{"StaticCollectionConfig":` +
-		`{"name":"coll1","required_peer_count":1,"maximum_peer_count":2,"block_to_live":1}}}],"init_required":true,"package_id":"pkg1"}`
+	checkCommitReadinessPlainTextResponse = "Approving orgs: [org1]\nNon-approving orgs: [org2]\n"
+	checkCommitReadinessJSONResponse      = `{"approvals":{"org1":true,"org2":false}}`
 )
 
-var _ = Describe("LifecycleChaincodeQueryApprovedCommand", func() {
+var _ = Describe("LifecycleChaincodeCheckCommitReadinessCommand", func() {
 	var (
 		cmd      *cobra.Command
 		settings *environment.Settings
@@ -55,15 +50,15 @@ var _ = Describe("LifecycleChaincodeQueryApprovedCommand", func() {
 	})
 
 	JustBeforeEach(func() {
-		cmd = lifecycle.NewQueryApprovedCommand(settings)
+		cmd = lifecycle.NewCheckCommitReadinessCommand(settings)
 	})
 
 	AfterEach(func() {
 		os.Args = args
 	})
 
-	It("should create a chaincode 'query approved' command", func() {
-		Expect(cmd.Name()).To(Equal("queryapproved"))
+	It("should create a chaincode checkcommitreadiness command", func() {
+		Expect(cmd.Name()).To(Equal("checkcommitreadiness"))
 		Expect(cmd.HasSubCommands()).To(BeFalse())
 	})
 
@@ -71,13 +66,13 @@ var _ = Describe("LifecycleChaincodeQueryApprovedCommand", func() {
 		os.Args = append(os.Args, "--help")
 
 		Expect(cmd.Execute()).Should(Succeed())
-		Expect(fmt.Sprint(out)).To(ContainSubstring("queryapproved"))
+		Expect(fmt.Sprint(out)).To(ContainSubstring("checkcommitreadiness"))
 	})
 })
 
-var _ = Describe("LifecycleChaincodeQueryApprovedImplementation", func() {
+var _ = Describe("LifecycleChaincodeCheckCommitReadinessImplementation", func() {
 	var (
-		impl     *lifecycle.QueryApprovedCommand
+		impl     *lifecycle.CheckCommitReadinessCommand
 		err      error
 		out      *bytes.Buffer
 		settings *environment.Settings
@@ -98,7 +93,7 @@ var _ = Describe("LifecycleChaincodeQueryApprovedImplementation", func() {
 		factory = &mocks.Factory{}
 		client = &mocks.ResourceManagement{}
 
-		impl = &lifecycle.QueryApprovedCommand{}
+		impl = &lifecycle.CheckCommitReadinessCommand{}
 		impl.Settings = settings
 		impl.Factory = factory
 	})
@@ -112,19 +107,55 @@ var _ = Describe("LifecycleChaincodeQueryApprovedImplementation", func() {
 			err = impl.Validate()
 		})
 
-		Context("when chaincode is not set", func() {
-			It("should fail without chaincode", func() {
+		It("should fail when chaincode name is not set", func() {
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(Equal("chaincode name not specified"))
+		})
+
+		Context("when chaincode version is not set", func() {
+			BeforeEach(func() {
+				impl.Name = "mycc"
+			})
+
+			It("should fail without chaincode version", func() {
 				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).To(Equal("chaincode name not specified"))
+				Expect(err.Error()).To(Equal("chaincode version not specified"))
 			})
 		})
 
-		Context("when sequence is not set", func() {
+		Context("when chaincode sequence is not set", func() {
 			BeforeEach(func() {
-				impl.ChaincodeName = "cc1"
+				impl.Name = "mycc"
+				impl.Version = "0.0.0"
 			})
 
-			It("should fail without sequence", func() {
+			It("should fail without chaincode sequence", func() {
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(Equal("sequence not specified"))
+			})
+		})
+
+		Context("when chaincode sequence is not greater than 0", func() {
+			BeforeEach(func() {
+				impl.Name = "mycc"
+				impl.Version = "0.0.0"
+				impl.Sequence = "-1"
+			})
+
+			It("should fail with chaincode sequence not greater than 0", func() {
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(Equal("sequence must be greater than 0"))
+			})
+		})
+
+		Context("when chaincode sequence is invalid", func() {
+			BeforeEach(func() {
+				impl.Name = "mycc"
+				impl.Version = "0.0.0"
+				impl.Sequence = "xxx"
+			})
+
+			It("should fail with chaincode sequence is invalid", func() {
 				Expect(err).NotTo(BeNil())
 				Expect(err.Error()).To(ContainSubstring("invalid sequence"))
 			})
@@ -132,7 +163,8 @@ var _ = Describe("LifecycleChaincodeQueryApprovedImplementation", func() {
 
 		Context("when all arguments are set", func() {
 			BeforeEach(func() {
-				impl.ChaincodeName = "cc1"
+				impl.Name = "mycc"
+				impl.Version = "0.0.0"
 				impl.Sequence = "1"
 			})
 
@@ -144,33 +176,14 @@ var _ = Describe("LifecycleChaincodeQueryApprovedImplementation", func() {
 
 	Describe("Run", func() {
 		BeforeEach(func() {
-			impl.ChaincodeName = "cc1"
+			impl.Name = "cc1"
 			impl.Sequence = "1"
 
-			result := resmgmt.LifecycleApprovedChaincodeDefinition{
-				Name:                "cc1",
-				Version:             "v1",
-				Sequence:            1,
-				PackageID:           "pkg1",
-				ValidationPlugin:    "vscc",
-				EndorsementPlugin:   "escc",
-				ChannelConfigPolicy: "ccpolicy",
-				InitRequired:        true,
-				CollectionConfig: []*pb.CollectionConfig{
-					{
-						Payload: &pb.CollectionConfig_StaticCollectionConfig{
-							StaticCollectionConfig: &pb.StaticCollectionConfig{
-								Name:              "coll1",
-								RequiredPeerCount: 1,
-								MaximumPeerCount:  2,
-								BlockToLive:       1,
-							},
-						},
-					},
-				},
+			result := resmgmt.LifecycleCheckCCCommitReadinessResponse{
+				Approvals: map[string]bool{"org1": true, "org2": false},
 			}
 
-			client.LifecycleQueryApprovedCCReturns(result, nil)
+			client.LifecycleCheckCCCommitReadinessReturns(result, nil)
 			impl.ResourceManagement = client
 		})
 
@@ -192,7 +205,7 @@ var _ = Describe("LifecycleChaincodeQueryApprovedImplementation", func() {
 
 			It("should succeed with plain text response", func() {
 				Expect(err).To(BeNil())
-				Expect(fmt.Sprint(out)).To(Equal(queryApprovedPlainTextResponse))
+				Expect(fmt.Sprint(out)).To(Equal(checkCommitReadinessPlainTextResponse))
 			})
 
 			When("the output format is set to json", func() {
@@ -202,7 +215,7 @@ var _ = Describe("LifecycleChaincodeQueryApprovedImplementation", func() {
 
 				It("should succeed with JSON response", func() {
 					Expect(err).To(BeNil())
-					Expect(fmt.Sprint(out)).To(Equal(queryApprovedJSONResponse))
+					Expect(fmt.Sprint(out)).To(Equal(checkCommitReadinessJSONResponse))
 				})
 			})
 		})
@@ -218,12 +231,12 @@ var _ = Describe("LifecycleChaincodeQueryApprovedImplementation", func() {
 					CurrentContext: "foo",
 				}
 
-				client.LifecycleQueryApprovedCCReturns(resmgmt.LifecycleApprovedChaincodeDefinition{}, errors.New("query approved error"))
+				client.LifecycleCheckCCCommitReadinessReturns(resmgmt.LifecycleCheckCCCommitReadinessResponse{}, errors.New("check commit readiness error"))
 			})
 
-			It("should fail to query approved chaincodes", func() {
+			It("should fail to check chaincode for commit readiness", func() {
 				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).To(ContainSubstring("query approved error"))
+				Expect(err.Error()).To(ContainSubstring("check commit readiness error"))
 			})
 		})
 	})

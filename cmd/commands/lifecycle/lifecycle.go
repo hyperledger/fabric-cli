@@ -38,6 +38,7 @@ func NewCommand(settings *environment.Settings) *cobra.Command {
 		NewCommitCommand(settings),
 		NewQueryInstalledCommand(settings),
 		NewQueryApprovedCommand(settings),
+		NewCheckCommitReadinessCommand(settings),
 	)
 
 	cmd.SetOutput(settings.Streams.Out)

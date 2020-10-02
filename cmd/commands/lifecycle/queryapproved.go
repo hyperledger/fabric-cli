@@ -24,7 +24,7 @@ func NewQueryApprovedCommand(settings *environment.Settings) *cobra.Command {
 	c.Settings = settings
 
 	cmd := &cobra.Command{
-		Use:   "queryapproved <channel-id> <chaincode-name> <sequence>",
+		Use:   "queryapproved <chaincode-name> <sequence>",
 		Short: "Query for approved chaincodes",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
@@ -39,7 +39,6 @@ func NewQueryApprovedCommand(settings *environment.Settings) *cobra.Command {
 		},
 	}
 
-	c.AddArg(&c.ChannelID)
 	c.AddArg(&c.ChaincodeName)
 	c.AddArg(&c.Sequence)
 
@@ -55,7 +54,6 @@ func NewQueryApprovedCommand(settings *environment.Settings) *cobra.Command {
 type QueryApprovedCommand struct {
 	BaseCommand
 
-	ChannelID     string
 	ChaincodeName string
 	Sequence      string
 	OutputFormat  string
@@ -63,10 +61,6 @@ type QueryApprovedCommand struct {
 
 // Validate checks the required parameters for run
 func (c *QueryApprovedCommand) Validate() error {
-	if c.ChannelID == "" {
-		return errors.New("channel ID not specified")
-	}
-
 	if c.ChaincodeName == "" {
 		return errors.New("chaincode name not specified")
 	}
@@ -92,7 +86,7 @@ func (c *QueryApprovedCommand) Run() error {
 	}
 
 	approvedChaincode, err := c.ResourceManagement.LifecycleQueryApprovedCC(
-		c.ChannelID,
+		context.Channel,
 		resmgmt.LifecycleQueryApprovedCCRequest{
 			Name:     c.ChaincodeName,
 			Sequence: sequence,
@@ -108,10 +102,12 @@ func (c *QueryApprovedCommand) Run() error {
 		return c.printJSONResponse(approvedChaincode)
 	}
 
-	return c.printResponse(approvedChaincode)
+	c.printResponse(approvedChaincode)
+
+	return nil
 }
 
-func (c *QueryApprovedCommand) printResponse(ac resmgmt.LifecycleApprovedChaincodeDefinition) error {
+func (c *QueryApprovedCommand) printResponse(ac resmgmt.LifecycleApprovedChaincodeDefinition) {
 	c.printf("Name: %s, Version: %s, Package ID: %s, Sequence: %d, Validation Plugin: %s,"+
 		" Endorsement Plugin: %s, Channel Config Policy: %s, Init Required: %t\n",
 		ac.Name, ac.Version, ac.PackageID, ac.Sequence, ac.ValidationPlugin, ac.EndorsementPlugin, ac.ChannelConfigPolicy, ac.InitRequired)
@@ -125,6 +121,4 @@ func (c *QueryApprovedCommand) printResponse(ac resmgmt.LifecycleApprovedChainco
 				cfg.Name, cfg.BlockToLive, cfg.MaximumPeerCount, cfg.RequiredPeerCount, cfg.MemberOnlyRead, cfg.MemberOnlyWrite)
 		}
 	}
-
-	return nil
 }
