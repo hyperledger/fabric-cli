@@ -112,13 +112,11 @@ func (c *QueryApprovedCommand) printResponse(ac resmgmt.LifecycleApprovedChainco
 		" Endorsement Plugin: %s, Channel Config Policy: %s, Init Required: %t\n",
 		ac.Name, ac.Version, ac.PackageID, ac.Sequence, ac.ValidationPlugin, ac.EndorsementPlugin, ac.ChannelConfigPolicy, ac.InitRequired)
 
-	if len(ac.CollectionConfig) > 0 {
-		for _, collConfig := range ac.CollectionConfig {
-			cfg := collConfig.GetStaticCollectionConfig()
+	for _, collConfig := range ac.CollectionConfig {
+		cfg := collConfig.GetStaticCollectionConfig()
 
-			c.printf("- Collection: %s, Blocks to Live: %d, Maximum Peer Count: %d,"+
-				" Required Peer Count: %d, MemberOnlyRead: %t, cfg.MemberOnlyWrite: %t\n",
-				cfg.Name, cfg.BlockToLive, cfg.MaximumPeerCount, cfg.RequiredPeerCount, cfg.MemberOnlyRead, cfg.MemberOnlyWrite)
-		}
+		c.printf("- Collection: %s, Blocks to Live: %d, Maximum Peer Count: %d,"+
+			" Required Peer Count: %d, MemberOnlyRead: %t, cfg.MemberOnlyWrite: %t\n",
+			cfg.Name, cfg.BlockToLive, cfg.MaximumPeerCount, cfg.RequiredPeerCount, cfg.MemberOnlyRead, cfg.MemberOnlyWrite)
 	}
 }
