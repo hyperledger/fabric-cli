@@ -128,6 +128,20 @@ type ResourceManagement struct {
 		result1 fab.TransactionID
 		result2 error
 	}
+	LifecycleGetInstalledCCPackageStub        func(string, ...resmgmt.RequestOption) ([]byte, error)
+	lifecycleGetInstalledCCPackageMutex       sync.RWMutex
+	lifecycleGetInstalledCCPackageArgsForCall []struct {
+		arg1 string
+		arg2 []resmgmt.RequestOption
+	}
+	lifecycleGetInstalledCCPackageReturns struct {
+		result1 []byte
+		result2 error
+	}
+	lifecycleGetInstalledCCPackageReturnsOnCall map[int]struct {
+		result1 []byte
+		result2 error
+	}
 	LifecycleInstallCCStub        func(resmgmt.LifecycleInstallCCRequest, ...resmgmt.RequestOption) ([]resmgmt.LifecycleInstallCCResponse, error)
 	lifecycleInstallCCMutex       sync.RWMutex
 	lifecycleInstallCCArgsForCall []struct {
@@ -796,6 +810,70 @@ func (fake *ResourceManagement) LifecycleCommitCCReturnsOnCall(i int, result1 fa
 	}
 	fake.lifecycleCommitCCReturnsOnCall[i] = struct {
 		result1 fab.TransactionID
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ResourceManagement) LifecycleGetInstalledCCPackage(arg1 string, arg2 ...resmgmt.RequestOption) ([]byte, error) {
+	fake.lifecycleGetInstalledCCPackageMutex.Lock()
+	ret, specificReturn := fake.lifecycleGetInstalledCCPackageReturnsOnCall[len(fake.lifecycleGetInstalledCCPackageArgsForCall)]
+	fake.lifecycleGetInstalledCCPackageArgsForCall = append(fake.lifecycleGetInstalledCCPackageArgsForCall, struct {
+		arg1 string
+		arg2 []resmgmt.RequestOption
+	}{arg1, arg2})
+	fake.recordInvocation("LifecycleGetInstalledCCPackage", []interface{}{arg1, arg2})
+	fake.lifecycleGetInstalledCCPackageMutex.Unlock()
+	if fake.LifecycleGetInstalledCCPackageStub != nil {
+		return fake.LifecycleGetInstalledCCPackageStub(arg1, arg2...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.lifecycleGetInstalledCCPackageReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *ResourceManagement) LifecycleGetInstalledCCPackageCallCount() int {
+	fake.lifecycleGetInstalledCCPackageMutex.RLock()
+	defer fake.lifecycleGetInstalledCCPackageMutex.RUnlock()
+	return len(fake.lifecycleGetInstalledCCPackageArgsForCall)
+}
+
+func (fake *ResourceManagement) LifecycleGetInstalledCCPackageCalls(stub func(string, ...resmgmt.RequestOption) ([]byte, error)) {
+	fake.lifecycleGetInstalledCCPackageMutex.Lock()
+	defer fake.lifecycleGetInstalledCCPackageMutex.Unlock()
+	fake.LifecycleGetInstalledCCPackageStub = stub
+}
+
+func (fake *ResourceManagement) LifecycleGetInstalledCCPackageArgsForCall(i int) (string, []resmgmt.RequestOption) {
+	fake.lifecycleGetInstalledCCPackageMutex.RLock()
+	defer fake.lifecycleGetInstalledCCPackageMutex.RUnlock()
+	argsForCall := fake.lifecycleGetInstalledCCPackageArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *ResourceManagement) LifecycleGetInstalledCCPackageReturns(result1 []byte, result2 error) {
+	fake.lifecycleGetInstalledCCPackageMutex.Lock()
+	defer fake.lifecycleGetInstalledCCPackageMutex.Unlock()
+	fake.LifecycleGetInstalledCCPackageStub = nil
+	fake.lifecycleGetInstalledCCPackageReturns = struct {
+		result1 []byte
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ResourceManagement) LifecycleGetInstalledCCPackageReturnsOnCall(i int, result1 []byte, result2 error) {
+	fake.lifecycleGetInstalledCCPackageMutex.Lock()
+	defer fake.lifecycleGetInstalledCCPackageMutex.Unlock()
+	fake.LifecycleGetInstalledCCPackageStub = nil
+	if fake.lifecycleGetInstalledCCPackageReturnsOnCall == nil {
+		fake.lifecycleGetInstalledCCPackageReturnsOnCall = make(map[int]struct {
+			result1 []byte
+			result2 error
+		})
+	}
+	fake.lifecycleGetInstalledCCPackageReturnsOnCall[i] = struct {
+		result1 []byte
 		result2 error
 	}{result1, result2}
 }
@@ -1524,6 +1602,8 @@ func (fake *ResourceManagement) Invocations() map[string][][]interface{} {
 	defer fake.lifecycleCheckCCCommitReadinessMutex.RUnlock()
 	fake.lifecycleCommitCCMutex.RLock()
 	defer fake.lifecycleCommitCCMutex.RUnlock()
+	fake.lifecycleGetInstalledCCPackageMutex.RLock()
+	defer fake.lifecycleGetInstalledCCPackageMutex.RUnlock()
 	fake.lifecycleInstallCCMutex.RLock()
 	defer fake.lifecycleInstallCCMutex.RUnlock()
 	fake.lifecycleQueryApprovedCCMutex.RLock()

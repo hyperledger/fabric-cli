@@ -87,6 +87,7 @@ type ResourceManagement interface {
 	LifecycleApproveCC(channelID string, req resmgmt.LifecycleApproveCCRequest, options ...resmgmt.RequestOption) (fab.TransactionID, error)
 	LifecycleCommitCC(channelID string, req resmgmt.LifecycleCommitCCRequest, options ...resmgmt.RequestOption) (fab.TransactionID, error)
 	LifecycleQueryInstalledCC(options ...resmgmt.RequestOption) ([]resmgmt.LifecycleInstalledCC, error)
+	LifecycleGetInstalledCCPackage(packageID string, options ...resmgmt.RequestOption) ([]byte, error)
 	LifecycleQueryApprovedCC(channelID string, req resmgmt.LifecycleQueryApprovedCCRequest,
 		options ...resmgmt.RequestOption) (resmgmt.LifecycleApprovedChaincodeDefinition, error)
 	LifecycleCheckCCCommitReadiness(channelID string, req resmgmt.LifecycleCheckCCCommitReadinessRequest,
