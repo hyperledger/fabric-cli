@@ -91,6 +91,8 @@ type ResourceManagement interface {
 		options ...resmgmt.RequestOption) (resmgmt.LifecycleApprovedChaincodeDefinition, error)
 	LifecycleCheckCCCommitReadiness(channelID string, req resmgmt.LifecycleCheckCCCommitReadinessRequest,
 		options ...resmgmt.RequestOption) (resmgmt.LifecycleCheckCCCommitReadinessResponse, error)
+	LifecycleQueryCommittedCC(channelID string, req resmgmt.LifecycleQueryCommittedCCRequest,
+		options ...resmgmt.RequestOption) ([]resmgmt.LifecycleChaincodeDefinition, error)
 }
 
 // MSP defines the methods implemented by SDK msp client
