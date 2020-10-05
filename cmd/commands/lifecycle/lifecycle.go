@@ -37,6 +37,7 @@ func NewCommand(settings *environment.Settings) *cobra.Command {
 		NewApproveCommand(settings),
 		NewCommitCommand(settings),
 		NewQueryInstalledCommand(settings),
+		NewGetInstalledPkgCommand(settings),
 		NewQueryApprovedCommand(settings),
 		NewCheckCommitReadinessCommand(settings),
 		NewQueryCommittedCommand(settings),
