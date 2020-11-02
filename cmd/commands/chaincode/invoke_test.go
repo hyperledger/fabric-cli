@@ -116,6 +116,17 @@ var _ = Describe("ChaincodeInvokeImplementation", func() {
 				Expect(err).To(BeNil())
 			})
 		})
+
+		Context("when --is-init is set", func() {
+			BeforeEach(func() {
+				impl.ChaincodeName = "mycc"
+				impl.IsInit = true
+			})
+
+			It("should succeed with chaincode name is set", func() {
+				Expect(err).To(BeNil())
+			})
+		})
 	})
 
 	Describe("Run", func() {
