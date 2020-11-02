@@ -24,7 +24,7 @@ func NewQueryApprovedCommand(settings *environment.Settings) *cobra.Command {
 	c.Settings = settings
 
 	cmd := &cobra.Command{
-		Use:   "queryapproved <chaincode-name> <sequence>",
+		Use:   "queryapproved <chaincode-name>",
 		Short: "Query for approved chaincodes",
 		Args:  c.ParseArgs(),
 		PreRunE: func(_ *cobra.Command, _ []string) error {
@@ -43,6 +43,7 @@ func NewQueryApprovedCommand(settings *environment.Settings) *cobra.Command {
 	c.AddArg(&c.Sequence)
 
 	flags := cmd.Flags()
+	flags.StringVar(&c.Sequence, "sequence", "", "sets the sequence number (if not specified then the latest sequence is used)")
 	flags.StringVar(&c.OutputFormat, "output", "", outputFormatUsage)
 
 	cmd.SetOutput(c.Settings.Streams.Out)
@@ -65,9 +66,11 @@ func (c *QueryApprovedCommand) Validate() error {
 		return errors.New("chaincode name not specified")
 	}
 
-	_, err := strconv.ParseInt(c.Sequence, 10, 64)
-	if err != nil {
-		return errors.WithMessage(err, "invalid sequence")
+	if c.Sequence != "" {
+		_, err := strconv.ParseInt(c.Sequence, 10, 64)
+		if err != nil {
+			return errors.WithMessage(err, "invalid sequence")
+		}
 	}
 
 	return nil
@@ -80,9 +83,12 @@ func (c *QueryApprovedCommand) Run() error {
 		return err
 	}
 
-	sequence, err := strconv.ParseInt(c.Sequence, 10, 64)
-	if err != nil {
-		return errors.WithMessage(err, "invalid sequence")
+	var sequence int64
+	if c.Sequence != "" {
+		sequence, err = strconv.ParseInt(c.Sequence, 10, 64)
+		if err != nil {
+			return errors.WithMessage(err, "invalid sequence")
+		}
 	}
 
 	approvedChaincode, err := c.ResourceManagement.LifecycleQueryApprovedCC(

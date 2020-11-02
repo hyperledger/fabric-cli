@@ -119,12 +119,13 @@ var _ = Describe("LifecycleChaincodeQueryApprovedImplementation", func() {
 			})
 		})
 
-		Context("when sequence is not set", func() {
+		Context("when invalid sequence is set", func() {
 			BeforeEach(func() {
 				impl.ChaincodeName = "cc1"
+				impl.Sequence = "xxx"
 			})
 
-			It("should fail without sequence", func() {
+			It("should fail with invalid sequence", func() {
 				Expect(err).NotTo(BeNil())
 				Expect(err.Error()).To(ContainSubstring("invalid sequence"))
 			})
