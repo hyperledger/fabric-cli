@@ -27,7 +27,7 @@ The Hyperledger Fabric CLI is a tool used to interact with [Fabric networks](htt
 
 ## Network
 
-A network is a direct reference to a [Fabric-SDK-Go configuration](https://github.com/hyperledger/fabric-sdk-go/blob/master/pkg/core/config/testdata/config_test.yaml).  This configuration contains all of the necessary details for interacting with a Fabric network at a global scope.
+A network is a direct reference to a [Fabric-SDK-Go configuration](https://github.com/hyperledger/fabric-sdk-go/blob/main/pkg/core/config/testdata/config_test.yaml).  This configuration contains all of the necessary details for interacting with a Fabric network at a global scope.
 
 ## Context
 
