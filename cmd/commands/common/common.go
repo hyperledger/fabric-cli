@@ -61,6 +61,9 @@ func GetCollectionsConfigFromBytes(bytes []byte) ([]*pb.CollectionConfig, error)
 					MemberOrgsPolicy:  cpc,
 					RequiredPeerCount: cconfitem.RequiredCount,
 					MaximumPeerCount:  cconfitem.MaxPeerCount,
+					MemberOnlyRead:    cconfitem.MemberOnlyRead,
+					MemberOnlyWrite:   cconfitem.MemberOnlyWrite,
+					BlockToLive:       cconfitem.BlockToLive,
 				},
 			},
 		}
