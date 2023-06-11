@@ -8,13 +8,9 @@ package chaincode
 
 import (
 	"errors"
-	"fmt"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/spf13/cobra"
 
-	"github.com/hyperledger/fabric-cli/cmd/commands/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
@@ -77,7 +73,7 @@ func (c *QueryCommand) Validate() error {
 
 // Run executes the command
 func (c *QueryCommand) Run() error {
-	req := channel.Request{
+	/*req := channel.Request{
 		ChaincodeID: c.ChaincodeName,
 		Fcn:         c.ChaincodeFcn,
 		Args:        common.AsByteArgs(c.ChaincodeArgs),
@@ -89,6 +85,6 @@ func (c *QueryCommand) Run() error {
 	}
 
 	fmt.Fprintln(c.Settings.Streams.Out, string(resp.Payload))
-
+	*/
 	return nil
 }

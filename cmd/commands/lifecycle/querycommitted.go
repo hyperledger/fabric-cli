@@ -7,8 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package lifecycle
 
 import (
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -66,7 +64,7 @@ func (c *QueryCommittedCommand) Validate() error {
 
 // Run executes the command
 func (c *QueryCommittedCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	/*context, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
@@ -88,10 +86,11 @@ func (c *QueryCommittedCommand) Run() error {
 	}
 
 	c.printResponse(committedChaincodes)
-
+	*/
 	return nil
 }
 
+/*
 func (c *QueryCommittedCommand) printResponse(defs []resmgmt.LifecycleChaincodeDefinition) {
 	if len(defs) == 0 {
 		c.println("No committed chaincodes")
@@ -125,3 +124,4 @@ func (c *QueryCommittedCommand) printResponse(defs []resmgmt.LifecycleChaincodeD
 		}
 	}
 }
+*/

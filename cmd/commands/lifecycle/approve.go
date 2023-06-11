@@ -10,12 +10,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/hyperledger/fabric-cli/cmd/commands/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
@@ -111,12 +108,13 @@ func (c *ApproveCommand) Validate() error {
 
 // Run executes the command
 func (c *ApproveCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	//context
+	_, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
 
-	signaturePolicy, err := common.GetChaincodePolicy(c.SignaturePolicy)
+	/*signaturePolicy, err := common.GetChaincodePolicy(c.SignaturePolicy)
 	if err != nil {
 		return err
 	}
@@ -124,21 +122,22 @@ func (c *ApproveCommand) Run() error {
 	collectionsConfig, err := common.GetCollectionConfigFromFile(c.CollectionsConfig)
 	if err != nil {
 		return err
-	}
+	}*/
 
-	sequence, err := strconv.ParseInt(c.Sequence, 10, 64)
+	//sequence
+	_, err = strconv.ParseInt(c.Sequence, 10, 64)
 	if err != nil {
 		return errors.WithMessage(err, "invalid sequence")
 	}
 
-	req := resmgmt.LifecycleApproveCCRequest{
+	/*req := resmgmt.LifecycleApproveCCRequest{
 		Name:                c.Name,
 		Version:             c.Version,
 		PackageID:           c.PackageID,
 		Sequence:            sequence,
-		SignaturePolicy:     signaturePolicy,
+		SignaturePolicy:     nil,
 		ChannelConfigPolicy: c.ChannelConfigPolicy,
-		CollectionConfig:    collectionsConfig,
+		CollectionConfig:    nil,
 		InitRequired:        c.InitRequired,
 		EndorsementPlugin:   c.EndorsementPlugin,
 		ValidationPlugin:    c.ValidationPlugin,
@@ -151,7 +150,7 @@ func (c *ApproveCommand) Run() error {
 
 	if _, err := c.ResourceManagement.LifecycleApproveCC(context.Channel, req, options...); err != nil {
 		return err
-	}
+	}*/
 
 	fmt.Fprintf(c.Settings.Streams.Out, "successfully approved chaincode '%s'\n", c.Name)
 

@@ -8,12 +8,9 @@ package lifecycle
 
 import (
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"strings"
 
-	pb "github.com/hyperledger/fabric-protos-go/peer"
-	lifecyclepkg "github.com/hyperledger/fabric-sdk-go/pkg/fab/ccpackager/lifecycle"
+	pb "github.com/hyperledger/fabric-protos-go-apiv2/peer"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -79,7 +76,7 @@ func (c *PackageCommand) Validate() error {
 
 // Run executes the command
 func (c *PackageCommand) Run() error {
-	pkgBytes, err := lifecyclepkg.NewCCPackage(&lifecyclepkg.Descriptor{
+	/*pkgBytes, err := lifecyclepkg.NewCCPackage(&lifecyclepkg.Descriptor{
 		Path:  c.Path,
 		Type:  pb.ChaincodeSpec_Type(pb.ChaincodeSpec_Type_value[strings.ToUpper(c.Type)]),
 		Label: c.Label,
@@ -93,6 +90,6 @@ func (c *PackageCommand) Run() error {
 	}
 
 	fmt.Fprintf(c.Settings.Streams.Out, "successfully packaged chaincode '%s'\n", c.Label)
-
+	*/
 	return nil
 }

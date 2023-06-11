@@ -11,10 +11,6 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/resource"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -84,17 +80,19 @@ func (c *InstallCommand) Validate() error {
 
 // Run executes the command
 func (c *InstallCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	// context
+	_, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
 
-	pkg, err := ioutil.ReadFile(c.ChaincodePath)
+	//pkg
+	_, err = ioutil.ReadFile(c.ChaincodePath)
 	if err != nil {
 		return err
 	}
 
-	req := resmgmt.InstallCCRequest{
+	/*req := resmgmt.InstallCCRequest{
 		Name:    c.ChaincodeName,
 		Path:    c.ChaincodePath,
 		Version: c.ChaincodeVersion,
@@ -111,7 +109,7 @@ func (c *InstallCommand) Run() error {
 
 	if _, err := c.ResourceManagement.InstallCC(req, options...); err != nil {
 		return err
-	}
+	}*/
 
 	fmt.Fprintf(c.Settings.Streams.Out, "successfully installed chaincode '%s'\n", c.ChaincodeName)
 

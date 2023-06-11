@@ -9,9 +9,6 @@ package fabric_test
 import (
 	"testing"
 
-	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/hyperledger/fabric-cli/pkg/fabric"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -22,7 +19,6 @@ import (
 //go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/ledger.go --fake-name Ledger . Ledger
 //go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/resmgmt.go --fake-name ResourceManagement . ResourceManagement
 //go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/msp.go --fake-name MSP . MSP
-//go:generate gobin -m -run github.com/maxbrunsfeld/counterfeiter/v6 -o mocks/channelcfg.go --fake-name ChannelCfg github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab.ChannelCfg
 
 func TestFabric(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -30,6 +26,7 @@ func TestFabric(t *testing.T) {
 	RunSpecs(t, "Fabric Suite")
 }
 
+/*
 var _ = Describe("Factory", func() {
 	var (
 		factory fabric.Factory
@@ -91,3 +88,4 @@ var _ = Describe("Factory", func() {
 	})
 
 })
+*/

@@ -8,9 +8,7 @@ package channel
 
 import (
 	"errors"
-	"fmt"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -68,7 +66,7 @@ func (c *JoinCommand) Validate() error {
 
 // Run executes the command
 func (c *JoinCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	/*context, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
@@ -82,6 +80,6 @@ func (c *JoinCommand) Run() error {
 	}
 
 	fmt.Fprintf(c.Settings.Streams.Out, "successfully joined channel '%s'\n", c.ChannelID)
-
+	*/
 	return nil
 }

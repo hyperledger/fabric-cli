@@ -12,8 +12,6 @@ import (
 	"fmt"
 
 	"github.com/hyperledger/fabric-cli/cmd/commands/common"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -92,27 +90,31 @@ func (c *InstantiateCommand) Validate() error {
 
 // Run executes the command
 func (c *InstantiateCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	//context
+	_, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
 
-	args, err := json.Marshal(c.ChaincodeArgs)
+	//args
+	_, err = json.Marshal(c.ChaincodeArgs)
 	if err != nil {
 		return err
 	}
 
-	policy, err := common.GetChaincodePolicy(c.ChaincodePolicy)
+	//policy
+	_, err = common.GetChaincodePolicy(c.ChaincodePolicy)
 	if err != nil {
 		return err
 	}
 
-	collectionsConfig, err := common.GetCollectionConfigFromFile(c.ChaincodeCollectionsConfig)
+	//collectionsConfig
+	_, err = common.GetCollectionConfigFromFile(c.ChaincodeCollectionsConfig)
 	if err != nil {
 		return err
 	}
 
-	req := resmgmt.InstantiateCCRequest{
+	/*req := resmgmt.InstantiateCCRequest{
 		Name:       c.ChaincodeName,
 		Path:       c.ChaincodePath,
 		Version:    c.ChaincodeVersion,
@@ -128,7 +130,7 @@ func (c *InstantiateCommand) Run() error {
 
 	if _, err := c.ResourceManagement.InstantiateCC(context.Channel, req, options...); err != nil {
 		return err
-	}
+	}*/
 
 	fmt.Fprintf(c.Settings.Streams.Out, "successfully instantiated chaincode '%s'\n", c.ChaincodeName)
 

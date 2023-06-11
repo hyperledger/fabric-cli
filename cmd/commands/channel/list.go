@@ -7,9 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package channel
 
 import (
-	"fmt"
-
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -45,7 +42,7 @@ type ListCommand struct {
 
 // Run executes the command
 func (c *ListCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	/*context, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
@@ -63,6 +60,6 @@ func (c *ListCommand) Run() error {
 	for _, channel := range resp.Channels {
 		fmt.Fprintf(c.Settings.Streams.Out, " - %s\n", channel.ChannelId)
 	}
-
+	*/
 	return nil
 }

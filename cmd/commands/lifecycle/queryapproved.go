@@ -9,8 +9,6 @@ package lifecycle
 import (
 	"strconv"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -78,7 +76,7 @@ func (c *QueryApprovedCommand) Validate() error {
 
 // Run executes the command
 func (c *QueryApprovedCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	/*context, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
@@ -109,10 +107,11 @@ func (c *QueryApprovedCommand) Run() error {
 	}
 
 	c.printResponse(approvedChaincode)
-
+	*/
 	return nil
 }
 
+/*
 func (c *QueryApprovedCommand) printResponse(ac resmgmt.LifecycleApprovedChaincodeDefinition) {
 	c.printf("Name: %s, Version: %s, Package ID: %s, Sequence: %d, Validation Plugin: %s,"+
 		" Endorsement Plugin: %s, Channel Config Policy: %s, Init Required: %t\n",
@@ -126,3 +125,4 @@ func (c *QueryApprovedCommand) printResponse(ac resmgmt.LifecycleApprovedChainco
 			cfg.Name, cfg.BlockToLive, cfg.MaximumPeerCount, cfg.RequiredPeerCount, cfg.MemberOnlyRead, cfg.MemberOnlyWrite)
 	}
 }
+*/

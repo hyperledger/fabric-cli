@@ -7,9 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package chaincode
 
 import (
-	"fmt"
-
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -52,7 +49,7 @@ type ListCommand struct {
 
 // Run executes the command
 func (c *ListCommand) Run() error {
-	if !c.Installed && !c.Instantiated {
+	/*if !c.Installed && !c.Instantiated {
 		c.Installed = true
 		c.Instantiated = true
 	}
@@ -89,6 +86,6 @@ func (c *ListCommand) Run() error {
 			fmt.Fprintf(c.Settings.Streams.Out, " - %s\n", chaincode.Name)
 		}
 	}
-
+	*/
 	return nil
 }

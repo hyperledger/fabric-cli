@@ -47,13 +47,13 @@ type BaseCommand struct {
 func (c *BaseCommand) Complete() error {
 	var err error
 
-	if c.Factory == nil {
+	/*if c.Factory == nil {
 		c.Factory, err = fabric.NewFactory(c.Settings.Config)
 		if err != nil {
 			return err
 		}
 	}
-
+	*/
 	c.ResourceManagement, err = c.Factory.ResourceManagement()
 	if err != nil {
 		return err

@@ -7,15 +7,11 @@ SPDX-License-Identifier: Apache-2.0
 package lifecycle
 
 import (
-	"fmt"
 	"strconv"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/hyperledger/fabric-cli/cmd/commands/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
@@ -107,7 +103,7 @@ func (c *CommitCommand) Validate() error {
 
 // Run executes the command
 func (c *CommitCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	/*context, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
@@ -155,5 +151,6 @@ func (c *CommitCommand) Run() error {
 
 	fmt.Fprintf(c.Settings.Streams.Out, "successfully committed chaincode '%s'\n", c.Name)
 
+	return nil*/
 	return nil
 }

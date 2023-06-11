@@ -9,9 +9,6 @@ package lifecycle
 import (
 	"strconv"
 
-	"github.com/hyperledger/fabric-cli/cmd/commands/common"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -102,7 +99,7 @@ func (c *CheckCommitReadinessCommand) Validate() error {
 
 // Run executes the command
 func (c *CheckCommitReadinessCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	/*context, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
@@ -122,7 +119,7 @@ func (c *CheckCommitReadinessCommand) Run() error {
 		return errors.WithMessage(err, "invalid sequence")
 	}
 
-	resp, err := c.ResourceManagement.LifecycleCheckCCCommitReadiness(
+	/*resp, err := c.ResourceManagement.LifecycleCheckCCCommitReadiness(
 		context.Channel,
 		resmgmt.LifecycleCheckCCCommitReadinessRequest{
 			Name:                c.Name,
@@ -146,11 +143,12 @@ func (c *CheckCommitReadinessCommand) Run() error {
 		return c.printJSONResponse(resp)
 	}
 
-	c.printResponse(resp)
+	c.printResponse(resp)*/
 
 	return nil
 }
 
+/*
 func (c *CheckCommitReadinessCommand) printResponse(crr resmgmt.LifecycleCheckCCCommitReadinessResponse) {
 	var approvingOrgs []string
 	var nonApprovingOrgs []string
@@ -166,3 +164,4 @@ func (c *CheckCommitReadinessCommand) printResponse(crr resmgmt.LifecycleCheckCC
 	c.printf("Approving orgs: %s\n", approvingOrgs)
 	c.printf("Non-approving orgs: %s\n", nonApprovingOrgs)
 }
+*/

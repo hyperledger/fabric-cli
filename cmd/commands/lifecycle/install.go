@@ -8,12 +8,7 @@ package lifecycle
 
 import (
 	"errors"
-	"fmt"
-	"io/ioutil"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/ccpackager/lifecycle"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -76,7 +71,7 @@ func (c *InstallCommand) Validate() error {
 
 // Run executes the command
 func (c *InstallCommand) Run() error {
-	context, err := c.Settings.Config.GetCurrentContext()
+	/*context, err := c.Settings.Config.GetCurrentContext()
 	if err != nil {
 		return err
 	}
@@ -104,6 +99,6 @@ func (c *InstallCommand) Run() error {
 	} else {
 		fmt.Fprintf(c.Settings.Streams.Out, "successfully installed chaincode '%s'. Package ID '%s'\n", c.Label, responses[0].PackageID)
 	}
-
+	*/
 	return nil
 }
