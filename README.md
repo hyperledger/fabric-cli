@@ -10,6 +10,8 @@ This is NOT the "official" Fabric CLI and there is not yet any commitment that i
 
 The Hyperledger Fabric CLI is a tool used to interact with [Fabric networks](https://hyperledger-fabric.readthedocs.io/en/latest/).  
 
+[Test GitHub Actions -  DO NOT MERGE]
+
 ## Installation
 
 1. Clone this repo
@@ -58,7 +60,7 @@ For example,if you want to integrate `cryptogen` into `fabric` cmd:
     description: Utility for generating Hyperledger Fabric key material
     command: cryptogen
     ```
-2. Exec the command: 
+2. Exec the command:
     ```shell script
     #PATH is the location of `plugin.yaml`.
     $fabric plugin install $PATH
@@ -67,7 +69,7 @@ For example,if you want to integrate `cryptogen` into `fabric` cmd:
     ```
    $fabric cryptogen ...
    ```
-You can integrate some **Go Plugins** or **External Command** into **fabric** cmd, 
+You can integrate some **Go Plugins** or **External Command** into **fabric** cmd,
 
 ## Documentation
 * [Design Document](https://docs.google.com/document/d/1zIQrS4TRgQEx1z9-wwtO8tYOGRyWdUoTdfk49GFx1wY/edit?usp=sharing)
