@@ -8,7 +8,6 @@ package chaincode
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/spf13/cobra"
 
@@ -67,7 +66,7 @@ func (c *EventsCommand) Validate() error {
 
 // Run executes the command
 func (c *EventsCommand) Run() error {
-	registration, eventCh, err := c.Channel.RegisterChaincodeEvent(c.ChaincodeName, "")
+	/*registration, eventCh, err := c.Channel.RegisterChaincodeEvent(c.ChaincodeName, "")
 	if err != nil {
 		return err
 	}
@@ -76,7 +75,7 @@ func (c *EventsCommand) Run() error {
 
 	for event := range eventCh {
 		fmt.Fprintln(c.Settings.Streams.Out, string(event.Payload))
-	}
+	}*/
 
 	return nil
 }

@@ -7,8 +7,12 @@ SPDX-License-Identifier: Apache-2.0
 package channel
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/spf13/cobra"
 
+	"github.com/hyperledger/fabric-admin-sdk/pkg/channel"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
@@ -16,15 +20,13 @@ import (
 func NewChannelListCommand(settings *environment.Settings) *cobra.Command {
 	c := ListCommand{}
 
-	c.Settings = settings
-
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List all joined channels",
 		Long:  "List all joined channels, peer is the current context's peer",
-		PreRunE: func(_ *cobra.Command, _ []string) error {
+		/*PreRunE: func(_ *cobra.Command, _ []string) error {
 			return c.Complete()
-		},
+		},*/
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return c.Run()
 		},
@@ -42,24 +44,16 @@ type ListCommand struct {
 
 // Run executes the command
 func (c *ListCommand) Run() error {
-	/*context, err := c.Settings.Config.GetCurrentContext()
-	if err != nil {
-		return err
-	}
-
-	options := []resmgmt.RequestOption{
-		resmgmt.WithTargetEndpoints(context.Peers...),
-	}
-
-	resp, err := c.ResourceManagement.QueryChannels(options...)
+	context := context.Background()
+	peerChannelInfo, err := channel.ListChannelOnPeer(context, c.Connection, c.OrgMSP)
 	if err != nil {
 		return err
 	}
 
 	fmt.Fprintln(c.Settings.Streams.Out, "Channels Joined:")
-	for _, channel := range resp.Channels {
+	for _, channel := range peerChannelInfo {
 		fmt.Fprintf(c.Settings.Streams.Out, " - %s\n", channel.ChannelId)
 	}
-	*/
+
 	return nil
 }

@@ -8,7 +8,6 @@ package channel
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/spf13/cobra"
 
@@ -67,7 +66,7 @@ func (c *ConfigCommand) Validate() error {
 
 // Run executes the command
 func (c *ConfigCommand) Run() error {
-	resp, err := c.ResourceManagement.QueryConfigFromOrderer(c.ChannelID)
+	/*resp, err := c.ResourceManagement.QueryConfigFromOrderer(c.ChannelID)
 	if err != nil {
 		return err
 	}
@@ -87,7 +86,7 @@ func (c *ConfigCommand) Run() error {
 		for _, anchor := range resp.AnchorPeers() {
 			fmt.Fprintf(c.Settings.Streams.Out, " - %s:%d (%s)\n", anchor.Host, anchor.Port, anchor.Org)
 		}
-	}
+	}*/
 
 	return nil
 }
