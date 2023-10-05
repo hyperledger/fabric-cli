@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"

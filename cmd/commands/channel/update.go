@@ -8,10 +8,7 @@ package channel
 
 import (
 	"errors"
-	"fmt"
-	"os"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	"github.com/spf13/cobra"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
@@ -71,7 +68,7 @@ func (c *UpdateCommand) Validate() error {
 
 // Run executes the command
 func (c *UpdateCommand) Run() error {
-	r, err := os.Open(c.ChannelTX)
+	/*r, err := os.Open(c.ChannelTX)
 	if err != nil {
 		return err
 	}
@@ -86,6 +83,6 @@ func (c *UpdateCommand) Run() error {
 	}
 
 	fmt.Fprintf(c.Settings.Streams.Out, "successfully updated channel '%s'\n", c.ChannelID)
-
+	*/
 	return nil
 }

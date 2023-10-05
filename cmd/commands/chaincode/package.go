@@ -2,11 +2,8 @@ package chaincode
 
 import (
 	"errors"
-	"fmt"
-	"io/ioutil"
 
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/ccpackager/gopackager"
 	"github.com/spf13/cobra"
 )
 
@@ -60,7 +57,7 @@ func (c *PackageCommand) Validate() error {
 
 // Run executes the command
 func (c *PackageCommand) Run() error {
-	pkg, err := gopackager.NewCCPackage(c.ChaincodePath, "")
+	/*pkg, err := gopackager.NewCCPackage(c.ChaincodePath, "")
 	if err != nil {
 		return err
 	}
@@ -70,6 +67,6 @@ func (c *PackageCommand) Run() error {
 	}
 
 	fmt.Fprintf(c.Settings.Streams.Out, "successfully packaged chaincode '%s'\n", c.ChaincodeName)
-
+	*/
 	return nil
 }

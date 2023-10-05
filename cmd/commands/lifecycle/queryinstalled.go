@@ -7,8 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package lifecycle
 
 import (
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -66,7 +64,7 @@ func (c *QueryInstalledCommand) Validate() error {
 
 // Run executes the command
 func (c *QueryInstalledCommand) Run() error {
-	installedChaincodes, err := c.ResourceManagement.LifecycleQueryInstalledCC(
+	/*installedChaincodes, err := c.ResourceManagement.LifecycleQueryInstalledCC(
 		resmgmt.WithRetry(retry.DefaultResMgmtOpts),
 		resmgmt.WithTargetEndpoints(c.Peer),
 	)
@@ -79,10 +77,11 @@ func (c *QueryInstalledCommand) Run() error {
 	}
 
 	c.printResponse(installedChaincodes)
-
+	*/
 	return nil
 }
 
+/*
 func (c *QueryInstalledCommand) printResponse(installedChaincodes []resmgmt.LifecycleInstalledCC) {
 	if len(installedChaincodes) == 0 {
 		c.printf("No installed chaincodes on peer %s", c.Peer)
@@ -107,4 +106,4 @@ func (c *QueryInstalledCommand) printReferences(refs map[string][]resmgmt.CCRefe
 			c.printf("--- Name: %s, Version: %s\n", ref.Name, ref.Version)
 		}
 	}
-}
+}*/

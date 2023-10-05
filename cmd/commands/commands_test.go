@@ -13,7 +13,7 @@ import (
 
 	"github.com/hyperledger/fabric-cli/cmd/commands"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

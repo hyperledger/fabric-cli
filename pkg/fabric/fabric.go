@@ -7,16 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package fabric
 
 import (
-	"os"
-
 	"github.com/hyperledger/fabric-cli/pkg/environment"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/event"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
 type factory struct {
@@ -25,7 +16,7 @@ type factory struct {
 }
 
 // interface implementation check
-var _ Factory = &factory{}
+/*var _ Factory = &factory{}
 
 // NewFactory creates a factory for the given profile/context
 func NewFactory(config *environment.Config) (Factory, error) {
@@ -45,6 +36,7 @@ func NewFactory(config *environment.Config) (Factory, error) {
 	}, nil
 }
 
+/*
 func (f *factory) SDK() (SDK, error) {
 	sdk, err := fabsdk.New(config.FromFile(os.ExpandEnv(f.config)))
 	if err != nil {
@@ -147,3 +139,4 @@ func (f *factory) MSP() (MSP, error) {
 
 	return client, nil
 }
+*/

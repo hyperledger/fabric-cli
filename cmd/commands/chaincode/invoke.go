@@ -8,13 +8,9 @@ package chaincode
 
 import (
 	"errors"
-	"fmt"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/spf13/cobra"
 
-	"github.com/hyperledger/fabric-cli/cmd/commands/common"
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 )
 
@@ -79,7 +75,7 @@ func (c *InvokeCommand) Validate() error {
 
 // Run executes the command
 func (c *InvokeCommand) Run() error {
-	fcn := c.ChaincodeFcn
+	/*fcn := c.ChaincodeFcn
 	if c.IsInit {
 		fcn = "Init"
 	}
@@ -97,6 +93,6 @@ func (c *InvokeCommand) Run() error {
 	}
 
 	fmt.Fprintln(c.Settings.Streams.Out, string(resp.Payload))
-
+	*/
 	return nil
 }

@@ -16,7 +16,7 @@ import (
 	"github.com/hyperledger/fabric-cli/pkg/environment"
 	"github.com/hyperledger/fabric-cli/pkg/plugin"
 	"github.com/hyperledger/fabric-cli/pkg/plugin/mocks"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
 )

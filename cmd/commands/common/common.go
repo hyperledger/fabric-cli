@@ -5,10 +5,8 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/hyperledger/fabric-protos-go/common"
-	pb "github.com/hyperledger/fabric-protos-go/peer"
-
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/common/policydsl"
+	"github.com/hyperledger/fabric-protos-go-apiv2/common"
+	pb "github.com/hyperledger/fabric-protos-go-apiv2/peer"
 )
 
 // CollectionConfigJSON contains the parameters for a collection configuration
@@ -45,13 +43,13 @@ func GetCollectionsConfigFromBytes(bytes []byte) ([]*pb.CollectionConfig, error)
 
 	ccarray := make([]*pb.CollectionConfig, 0, len(cconf))
 	for _, cconfitem := range cconf {
-		p, err := policydsl.FromString(cconfitem.Policy)
-		if err != nil {
-			return nil, err
-		}
+		//p, err := policydsl.FromString(cconfitem.Policy)
+		//if err != nil {
+		//	return nil, err
+		//}
 		cpc := &pb.CollectionPolicyConfig{
 			Payload: &pb.CollectionPolicyConfig_SignaturePolicy{
-				SignaturePolicy: p,
+				//SignaturePolicy: p,
 			},
 		}
 		cc := &pb.CollectionConfig{
@@ -74,7 +72,7 @@ func GetCollectionsConfigFromBytes(bytes []byte) ([]*pb.CollectionConfig, error)
 
 // GetChaincodePolicy returns the signature policy from the given policy string
 func GetChaincodePolicy(policyString string) (*common.SignaturePolicyEnvelope, error) {
-	if len(policyString) == 0 {
+	/*if len(policyString) == 0 {
 		return policydsl.AcceptAllPolicy, nil
 	}
 
@@ -82,7 +80,8 @@ func GetChaincodePolicy(policyString string) (*common.SignaturePolicyEnvelope, e
 	if err != nil {
 		return nil, errors.New("error parsing chaincode policy")
 	}
-	return policy, nil
+	return policy, nil*/
+	return nil, nil
 }
 
 // AsByteArgs converts the given string array into an array of byte arrays so that they

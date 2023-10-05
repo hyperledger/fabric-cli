@@ -9,10 +9,7 @@ package lifecycle
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -81,7 +78,7 @@ func (c *GetInstalledPkgCommand) Validate() error {
 
 // Run executes the command
 func (c *GetInstalledPkgCommand) Run() error {
-	pkgBytes, err := c.ResourceManagement.LifecycleGetInstalledCCPackage(
+	/*pkgBytes, err := c.ResourceManagement.LifecycleGetInstalledCCPackage(
 		c.PackageID,
 		resmgmt.WithRetry(retry.DefaultResMgmtOpts),
 		resmgmt.WithTargetEndpoints(c.Peer),
@@ -101,6 +98,6 @@ func (c *GetInstalledPkgCommand) Run() error {
 	}
 
 	c.printf("Chaincode package saved to %s\n", filePath)
-
+	*/
 	return nil
 }
