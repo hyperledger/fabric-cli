@@ -4,6 +4,7 @@ Maintainers
 fabric-cli uses a non-author code review policy, requiring a single approval from a non-author maintainer.
 
 **Active maintainers**
+
 | Name | GitHub | Chat | email |
 |------|--------|------|-------|
 | Arnaud Le Hors | [lehors](https://github.com/lehors) | lehors | <lehors@us.ibm.com> |
