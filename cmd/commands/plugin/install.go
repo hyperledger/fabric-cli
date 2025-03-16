@@ -9,6 +9,9 @@ package plugin
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -59,6 +62,36 @@ type InstallCommand struct {
 func (c *InstallCommand) Validate() error {
 	if len(c.Path) == 0 {
 		return errors.New("plugin path not specified")
+	}
+
+	// Validate the path to prevent path traversal
+	if strings.Contains(c.Path, "..") {
+		return errors.New("path contains potentially unsafe '..' sequence")
+	}
+
+	// Check if path exists
+	absPath, err := filepath.Abs(c.Path)
+	if err != nil {
+		return fmt.Errorf("invalid path: %v", err)
+	}
+
+	fileInfo, err := os.Stat(absPath)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("plugin path does not exist: %s", absPath)
+	}
+	if err != nil {
+		return fmt.Errorf("error accessing plugin path: %v", err)
+	}
+
+	// Ensure it's a directory
+	if !fileInfo.IsDir() {
+		return errors.New("plugin path must be a directory")
+	}
+
+	// Check for plugin.yaml file
+	pluginYamlPath := filepath.Join(absPath, plugin.DefaultFilename)
+	if _, err := os.Stat(pluginYamlPath); os.IsNotExist(err) {
+		return fmt.Errorf("plugin.yaml not found in %s", absPath)
 	}
 
 	return nil

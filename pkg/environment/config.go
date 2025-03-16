@@ -9,8 +9,11 @@ package environment
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 	"text/tabwriter"
 	"text/template"
 
@@ -92,6 +95,11 @@ func (c *Config) AddFlags(fs *pflag.FlagSet) {
 
 // LoadFromFile populates config based on the specified path
 func (c *Config) LoadFromFile(path string) error {
+	// Validate the path to prevent path traversal
+	if err := validateConfigPath(path); err != nil {
+		return err
+	}
+
 	if _, err := os.Stat(path); err != nil {
 		return err
 	}
@@ -101,7 +109,13 @@ func (c *Config) LoadFromFile(path string) error {
 		return err
 	}
 
+	// Use safe YAML unmarshaling
 	if err := yaml.Unmarshal(data, &c); err != nil {
+		return err
+	}
+
+	// Validate config after loading
+	if err := c.validate(); err != nil {
 		return err
 	}
 
@@ -110,12 +124,38 @@ func (c *Config) LoadFromFile(path string) error {
 
 // Save writes the current config value to the specified path
 func (c *Config) Save(path string) error {
+	// Validate the path to prevent path traversal
+	if err := validateConfigPath(path); err != nil {
+		return err
+	}
+
+	// Validate config before saving
+	if err := c.validate(); err != nil {
+		return err
+	}
+
+	// Create directory if it doesn't exist
+	dir := filepath.Dir(path)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if err := os.MkdirAll(dir, 0700); err != nil {
+			return err
+		}
+	}
+
 	data, err := yaml.Marshal(c)
 	if err != nil {
 		return err
 	}
 
-	if err := ioutil.WriteFile(path, data, 0600); err != nil {
+	// Write to a temporary file first, then rename to ensure atomic write
+	tempFile := path + ".tmp"
+	if err := ioutil.WriteFile(tempFile, data, 0600); err != nil {
+		return err
+	}
+
+	if err := os.Rename(tempFile, path); err != nil {
+		// Clean up the temporary file if rename fails
+		os.Remove(tempFile)
 		return err
 	}
 
@@ -155,10 +195,84 @@ func (c *Config) GetCurrentContextNetwork() (*Network, error) {
 	return network, nil
 }
 
+// validate performs validation on the config
+func (c *Config) validate() error {
+	// Validate networks
+	for name, network := range c.Networks {
+		if network == nil {
+			return fmt.Errorf("network '%s' is nil", name)
+		}
+		
+		// Validate network name
+		if !isValidName(name) {
+			return fmt.Errorf("invalid network name: %s", name)
+		}
+		
+		// Validate config path
+		if network.ConfigPath != "" && !isValidFilePath(network.ConfigPath) {
+			return fmt.Errorf("invalid config path for network '%s': %s", name, network.ConfigPath)
+		}
+	}
+
+	// Validate contexts
+	for name, context := range c.Contexts {
+		if context == nil {
+			return fmt.Errorf("context '%s' is nil", name)
+		}
+		
+		// Validate context name
+		if !isValidName(name) {
+			return fmt.Errorf("invalid context name: %s", name)
+		}
+		
+		// Validate network reference
+		if context.Network != "" && !isValidName(context.Network) {
+			return fmt.Errorf("invalid network name in context '%s': %s", name, context.Network)
+		}
+	}
+
+	// Validate current context
+	if c.CurrentContext != "" && !isValidName(c.CurrentContext) {
+		return fmt.Errorf("invalid current context name: %s", c.CurrentContext)
+	}
+
+	return nil
+}
+
 // NewConfig returns a new config
 func NewConfig() *Config {
 	return &Config{
 		Networks: make(map[string]*Network),
 		Contexts: make(map[string]*Context),
 	}
+}
+
+// validateConfigPath validates the config file path
+func validateConfigPath(path string) error {
+	// Check for path traversal attempts
+	if strings.Contains(path, "..") {
+		return errors.New("path contains potentially unsafe '..' sequence")
+	}
+
+	// Ensure the path is absolute
+	if !filepath.IsAbs(path) {
+		return errors.New("config path must be absolute")
+	}
+
+	return nil
+}
+
+// isValidName checks if a name is valid
+func isValidName(name string) bool {
+	// Check for path traversal attempts or special characters
+	return !strings.Contains(name, "..") && 
+		!strings.Contains(name, "/") && 
+		!strings.Contains(name, "\\") &&
+		len(name) > 0
+}
+
+// isValidFilePath checks if a file path is valid
+func isValidFilePath(path string) bool {
+	// Check for path traversal attempts
+	return !strings.Contains(path, "..")
 }
